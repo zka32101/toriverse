@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper function to check if user is authenticated
+    function isAuthenticated() {
+      return request.auth.uid != null;
+    }
+
+    // Helper function to check if user is the document owner
+    function isOwner(uid) {
+      return request.auth.uid == uid;
+    }
+
+    // Users collection: only read/write own document
+    match /users/{uid} {
+      allow read: if isAuthenticated() && isOwner(uid);
+      allow write: if isAuthenticated() && isOwner(uid);
+      allow list: if false; // prevent listing all users
+    }
+
+    // Matches collection: players can read their matches
+    match /matches/{matchId} {
+      allow read: if isAuthenticated() && 
+                      request.auth.uid in resource.data.players;
+      allow create: if isAuthenticated(); // created by cloud functions
+      allow update: if false; // only server can update
+      allow delete: if false;
+    }
+
+    // Round results collection: write-restricted to backend
+    match /roundResults/{resultId} {
+      allow read: if isAuthenticated() &&
+                      (exists(/databases/{database}/documents/matches/$(resource.data.matchId)) &&
+                       request.auth.uid in get(/databases/{database}/documents/matches/$(resource.data.matchId)).data.players);
+      allow write: if false; // only cloud functions
+    }
+
+    // Rescue cards collection
+    match /rescueCards/{cardId} {
+      allow read: if isAuthenticated() && isOwner(resource.data.playerId);
+      allow write: if false; // only cloud functions
+    }
+
+    // Weak bonus collection
+    match /weakBonuses/{bonusId} {
+      allow read: if isAuthenticated() &&
+                      (exists(/databases/{database}/documents/matches/$(resource.data.matchId)) &&
+                       request.auth.uid in get(/databases/{database}/documents/matches/$(resource.data.matchId)).data.players);
+      allow write: if false; // only cloud functions
+    }
+
+    // Cosmetics collection: readable by all, managed by admin
+    match /cosmetics/{cosmeticId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
