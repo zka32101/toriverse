@@ -14,10 +14,6 @@ jobs:
   analyze:
     name: Analyze Code
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        flutter-version: ['3.4.x']
-        dart-version: ['3.2.x']
 
     steps:
       - uses: actions/checkout@v4
@@ -27,7 +23,6 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: ${{ matrix.flutter-version }}
           channel: stable
           cache: true
 
