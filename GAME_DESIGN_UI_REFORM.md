@@ -137,11 +137,13 @@ Phase2で実装済みのクラン・フォロー・レコメンド機能は、�
 
 ## 4. 実装ロードマップ（次スプリント以降）
 
-1. **デザイントークン拡張の実装**（本PRで着手 — `lib/config/theme.dart` 拡張）
-2. 同時公開・くじ引き演出の専用フルスクリーンウィジェット新規実装
-3. `rivalry_tracker.dart`（§2.2）のドメインサービス実装 + 対局画面への表示
-4. バランス検証シミュレーションハーネス（§2.4）
-5. リザルト画面の逆転演出強化 + クリップ導線統合
+1. ✅ **デザイントークン拡張の実装** — `lib/config/theme.dart` 拡張（マージ済み）
+2. ✅ **3色オセロ挟み判定バグの修正** — 当初のスコープ外だが、ロードマップ着手中に発見した致命的な既存バグ（赤石が捕獲不可能だった）を先行修正（マージ済み）
+3. ✅ **同時公開・くじ引き演出の専用フルスクリーンウィジェット** — `SimultaneousRevealWidget`（`lib/features/match/presentation/widgets/simultaneous_reveal_widget.dart`）として実装。`ProcessOrderRandomizer.generateAnimationSequence` の出力を `toReplayEvents()` で変換して消費する
+4. ✅ **`rivalry_tracker.dart`（§2.2）のドメインサービス実装** — `lib/features/match/domain/services/rivalry_tracker.dart`。盤面のbefore/after差分から攻撃内訳を算出し、直近ラウンドの対立スコア・二強連合判定を提供
+5. **対局画面への表示統合**（未着手） — `SimultaneousRevealWidget` と `RivalryTracker` を `match_screen.dart` のラウンド遷移フローに実際に組み込む。現在の `match_screen.dart` は簡易な即時着手フローのため、CLAUDE.md が定める非同期・同時提出制のラウンド同期ロジックとあわせて設計する必要がある
+6. バランス検証シミュレーションハーネス（§2.4）
+7. リザルト画面の逆転演出強化 + クリップ導線統合
 
 ---
 

@@ -235,5 +235,22 @@ void main() {
       expect(sequence.isNotEmpty, true);
       expect(sequence[0]['type'], 'lottery');
     });
+
+    test('toReplayEvents で ReplayEvent のリストに変換できる', () {
+      final sequence = ProcessOrderRandomizer.generateAnimationSequence(
+        processOrder: ['player_0', 'player_1'],
+        moveResults: {
+          'player_0': {'flips': [[3, 3]]},
+          'player_1': {'flips': []},
+        },
+      );
+
+      final events = ProcessOrderRandomizer.toReplayEvents(sequence);
+
+      expect(events.length, sequence.length);
+      expect(events.first.type, 'lottery');
+      expect(events.first.delayMs, 500);
+      expect(events.first.data['description'], 'くじ引き中...');
+    });
   });
 }
