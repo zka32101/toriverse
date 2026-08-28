@@ -72,6 +72,10 @@ class Board {
   }
 
   /// 指定方向で挟める石があるかチェック（内部用）
+  ///
+  /// 3色オセロでは「相手」は単一色ではないため、自分以外の色（黒・白・赤の
+  /// うち自分の色を除いた2色）が連続する区間を自分の色で挟めれば成立する。
+  /// 区間内で相手2色が混在していても（例: 白→赤→白）挟み対象になる。
   bool _hasFlippableInDirection(
     int startRow,
     int startCol,
@@ -82,10 +86,7 @@ class Board {
     int r = startRow + dr;
     int c = startCol + dc;
 
-    // 相手の色を判定
-    final opponent = _getOpponent(player);
-
-    // 最低1つの相手の石を通す必要がある
+    // 最低1つの相手の石（自分以外の色）を通す必要がある
     bool foundOpponent = false;
 
     while (r >= 0 && r < 8 && c >= 0 && c < 8) {
@@ -96,15 +97,12 @@ class Board {
         return false;
       }
 
-      if (stone == opponent) {
-        // 相手の石 → 記録して続ける
-        foundOpponent = true;
-      } else if (stone == player) {
+      if (stone == player) {
         // 自分の色で閉じた → 条件を満たす
         return foundOpponent;
       } else {
-        // 別の色（3色なので起こり得る）
-        return false;
+        // 自分以外の色（3色なので2色ありうる。混在も可）→ 記録して続ける
+        foundOpponent = true;
       }
 
       r += dr;
@@ -136,10 +134,12 @@ class Board {
   }
 
   /// 指定方向の石を反転（内部用）
+  ///
+  /// 自分以外の色（黒・白・赤のうち自分の色を除く、混在可）が連続する
+  /// 区間を自分の色で挟んだ場合、その区間すべてを自分の色に反転する。
   void _flipInDirection(int startRow, int startCol, int player, int dr, int dc) {
     int r = startRow + dr;
     int c = startCol + dc;
-    final opponent = _getOpponent(player);
 
     // 反転対象のマスを収集
     final toFlip = <List<int>>[];
@@ -151,33 +151,20 @@ class Board {
         break;
       }
 
-      if (stone == opponent) {
-        toFlip.add([r, c]);
-      } else if (stone == player) {
+      if (stone == player) {
         // 自分の色で閉じた → 収集した相手の石を反転
         for (final flip in toFlip) {
           _grid[flip[0]][flip[1]] = player;
         }
         return;
       } else {
-        // 別の色 → 反転中止
-        break;
+        // 自分以外の色（混在可） → 記録して続ける
+        toFlip.add([r, c]);
       }
 
       r += dr;
       c += dc;
     }
-  }
-
-  /// 相手の色を取得（3色対応）
-  ///
-  /// 注意: 3色オセロでは複数の相手がいるため、
-  /// このメソッドは「プレイヤー以外」という意味で使用
-  /// 実際のゲームでは対戦相手を明示的に指定する必要がある
-  int _getOpponent(int player) {
-    // このメソッドは2色用の簡略化
-    // 3色では全てのプレイヤーを考慮する必要がある
-    return player == black ? white : black;
   }
 
   /// 盤面の石の個数をカウント

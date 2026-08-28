@@ -169,6 +169,91 @@ void main() {
     });
   });
 
+  group('Board - 3色対応の挟み判定', () {
+    test('赤が白を挟んで反転できる', () {
+      // 赤 - 白 - (置く場所) の並びを作る
+      final grid = List.generate(8, (_) => List.filled(8, Board.empty));
+      grid[3][2] = Board.red;
+      grid[3][3] = Board.white;
+      final board = Board.fromGrid(grid);
+
+      expect(board.isValidMove(3, 4, Board.red), true);
+      board.placeStone(3, 4, Board.red);
+      expect(board.getStone(3, 3), Board.red); // 白が赤に反転
+      expect(board.getStone(3, 4), Board.red);
+    });
+
+    test('黒が赤を挟んで反転できる（赤も捕獲対象になる）', () {
+      final grid = List.generate(8, (_) => List.filled(8, Board.empty));
+      grid[3][2] = Board.black;
+      grid[3][3] = Board.red;
+      final board = Board.fromGrid(grid);
+
+      expect(board.isValidMove(3, 4, Board.black), true);
+      board.placeStone(3, 4, Board.black);
+      expect(board.getStone(3, 3), Board.black); // 赤が黒に反転
+    });
+
+    test('白が黒を挟んで反転できる（従来の2色ロジックと同じ挙動）', () {
+      final grid = List.generate(8, (_) => List.filled(8, Board.empty));
+      grid[3][2] = Board.white;
+      grid[3][3] = Board.black;
+      final board = Board.fromGrid(grid);
+
+      expect(board.isValidMove(3, 4, Board.white), true);
+      board.placeStone(3, 4, Board.white);
+      expect(board.getStone(3, 3), Board.white);
+    });
+
+    test('異なる2色が混在する区間もまとめて挟める（白→赤→白）', () {
+      final grid = List.generate(8, (_) => List.filled(8, Board.empty));
+      grid[3][1] = Board.black;
+      grid[3][2] = Board.white;
+      grid[3][3] = Board.red;
+      grid[3][4] = Board.white;
+      final board = Board.fromGrid(grid);
+
+      expect(board.isValidMove(3, 5, Board.black), true);
+      board.placeStone(3, 5, Board.black);
+      // 挟まれた区間（白・赤・白）がすべて黒に反転する
+      expect(board.getStone(3, 2), Board.black);
+      expect(board.getStone(3, 3), Board.black);
+      expect(board.getStone(3, 4), Board.black);
+    });
+
+    test('手前の自分の色で閉じた時点で判定し、その先は無視する', () {
+      // 黒-白-黒-白 の並びで (3,5) に黒を置いた場合、
+      // 直近の (3,3) の黒で閉じるため (3,4) の白のみ反転する
+      final grid = List.generate(8, (_) => List.filled(8, Board.empty));
+      grid[3][1] = Board.black;
+      grid[3][2] = Board.white;
+      grid[3][3] = Board.black;
+      grid[3][4] = Board.white;
+      final board = Board.fromGrid(grid);
+
+      expect(board.isValidMove(3, 5, Board.black), true);
+      board.placeStone(3, 5, Board.black);
+      expect(board.getStone(3, 4), Board.black); // 反転
+      expect(board.getStone(3, 3), Board.black); // 元々黒（変化なし）
+      expect(board.getStone(3, 2), Board.white); // 遠方は対象外のまま
+      expect(board.getStone(3, 1), Board.black); // 遠方は対象外のまま
+    });
+
+    test('自分の色に隣接直後は挟む石がなく不正な手', () {
+      final grid = List.generate(8, (_) => List.filled(8, Board.empty));
+      grid[3][4] = Board.black;
+      final board = Board.fromGrid(grid);
+
+      // (3,4)がすでに黒なので、隣接する(3,5)から見て相手石を挟んでいない
+      expect(board.isValidMove(3, 5, Board.black), false);
+    });
+
+    test('赤の初期合法手は0（初期配置に赤石が存在しないため）', () {
+      final board = Board.initial();
+      expect(board.getValidMoves(Board.red), isEmpty);
+    });
+  });
+
   group('Board - パフォーマンス', () {
     test('大量の合法手計算が高速', () {
       final board = Board.initial();
