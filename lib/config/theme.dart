@@ -24,9 +24,38 @@ class ToriverseTheme {
   static const double minTapSize = 44.0;
 
   // Typography sizes
+  static const double displayFontSize = 40.0; // リザルト画面の逆転演出用大見出し
   static const double headingFontSize = 28.0; // Roboto 700
   static const double bodyFontSize = 16.0;   // Roboto 400
   static const double buttonFontSize = 16.0;
+  static const double captionFontSize = 12.0;
+  static const double numericFontSize = 20.0; // 石数カウンター等の等幅数字表示用
+
+  // ===== Semantic result colors (順位・石差表示用) =====
+  static const Color winningColor = Color(0xFF4CAF50);
+  static const Color losingColor = Color(0xFF9E9E9E);
+  static const Color neutralColor = Color(0xFFFFC107);
+
+  /// 対立関係インジケーター用（GAME_DESIGN_UI_REFORM.md §2.2）
+  static const Color rivalryWarning = Color(0xFFFF7043);
+
+  // ===== Motion tokens (同時公開演出を中心としたモーション言語) =====
+  /// 提出締切が近づく際の緊張演出（脈動アニメーション周期）
+  static const Duration revealAnticipation = Duration(milliseconds: 900);
+
+  /// くじ引き演出（処理順抽選）の再生時間
+  static const Duration lotteryDuration = Duration(milliseconds: 500);
+
+  /// 反転アニメーションの1手あたりの再生間隔
+  static const Duration flipStagger = Duration(milliseconds: 800);
+
+  /// 弱者ボーナス発動時の強調パルス
+  static const Duration bonusPulse = Duration(milliseconds: 600);
+
+  // ===== Elevation (カード階層の統一) =====
+  static const double elevationCard = 1.0;
+  static const double elevationRaised = 4.0;
+  static const double elevationOverlay = 8.0;
 
   /// Get light theme
   static ThemeData lightTheme() {
@@ -148,5 +177,14 @@ class ToriverseTheme {
       default:
         return 'Player $playerIndex';
     }
+  }
+
+  /// 順位に応じたセマンティックカラーを返す（1位=winning, 最下位=losing, それ以外=neutral）
+  ///
+  /// 3人対戦のため rank は 1〜3 を想定。
+  static Color getRankColor(int rank, int totalPlayers) {
+    if (rank <= 1) return winningColor;
+    if (rank >= totalPlayers) return losingColor;
+    return neutralColor;
   }
 }
