@@ -1,0 +1,24 @@
+# riverpod_generator の対象ファイルを明示的に絞り込む。
+#
+# 背景（PR #16 参照）: build_runner の "Run code generation" ステップが
+# lib/features/discovery/application/providers/discovery_providers.dart や
+# lib/features/monetization/application/providers/monetization_providers.dart
+# など、@riverpod を一切使用していない（@freezed のみの）ファイルに対しても
+# riverpod_generator のビルドアクションが発行され、それが完了しないまま
+# 進捗ゼロで無限にハングする現象を確認した（riverpod_generator の既知の
+# 問題領域: https://github.com/rrousselGit/riverpod/issues/2766 参照）。
+#
+# @riverpod を実際に使用しているのは現状 leaderboards_and_social 機能の
+# みのため、riverpod_generator の対象をそこに限定し、無関係なファイルへの
+# 不要な（かつハングを誘発する）ビルドアクション発行を防ぐ。
+#
+# 注意: 今後 lib/features/ 配下の他の機能で @riverpod を新規に使う場合は、
+# 下記 generate_for にそのパスを追加すること。追加を忘れると、その機能の
+# プロバイダーはコード生成されずビルドエラーになる（サイレントに無視され
+# はしない）。
+targets:
+  $default:
+    builders:
+      riverpod_generator:riverpod_generator:
+        generate_for:
+          - lib/features/leaderboards_and_social/**
