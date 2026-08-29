@@ -131,3 +131,25 @@ final roundResultProvider =
     StateNotifierProvider<RoundResultNotifier, RoundResultModel?>((ref) {
   return RoundResultNotifier();
 });
+
+/// Stream that ticks down from submission timeout to 0
+/// Emits remaining milliseconds every 100ms
+final timeRemainingProvider =
+    StreamProvider<int>((ref) async* {
+  final roundSubmission = ref.watch(roundSubmissionProvider);
+  if (roundSubmission == null) {
+    yield 0;
+    return;
+  }
+
+  while (true) {
+    final remaining = roundSubmission.msRemaining;
+    yield remaining;
+
+    if (remaining <= 0) {
+      return;
+    }
+
+    await Future.delayed(const Duration(milliseconds: 100));
+  }
+});

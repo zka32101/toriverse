@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:toriverse/config/theme.dart';
 import 'package:toriverse/features/match/application/providers/game_state.dart';
 import 'package:toriverse/features/match/application/providers/round_submission_provider.dart';
+import 'package:toriverse/features/match/application/services/move_applicator.dart';
 import 'package:toriverse/features/match/data/models/round_result_model.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
 import 'package:toriverse/features/match/domain/services/ai_player.dart';
@@ -28,26 +29,31 @@ class MatchScreen extends ConsumerStatefulWidget {
 class _MatchScreenState extends ConsumerState<MatchScreen> {
   int? _selectedRow;
   int? _selectedCol;
+  late String _currentPlayerId; // Human player ID
 
   @override
   void initState() {
     super.initState();
-    // Start first round submission
+    _currentPlayerId = 'player_0'; // TODO: Get from user auth context
+
+    // Start first round
     _startNewRound();
+
+    // Schedule AI moves
+    _scheduleAIMoves();
   }
 
   void _startNewRound() {
     final gameState = ref.read(gameStateProvider);
     if (gameState != null) {
-      ref.read(roundSubmissionProvider.notifier).startRound(
+      ref
+          .read(roundSubmissionProvider.notifier)
+          .startRound(
             roundIndex: gameState.roundIndex,
             playerIds: gameState.playerIds,
           );
       ref.read(roundPhaseProvider.notifier).setSelection();
       _clearSelection();
-
-      // Auto-submit AI moves after a short delay
-      _scheduleAIMoves();
     }
   }
 
@@ -62,14 +68,21 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
         for (int i = 0; i < gameState.playerIds.length; i++) {
           final playerId = gameState.playerIds[i];
 
+          // Skip if already submitted
+          if (roundSubmission.submittedPositions[playerId] != null) {
+            continue;
+          }
+
           // Auto-submit AI player moves
           if (playerId == 'AI' || playerId.startsWith('AI_')) {
             final validMoves = gameState.board.getValidMoves(i);
             if (validMoves.isNotEmpty) {
-              // Use simple greedy move selection for AI
+              // Pick first valid move (simple greedy strategy)
               final move = validMoves.first;
-              ref.read(roundSubmissionProvider.notifier)
-                  .submitMove(playerId, move[0] * 8 + move[1]);
+              final position = move[0] * 8 + move[1];
+              ref
+                  .read(roundSubmissionProvider.notifier)
+                  .submitMove(playerId, position);
             }
           }
         }
@@ -101,12 +114,9 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     final roundSubmission = ref.read(roundSubmissionProvider);
     if (roundSubmission == null) return;
 
-    // Find current player (for non-simultaneous context; in simultaneous mode,
-    // submit as current user)
-    const playerId = 'player_0'; // TODO: Get from user context
+    // Submit for current human player
     final position = _selectedRow! * 8 + _selectedCol!;
-
-    ref.read(roundSubmissionProvider.notifier).submitMove(playerId, position);
+    ref.read(roundSubmissionProvider.notifier).submitMove(_currentPlayerId, position);
 
     ref.read(roundPhaseProvider.notifier).setWaiting();
     _clearSelection();
@@ -128,7 +138,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     }
   }
 
-  void _proceedToReveal() async {
+  void _proceedToReveal() {
     final gameState = ref.read(gameStateProvider);
     final roundSubmission = ref.read(roundSubmissionProvider);
 
@@ -140,8 +150,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     final roundResult = _generateRoundResult(gameState, roundSubmission);
     ref.read(roundResultProvider.notifier).setResult(roundResult);
 
-    // Show reveal animation, then apply moves
-    // The SimultaneousRevealWidget will handle the animation display
+    // The SimultaneousRevealWidget will now be displayed
   }
 
   RoundResultModel _generateRoundResult(
@@ -174,23 +183,27 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
 
     final replayEvents = ProcessOrderRandomizer.toReplayEvents(sequence);
 
-    return RoundResultModel(
-      id: '${widget.matchId}_${roundSubmission.roundIndex}',
+    // Filter out null positions
+    final validPositions = <String, int>{};
+    for (final (playerId, pos) in roundSubmission.submittedPositions.entries) {
+      if (pos != null) {
+        validPositions[playerId] = pos;
+      }
+    }
+
+    // Use MoveApplicator to compute round result (collisions, etc)
+    final result = MoveApplicator.applyRoundMoves(
       matchId: widget.matchId,
       roundIndex: roundSubmission.roundIndex,
-      submittedMoves: [
-        for (final playerId in gameState.playerIds)
-          if (roundSubmission.submittedPositions[playerId] != null)
-            SubmittedMove(
-              playerId: playerId,
-              position: roundSubmission.submittedPositions[playerId]!,
-              submittedAt: DateTime.now(),
-            ),
-      ],
+      boardBefore: gameState.board,
+      playerIds: gameState.playerIds,
       processOrder: processOrder,
+      submittedPositions: validPositions,
+      rivalryTracker: null, // TODO: Add rivalry tracking
       replayEvents: replayEvents,
-      createdAt: DateTime.now(),
     );
+
+    return result;
   }
 
   void _applyRoundMoves() async {
@@ -262,6 +275,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) {
           _startNewRound();
+          _scheduleAIMoves();
         }
       });
     }
@@ -273,6 +287,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     final roundPhase = ref.watch(roundPhaseProvider);
     final roundSubmission = ref.watch(roundSubmissionProvider);
     final roundResult = ref.watch(roundResultProvider);
+    final timeRemaining = ref.watch(timeRemainingProvider);
 
     if (gameState == null) {
       return Scaffold(
@@ -291,7 +306,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            // Main game board
+            // Main game board (hidden during reveal)
             if (roundPhase != RoundPhase.revealing)
               Column(
                 children: [
@@ -319,7 +334,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                       child: BoardWidget(
                         board: gameState.board,
                         validMoves: roundPhase == RoundPhase.selection
-                            ? gameState.validMoves
+                            ? gameState.board.getValidMoves(0) // Show moves for player 0
                             : [],
                         onMoveTapped: roundPhase == RoundPhase.selection
                             ? (row, col) {
@@ -333,20 +348,34 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                   ),
 
                   // Submission UI
-                  if (roundPhase == RoundPhase.selection && roundSubmission != null)
-                    MoveSubmissionPanel(
-                      currentPlayer: 'player_0',
-                      validMoveCount: gameState.validMoves.length,
-                      onSubmit: _selectedRow != null && _selectedCol != null
-                          ? _submitSelectedMove
-                          : null,
-                      timeRemaining: roundSubmission.msRemaining,
-                      onTimeout: _checkRoundCompletion,
+                  if (roundPhase == RoundPhase.selection &&
+                      roundSubmission != null)
+                    timeRemaining.when(
+                      data: (ms) => MoveSubmissionPanel(
+                        currentPlayer: _currentPlayerId,
+                        validMoveCount: gameState.board.getValidMoves(0).length,
+                        onSubmit: _selectedRow != null && _selectedCol != null
+                            ? _submitSelectedMove
+                            : null,
+                        timeRemaining: ms,
+                        onTimeout: _checkRoundCompletion,
+                      ),
+                      loading: () => MoveSubmissionPanel(
+                        currentPlayer: _currentPlayerId,
+                        validMoveCount: 0,
+                      ),
+                      error: (_, __) => MoveSubmissionPanel(
+                        currentPlayer: _currentPlayerId,
+                        validMoveCount: 0,
+                      ),
                     )
-                  else if (roundPhase == RoundPhase.waiting)
+                  else if (roundPhase == RoundPhase.waiting &&
+                      roundSubmission != null)
                     _WaitingPanel(
-                      roundSubmission: roundSubmission,
-                      playerIds: gameState.playerIds,
+                      submittedCount: roundSubmission.submittedPositions.values
+                          .where((v) => v != null)
+                          .length,
+                      totalPlayers: gameState.playerIds.length,
                     ),
                 ],
               ),
@@ -406,22 +435,16 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
 
 /// Waiting for other players panel
 class _WaitingPanel extends StatelessWidget {
-  final RoundSubmissionState? roundSubmission;
-  final List<String> playerIds;
+  final int submittedCount;
+  final int totalPlayers;
 
   const _WaitingPanel({
-    required this.roundSubmission,
-    required this.playerIds,
+    required this.submittedCount,
+    required this.totalPlayers,
   });
 
   @override
   Widget build(BuildContext context) {
-    final submitted = roundSubmission?.submittedPositions
-            .values
-            .where((v) => v != null)
-            .length ??
-        0;
-
     return Container(
       color: Colors.grey.shade100,
       padding: const EdgeInsets.all(16),
@@ -434,26 +457,16 @@ class _WaitingPanel extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           LinearProgressIndicator(
-            value: submitted / playerIds.length,
+            value: submittedCount / totalPlayers,
             minHeight: 8,
           ),
           const SizedBox(height: 8),
           Text(
-            '$submitted / ${playerIds.length}',
+            '$submittedCount / $totalPlayers',
             style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ],
       ),
     );
-  }
-}
-
-extension on GameState {
-  /// Get valid moves for the "current" player
-  /// In simultaneous mode, this doesn't represent turn order,
-  /// just available moves for selection
-  List<List<int>> get validMoves {
-    // For now, show moves for first human player (player_0)
-    return board.getValidMoves(0);
   }
 }
