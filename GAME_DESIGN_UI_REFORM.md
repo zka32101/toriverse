@@ -141,7 +141,17 @@ Phase2で実装済みのクラン・フォロー・レコメンド機能は、�
 2. ✅ **3色オセロ挟み判定バグの修正** — 当初のスコープ外だが、ロードマップ着手中に発見した致命的な既存バグ（赤石が捕獲不可能だった）を先行修正（マージ済み）
 3. ✅ **同時公開・くじ引き演出の専用フルスクリーンウィジェット** — `SimultaneousRevealWidget`（`lib/features/match/presentation/widgets/simultaneous_reveal_widget.dart`）として実装。`ProcessOrderRandomizer.generateAnimationSequence` の出力を `toReplayEvents()` で変換して消費する
 4. ✅ **`rivalry_tracker.dart`（§2.2）のドメインサービス実装** — `lib/features/match/domain/services/rivalry_tracker.dart`。盤面のbefore/after差分から攻撃内訳を算出し、直近ラウンドの対立スコア・二強連合判定を提供
-5. **対局画面への表示統合**（未着手） — `SimultaneousRevealWidget` と `RivalryTracker` を `match_screen.dart` のラウンド遷移フローに実際に組み込む。現在の `match_screen.dart` は簡易な即時着手フローのため、CLAUDE.md が定める非同期・同時提出制のラウンド同期ロジックとあわせて設計する必要がある
+5. 🚧 **対局画面への表示統合**（実装中） — `SimultaneousRevealWidget` と `RivalryTracker` を `match_screen.dart` のラウンド遷移フローに実装。CLAUDE.md が定める非同期・同時提出制のラウンド同期ロジックに合わせた以下を完成:
+   - `lib/features/match/application/providers/round_submission_provider.dart` (NEW): ラウンド提出フェーズ状態管理
+   - `lib/features/match/application/services/move_applicator.dart` (NEW): 手の適用・衝突検出ロジック
+   - `lib/features/match/presentation/screens/match_screen.dart` (REFACTOR): 4段階フロー実装
+     * **Selection Phase**: プレイヤーが手を選択（AI自動提出）
+     * **Waiting Phase**: すべてのプレイヤーの提出完了まで待機 / タイムアウト後自動進行
+     * **Revealing Phase**: `SimultaneousRevealWidget` でくじ引き→順番発表→反転再生
+     * **Finished Phase**: 結果反映 → 次ラウンドまたは終局
+   - 衝突検出・救済カード付与ロジック実装
+   - AI プレイヤー非ブロッキング手生成
+
 6. バランス検証シミュレーションハーネス（§2.4）
 7. リザルト画面の逆転演出強化 + クリップ導線統合
 
