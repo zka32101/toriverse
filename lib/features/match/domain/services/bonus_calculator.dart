@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import '../../data/models/round_result_model.dart';
+
 /// 弱者ボーナス判定ロジック
 ///
 /// 発動条件（すべてを満たす必要がある）:
@@ -177,5 +179,21 @@ class ProcessOrderRandomizer {
     }
 
     return sequence;
+  }
+
+  /// [generateAnimationSequence] の生Mapシーケンスを、
+  /// SimultaneousRevealWidget が消費する [ReplayEvent] のリストに変換する。
+  static List<ReplayEvent> toReplayEvents(
+    List<Map<String, dynamic>> sequence,
+  ) {
+    return sequence
+        .map(
+          (event) => ReplayEvent(
+            type: event['type'] as String,
+            data: event,
+            delayMs: (event['duration'] as int?) ?? 0,
+          ),
+        )
+        .toList();
   }
 }
