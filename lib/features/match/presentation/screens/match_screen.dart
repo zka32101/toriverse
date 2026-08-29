@@ -3,14 +3,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toriverse/config/theme.dart';
 import 'package:toriverse/features/match/application/providers/game_state.dart';
+import 'package:toriverse/features/match/application/providers/rivalry_state.dart';
 import 'package:toriverse/features/match/application/providers/round_submission_provider.dart';
 import 'package:toriverse/features/match/application/services/move_applicator.dart';
 import 'package:toriverse/features/match/data/models/round_result_model.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
 import 'package:toriverse/features/match/domain/services/ai_player.dart';
 import 'package:toriverse/features/match/domain/services/bonus_calculator.dart';
+import 'package:toriverse/features/match/domain/services/rivalry_tracker.dart';
 import 'package:toriverse/features/match/presentation/widgets/board_widget.dart';
 import 'package:toriverse/features/match/presentation/widgets/move_submission_panel.dart';
+import 'package:toriverse/features/match/presentation/widgets/rivalry_indicator_widget.dart';
 import 'package:toriverse/features/match/presentation/widgets/simultaneous_reveal_widget.dart';
 
 /// Match/Board screen: displays the 3-color Othello board and handles simultaneous moves
@@ -216,6 +219,9 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     var newBoard = gameState.board.clone();
     final roundResult = ref.read(roundResultProvider);
 
+    // Compute attack breakdown for rivalry tracking
+    final roundBreakdown = <int, Map<int, int>>{};
+
     if (roundResult != null) {
       for (final playerId in roundResult.processOrder) {
         final move = roundSubmission.submittedPositions[playerId];
@@ -227,10 +233,31 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
           // Only apply if move is valid
           if (newBoard.getValidMoves(playerIndex)
               .any((m) => m[0] == row && m[1] == col)) {
+            // Capture board state before move for attack breakdown computation
+            final boardBefore = newBoard.clone();
+
+            // Apply the move
             newBoard.placeStone(row, col, playerIndex);
+
+            // Compute attack breakdown for this player
+            final attackBreakdown = RivalryTracker.computeAttackBreakdown(
+              boardBefore: boardBefore,
+              boardAfter: newBoard,
+              mover: playerIndex,
+            );
+
+            // Store in round breakdown: { attacker_index: { target_index: stone_count } }
+            if (attackBreakdown.isNotEmpty) {
+              roundBreakdown[playerIndex] = attackBreakdown;
+            }
           }
         }
       }
+    }
+
+    // Record attack breakdown to rivalry tracker
+    if (roundBreakdown.isNotEmpty) {
+      ref.read(rivalryProvider.notifier).recordRound(roundBreakdown);
     }
 
     // Update game state with new board
@@ -288,6 +315,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     final roundSubmission = ref.watch(roundSubmissionProvider);
     final roundResult = ref.watch(roundResultProvider);
     final timeRemaining = ref.watch(timeRemainingProvider);
+    final rivalryState = ref.watch(rivalryProvider);
 
     if (gameState == null) {
       return Scaffold(
@@ -325,6 +353,17 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                           backgroundColor: _getPhaseColor(roundPhase),
                         ),
                       ],
+                    ),
+                  ),
+
+                  // Rivalry indicator (shows alliance/2v1 dynamics)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: RivalryIndicatorWidget(
+                      rivalryScores: rivalryState.getAggregatedScores(),
+                      playerIds: gameState.playerIds,
+                      currentPlayerIndex: 0, // Human player (player 0)
+                      showCounts: false,
                     ),
                   ),
 
