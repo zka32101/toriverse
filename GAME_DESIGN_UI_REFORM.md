@@ -152,7 +152,16 @@ Phase2で実装済みのクラン・フォロー・レコメンド機能は、�
    - 衝突検出・救済カード付与ロジック実装
    - AI プレイヤー非ブロッキング手生成
 
-6. バランス検証シミュレーションハーネス（§2.4）
+6. ✅ **バランス検証シミュレーションハーネス**（§2.4） — Monte Carlo シミュレーション実装完了
+   - `lib/features/match/domain/services/balance_simulator.dart`: 1000+ AI vs AI マッチを実行
+   - 検証項目:
+     * **勝率分布**: 各プレイヤーの勝率が ~33% に収束するか
+     * **弱者ボーナス発動率**: 発動が適切な頻度（各プレイヤー ~10% of matches）
+     * **膠着検出**: 11手ルール終盤で pass chains が多発していないか
+     * **均衡性**: win rate variance が ±15% 以内
+   - CLI ツール: `dart run bin/balance_simulator_cli.dart --matches 1000 --depth 2`
+   - テストスイート: 20+ assertions covering edge cases, report generation
+
 7. リザルト画面の逆転演出強化 + クリップ導線統合
 
 ---
