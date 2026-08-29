@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toriverse/config/theme.dart';
 import 'package:toriverse/features/match/application/providers/game_state.dart';
+import 'package:toriverse/features/match/application/providers/remote_config_provider.dart';
 import 'package:toriverse/features/match/application/providers/rivalry_state.dart';
 import 'package:toriverse/features/match/application/providers/round_submission_provider.dart';
 import 'package:toriverse/features/match/application/services/move_applicator.dart';
@@ -46,14 +47,20 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     _scheduleAIMoves();
   }
 
-  void _startNewRound() {
+  void _startNewRound() async {
     final gameState = ref.read(gameStateProvider);
     if (gameState != null) {
+      // Fetch submission timeout from Remote Config
+      final configResult = await ref.read(submissionTimeoutProvider.future);
+      final timeoutMs = configResult;
+      final timeout = Duration(milliseconds: timeoutMs);
+
       ref
           .read(roundSubmissionProvider.notifier)
           .startRound(
             roundIndex: gameState.roundIndex,
             playerIds: gameState.playerIds,
+            timeout: timeout,
           );
       ref.read(roundPhaseProvider.notifier).setSelection();
       _clearSelection();

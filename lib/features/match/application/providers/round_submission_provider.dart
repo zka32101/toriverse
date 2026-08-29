@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/round_result_model.dart';
 import '../../domain/services/bonus_calculator.dart';
+import 'remote_config_provider.dart';
 
 /// ラウンド中の手の提出状態を管理
 class RoundSubmissionState {
@@ -48,11 +49,13 @@ class RoundSubmissionState {
   static RoundSubmissionState create({
     required int roundIndex,
     required List<String> playerIds,
+    Duration? timeout,
   }) {
     return RoundSubmissionState(
       roundIndex: roundIndex,
       submittedPositions: {for (final id in playerIds) id: null},
       roundStartedAt: DateTime.now(),
+      roundTimeout: timeout ?? const Duration(seconds: 30),
     );
   }
 }
@@ -65,10 +68,12 @@ class RoundSubmissionNotifier extends StateNotifier<RoundSubmissionState?> {
   void startRound({
     required int roundIndex,
     required List<String> playerIds,
+    Duration? timeout,
   }) {
     state = RoundSubmissionState.create(
       roundIndex: roundIndex,
       playerIds: playerIds,
+      timeout: timeout,
     );
   }
 
