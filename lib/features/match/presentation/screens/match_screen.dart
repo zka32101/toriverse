@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toriverse/config/theme.dart';
+import 'package:toriverse/features/match/application/providers/ai_takeover_state.dart';
 import 'package:toriverse/features/match/application/providers/game_state.dart';
+import 'package:toriverse/features/match/application/providers/inactivity_provider.dart';
 import 'package:toriverse/features/match/application/providers/remote_config_provider.dart';
 import 'package:toriverse/features/match/application/providers/rivalry_state.dart';
 import 'package:toriverse/features/match/application/providers/round_submission_provider.dart';
@@ -12,6 +14,7 @@ import 'package:toriverse/features/match/domain/entities/board.dart';
 import 'package:toriverse/features/match/domain/services/ai_player.dart';
 import 'package:toriverse/features/match/domain/services/bonus_calculator.dart';
 import 'package:toriverse/features/match/domain/services/rivalry_tracker.dart';
+import 'package:toriverse/features/match/presentation/widgets/ai_takeover_indicator_widget.dart';
 import 'package:toriverse/features/match/presentation/widgets/board_widget.dart';
 import 'package:toriverse/features/match/presentation/widgets/move_submission_panel.dart';
 import 'package:toriverse/features/match/presentation/widgets/rivalry_indicator_widget.dart';
@@ -62,6 +65,13 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
             playerIds: gameState.playerIds,
             timeout: timeout,
           );
+
+      // Initialize round submission monitoring for AI takeover detection
+      ref.read(roundSubmissionMonitorProvider.notifier).startMonitoring(
+            playerIds: gameState.playerIds,
+            submissionTimeoutMs: timeoutMs,
+          );
+
       ref.read(roundPhaseProvider.notifier).setSelection();
       _clearSelection();
     }
@@ -93,6 +103,11 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
               ref
                   .read(roundSubmissionProvider.notifier)
                   .submitMove(playerId, position);
+
+              // Record submission for AI takeover timeout monitoring
+              ref
+                  .read(roundSubmissionMonitorProvider.notifier)
+                  .recordSubmission(playerId);
             }
           }
         }
@@ -128,6 +143,11 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     final position = _selectedRow! * 8 + _selectedCol!;
     ref.read(roundSubmissionProvider.notifier).submitMove(_currentPlayerId, position);
 
+    // Record submission for timeout monitoring
+    ref
+        .read(roundSubmissionMonitorProvider.notifier)
+        .recordSubmission(_currentPlayerId);
+
     ref.read(roundPhaseProvider.notifier).setWaiting();
     _clearSelection();
 
@@ -140,6 +160,18 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     final roundSubmission = ref.read(roundSubmissionProvider);
 
     if (gameState == null || roundSubmission == null) return;
+
+    // Check for submission timeouts and activate AI takeover if needed
+    final monitor = ref.read(roundSubmissionMonitorProvider);
+    if (monitor != null) {
+      final timedOutPlayers = monitor.getTimedOutPlayers(gameState.playerIds);
+      for (final playerId in timedOutPlayers) {
+        ref.read(aiTakeoverProvider.notifier).activateTakeover(
+          playerId: playerId,
+          reason: 'timeout',
+        );
+      }
+    }
 
     // Check if all players submitted or timeout
     if (roundSubmission.isAllSubmitted(gameState.playerIds) ||
@@ -221,6 +253,21 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     final roundSubmission = ref.read(roundSubmissionProvider);
 
     if (gameState == null || roundSubmission == null) return;
+
+    // For AI takeover players, auto-submit AI moves if not already submitted
+    final aiTakeover = ref.read(aiTakeoverProvider);
+    for (final playerId in aiTakeover.aiControlledPlayers) {
+      if (roundSubmission.submittedPositions[playerId] == null) {
+        final playerIndex = gameState.playerIds.indexOf(playerId);
+        final validMoves = gameState.board.getValidMoves(playerIndex);
+        if (validMoves.isNotEmpty) {
+          // Use AIPlayer to select move for better game quality
+          final move = AIPlayer.selectMove(gameState.board, playerIndex);
+          final position = move[0] * 8 + move[1];
+          ref.read(roundSubmissionProvider.notifier).submitMove(playerId, position);
+        }
+      }
+    }
 
     // Apply moves to board in process order
     var newBoard = gameState.board.clone();
@@ -323,6 +370,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     final roundResult = ref.watch(roundResultProvider);
     final timeRemaining = ref.watch(timeRemainingProvider);
     final rivalryState = ref.watch(rivalryProvider);
+    final aiTakeoverState = ref.watch(aiTakeoverProvider);
 
     if (gameState == null) {
       return Scaffold(
@@ -373,6 +421,19 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                       showCounts: false,
                     ),
                   ),
+
+                  // AI Takeover indicator (shows which players are AI-controlled)
+                  if (aiTakeoverState.activeTakeovers.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: AITakeoverIndicatorWidget(
+                        aiControlledPlayers: aiTakeoverState.activeTakeovers
+                            .map((playerId, info) =>
+                                MapEntry(playerId, info['reason'] as String))
+                            .cast<String, String>(),
+                        playerIds: gameState.playerIds,
+                      ),
+                    ),
 
                   // Board
                   Expanded(
