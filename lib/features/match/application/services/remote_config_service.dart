@@ -1,3 +1,5 @@
+import 'dart:developer' as developer;
+
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 /// Remote Config service for tuning game balance parameters
@@ -39,7 +41,11 @@ class RemoteConfigService {
     try {
       await _remoteConfig.fetchAndActivate();
     } catch (e) {
-      print('Failed to fetch Remote Config: $e');
+      developer.log(
+        'Failed to fetch Remote Config: $e',
+        name: 'RemoteConfigService',
+        level: 900, // WARNING level
+      );
       // Gracefully fall back to defaults
     }
   }
@@ -99,7 +105,11 @@ class RemoteConfigService {
     try {
       await _remoteConfig.fetchAndActivate();
     } catch (e) {
-      print('Failed to refresh Remote Config: $e');
+      developer.log(
+        'Failed to refresh Remote Config: $e',
+        name: 'RemoteConfigService',
+        level: 900, // WARNING level
+      );
     }
   }
 }

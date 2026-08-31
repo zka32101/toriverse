@@ -43,37 +43,63 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     super.initState();
     _currentPlayerId = 'player_0'; // TODO: Get from user auth context
 
-    // Start first round
-    _startNewRound();
-
-    // Schedule AI moves
-    _scheduleAIMoves();
+    // Start first round and schedule AI moves sequentially
+    _startNewRoundAndSchedule();
   }
 
-  void _startNewRound() async {
+  Future<void> _startNewRoundAndSchedule() async {
+    await _startNewRound();
+
+    // Only schedule AI moves after round is fully initialized
+    if (mounted) {
+      _scheduleAIMoves();
+    }
+  }
+
+  Future<void> _startNewRound() async {
     final gameState = ref.read(gameStateProvider);
     if (gameState != null) {
       // Fetch submission timeout from Remote Config
-      final configResult = await ref.read(submissionTimeoutProvider.future);
-      final timeoutMs = configResult;
-      final timeout = Duration(milliseconds: timeoutMs);
+      try {
+        final configResult = await ref.read(submissionTimeoutProvider.future);
+        final timeoutMs = configResult;
+        final timeout = Duration(milliseconds: timeoutMs);
 
-      ref
-          .read(roundSubmissionProvider.notifier)
-          .startRound(
-            roundIndex: gameState.roundIndex,
-            playerIds: gameState.playerIds,
-            timeout: timeout,
-          );
+        ref
+            .read(roundSubmissionProvider.notifier)
+            .startRound(
+              roundIndex: gameState.roundIndex,
+              playerIds: gameState.playerIds,
+              timeout: timeout,
+            );
 
-      // Initialize round submission monitoring for AI takeover detection
-      ref.read(roundSubmissionMonitorProvider.notifier).startMonitoring(
-            playerIds: gameState.playerIds,
-            submissionTimeoutMs: timeoutMs,
-          );
+        // Initialize round submission monitoring for AI takeover detection
+        ref.read(roundSubmissionMonitorProvider.notifier).startMonitoring(
+              playerIds: gameState.playerIds,
+              submissionTimeoutMs: timeoutMs,
+            );
 
-      ref.read(roundPhaseProvider.notifier).setSelection();
-      _clearSelection();
+        ref.read(roundPhaseProvider.notifier).setSelection();
+        _clearSelection();
+      } catch (e) {
+        // Fallback to default timeout if Remote Config fetch fails
+        const defaultTimeoutMs = 30000;
+        ref
+            .read(roundSubmissionProvider.notifier)
+            .startRound(
+              roundIndex: gameState.roundIndex,
+              playerIds: gameState.playerIds,
+              timeout: const Duration(milliseconds: defaultTimeoutMs),
+            );
+
+        ref.read(roundSubmissionMonitorProvider.notifier).startMonitoring(
+              playerIds: gameState.playerIds,
+              submissionTimeoutMs: defaultTimeoutMs,
+            );
+
+        ref.read(roundPhaseProvider.notifier).setSelection();
+        _clearSelection();
+      }
     }
   }
 

@@ -185,9 +185,14 @@ class CosmeticState {
 
   /// Check if player is actively using a cosmetic
   bool isActive(String cosmeticId) {
-    return ownedCosmetics
-        .firstWhere((owned) => owned.itemId == cosmeticId, orElse: () => OwnedCosmetic(itemId: '', source: '', acquiredAt: DateTime.now(), isActive: false))
-        .isActive;
+    try {
+      return ownedCosmetics
+          .firstWhere((owned) => owned.itemId == cosmeticId)
+          .isActive;
+    } catch (e) {
+      // Cosmetic not owned - return false to distinguish from "owned but inactive"
+      return false;
+    }
   }
 
   /// Get list of cosmetics player owns of specific type
@@ -209,21 +214,27 @@ class CosmeticState {
     List<CosmeticItem> starterKit = const [],
     List<CosmeticItem> catalog = const [],
   }) {
+    // Find the first board item (if any)
+    CosmeticItem? firstBoard;
+    try {
+      firstBoard = starterKit.firstWhere((item) => item.type == 'board');
+    } catch (e) {
+      // No board in starter kit - that's OK
+    }
+
     // Convert starter kit items to owned cosmetics
     final ownedItems = starterKit
         .map((item) => OwnedCosmetic(
               itemId: item.id,
               source: 'starter_kit',
               acquiredAt: DateTime.now(),
-              isActive: item.type == 'board', // First board is active by default
+              isActive: firstBoard != null && item.id == firstBoard.id, // Only the first board is active
             ))
         .toList();
 
     return CosmeticState(
       ownedCosmetics: ownedItems,
-      activeBoardId: starterKit.isNotEmpty
-          ? starterKit.firstWhere((item) => item.type == 'board', orElse: () => starterKit[0]).id
-          : null,
+      activeBoardId: firstBoard?.id, // Only set if a board was found
       catalogItems: catalog,
     );
   }

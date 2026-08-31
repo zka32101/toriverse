@@ -40,8 +40,19 @@ class RivalryState {
 
   /// Add a new round's attack breakdown to the history
   RivalryState addRound(Map<int, Map<int, int>> roundBreakdown) {
-    final updated = List<Map<int, Map<int, int>>>.from(recentRounds);
-    updated.add(roundBreakdown);
+    // Create deep copy of recentRounds to prevent mutation issues
+    final updated = recentRounds
+        .map((round) => {
+              for (final (attacker, targets) in round.entries)
+                attacker: {...targets}, // Deep copy inner map
+            })
+        .toList();
+
+    // Add deep copy of new round
+    updated.add({
+      for (final (attacker, targets) in roundBreakdown.entries)
+        attacker: {...targets}, // Deep copy inner map
+    });
 
     // Keep only last 3 rounds (default window)
     if (updated.length > 3) {
