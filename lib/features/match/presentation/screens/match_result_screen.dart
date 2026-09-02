@@ -7,6 +7,7 @@ import '../../domain/services/streak_calculator.dart' as calculator_module;
 import '../widgets/streak_display_widget.dart';
 import '../widgets/milestone_reached_dialog.dart';
 import '../screens/cosmetic_collection_screen.dart';
+import '../../../shared/services/analytics_service.dart';
 
 /// Match result screen showing game outcome, streak progress, and cosmetic rewards
 ///
@@ -84,6 +85,14 @@ class _MatchResultScreenState extends ConsumerState<MatchResultScreen>
           rarity: 'rare',
         );
       }
+
+      // Fire analytics event for milestone achievement
+      final analytics = AnalyticsService();
+      await analytics.logMilestoneReached(
+        milestone: streak,
+        cosmeticRewardId: reward?.id,
+        cosmeticRarity: reward?.rarity ?? 'none',
+      );
 
       if (mounted) {
         await showMilestoneReachedDialog(

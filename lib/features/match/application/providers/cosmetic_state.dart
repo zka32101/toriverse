@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../data/repositories/cosmetic_repository.dart';
 
 /// Represents a cosmetic item (board design, stone appearance, etc.)
 class CosmeticItem {
@@ -408,3 +409,27 @@ final ownedCosmeticsByTypeProvider = Provider.family<List<CosmeticItem>, String>
     return ref.watch(cosmeticProvider).getOwnedByType(type);
   },
 );
+
+/// Provider for cosmetic repository (singleton)
+final cosmeticRepositoryProvider = Provider<CosmeticRepository>(
+  (ref) => CosmeticRepository(),
+);
+
+/// Provider for cosmetic catalog fetched from Firestore
+///
+/// Async provider that fetches the cosmetic catalog on app startup.
+/// Falls back to hardcoded defaults on any network error.
+/// Re-fetches when explicitly invalidated or on app restart.
+final cosmeticCatalogProvider = FutureProvider<List<CosmeticItem>>((ref) async {
+  final repository = ref.watch(cosmeticRepositoryProvider);
+  return repository.fetchCosmeticCatalog();
+});
+
+/// Provider for real-time cosmetic catalog updates
+///
+/// Streams cosmetic catalog changes from Firestore.
+/// Used for reactive updates when cosmetics are added/modified.
+final cosmeticCatalogStreamProvider = StreamProvider<List<CosmeticItem>>((ref) {
+  final repository = ref.watch(cosmeticRepositoryProvider);
+  return repository.streamCosmeticCatalog();
+});
