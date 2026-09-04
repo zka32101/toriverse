@@ -202,6 +202,149 @@ class AnalyticsService {
     }
   }
 
+  /// Log cosmetics shop opened
+  ///
+  /// Called when user navigates to the cosmetics shop screen.
+  /// Tracks shop engagement and visit frequency.
+  Future<void> logCosmeticsShopOpened() async {
+    try {
+      await _analytics.logEvent(
+        name: 'cosmetics_shop_opened',
+        parameters: {
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  /// Log cosmetics shop filter applied
+  ///
+  /// Called when user filters cosmetics by type.
+  /// Tracks which cosmetic types are most viewed.
+  Future<void> logCosmeticsShopFiltered({
+    required String filterType, // 'board', 'stoneBlack', 'stoneWhite', 'stoneRed'
+  }) async {
+    try {
+      await _analytics.logEvent(
+        name: 'cosmetics_shop_filtered_by_type',
+        parameters: {
+          'filter_type': filterType,
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  /// Log cosmetic item preview
+  ///
+  /// Called when user opens detail dialog for a cosmetic.
+  /// Tracks cosmetic interest and engagement.
+  Future<void> logCosmeticItemPreviewed({
+    required String cosmeticId,
+    required String cosmeticType,
+    required String rarity,
+    required int priceYen,
+    required bool isOwned,
+  }) async {
+    try {
+      await _analytics.logEvent(
+        name: 'cosmetic_item_previewed',
+        parameters: {
+          'cosmetic_id': cosmeticId,
+          'cosmetic_type': cosmeticType,
+          'rarity': rarity,
+          'price_yen': priceYen,
+          'is_owned': isOwned,
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  /// Log cosmetic purchase failure
+  ///
+  /// Called when a purchase attempt fails.
+  /// Used to track payment issues and revenue blockers.
+  Future<void> logCosmeticPurchaseFailed({
+    required String cosmeticId,
+    required String cosmeticType,
+    required String failureReason, // 'insufficient_balance', 'payment_failed', 'network_error', 'unknown'
+  }) async {
+    try {
+      await _analytics.logEvent(
+        name: 'cosmetic_purchased_failed',
+        parameters: {
+          'cosmetic_id': cosmeticId,
+          'cosmetic_type': cosmeticType,
+          'failure_reason': failureReason,
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  /// Log cosmetic applied to match
+  ///
+  /// Called when user sets a cosmetic as active for use in matches.
+  /// Tracks cosmetic usage and engagement.
+  Future<void> logCosmeticAppliedToMatch({
+    required String cosmeticId,
+    required String cosmeticType,
+    required String rarity,
+  }) async {
+    try {
+      await _analytics.logEvent(
+        name: 'cosmetic_applied_to_match',
+        parameters: {
+          'cosmetic_id': cosmeticId,
+          'cosmetic_type': cosmeticType,
+          'rarity': rarity,
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
+  /// Log match completed with cosmetic
+  ///
+  /// Called after match concludes when player had a cosmetic active.
+  /// Tracks cosmetic usage in actual gameplay.
+  Future<void> logMatchCompletedWithCosmetic({
+    required String matchId,
+    required String result, // 'win', 'loss', 'draw'
+    required int currentStreak,
+    required int matchDurationSeconds,
+    required String cosmeticId,
+    required String cosmeticType,
+  }) async {
+    try {
+      await _analytics.logEvent(
+        name: 'match_completed_with_cosmetic',
+        parameters: {
+          'match_id': matchId,
+          'result': result,
+          'current_streak': currentStreak,
+          'duration_seconds': matchDurationSeconds,
+          'cosmetic_id': cosmeticId,
+          'cosmetic_type': cosmeticType,
+          'timestamp': DateTime.now().toIso8601String(),
+        },
+      );
+    } catch (e) {
+      // Silent fail
+    }
+  }
+
   /// Set user properties for cohort analysis
   ///
   /// Called once at user creation and periodically for updates.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:toriverse/features/shop/application/providers/cosmetics_providers.dart';
 import 'package:toriverse/shared/models/cosmetic_item.dart';
+import 'package:toriverse/shared/services/analytics_service.dart';
 
 /// Card widget displaying a single cosmetic item
 class CosmeticItemCard extends ConsumerStatefulWidget {
@@ -215,11 +216,29 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
   }
 
   void _showDetailDialog(BuildContext context) {
+    // Log preview event
+    final userOwnsCosmeticAsync =
+        ref.read(userOwnsCosmeticProvider(widget.cosmetic.id));
+    userOwnsCosmeticAsync.whenData((owned) {
+      _logCosmeticPreview(owned);
+    });
+
     showDialog(
       context: context,
       builder: (context) => _CosmeticDetailDialog(
         cosmetic: widget.cosmetic,
       ),
+    );
+  }
+
+  void _logCosmeticPreview(bool isOwned) {
+    const analyticsService = AnalyticsService();
+    analyticsService.logCosmeticItemPreviewed(
+      cosmeticId: widget.cosmetic.id,
+      cosmeticType: widget.cosmetic.typeString,
+      rarity: widget.cosmetic.rarity.toString().split('.').last,
+      priceYen: widget.cosmetic.priceJpy,
+      isOwned: isOwned,
     );
   }
 
@@ -231,11 +250,19 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
           .purchaseCosmetic(widget.cosmetic.id);
 
       if (!mounted) return;
+
+      // Log successful purchase
+      _logCosmeticPurchaseSuccess();
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('購入しました！')),
       );
     } catch (e) {
       if (!mounted) return;
+
+      // Log purchase failure
+      _logCosmeticPurchaseFailed(e.toString());
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('購入に失敗しました: $e')),
       );
@@ -246,6 +273,34 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
     }
   }
 
+  void _logCosmeticPurchaseSuccess() {
+    const analyticsService = AnalyticsService();
+    analyticsService.logCosmeticPurchased(
+      cosmeticId: widget.cosmetic.id,
+      cosmeticType: widget.cosmetic.typeString,
+      rarity: widget.cosmetic.rarity.toString().split('.').last,
+      priceYen: widget.cosmetic.priceJpy,
+      paymentMethod: 'in_app',
+    );
+  }
+
+  void _logCosmeticPurchaseFailed(String error) {
+    const analyticsService = AnalyticsService();
+    String failureReason = 'unknown';
+    if (error.contains('insufficient')) {
+      failureReason = 'insufficient_balance';
+    } else if (error.contains('payment')) {
+      failureReason = 'payment_failed';
+    } else if (error.contains('network')) {
+      failureReason = 'network_error';
+    }
+    analyticsService.logCosmeticPurchaseFailed(
+      cosmeticId: widget.cosmetic.id,
+      cosmeticType: widget.cosmetic.typeString,
+      failureReason: failureReason,
+    );
+  }
+
   void _setActive() async {
     try {
       await ref
@@ -253,6 +308,10 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
           .setActiveCosmectic(widget.cosmetic.id);
 
       if (!mounted) return;
+
+      // Log cosmetic applied to match
+      _logCosmeticApplied();
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('セットしました！')),
       );
@@ -262,6 +321,15 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
         SnackBar(content: Text('セットに失敗しました: $e')),
       );
     }
+  }
+
+  void _logCosmeticApplied() {
+    const analyticsService = AnalyticsService();
+    analyticsService.logCosmeticAppliedToMatch(
+      cosmeticId: widget.cosmetic.id,
+      cosmeticType: widget.cosmetic.typeString,
+      rarity: widget.cosmetic.rarity.toString().split('.').last,
+    );
   }
 
   Color _getCosmeticPreviewColor(CosmeticItem cosmetic) {

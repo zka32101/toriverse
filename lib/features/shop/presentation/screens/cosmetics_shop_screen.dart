@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:toriverse/features/shop/application/providers/cosmetics_providers.dart';
 import 'package:toriverse/shared/models/cosmetic_item.dart';
+import 'package:toriverse/shared/services/analytics_service.dart';
 import '../widgets/cosmetic_item_card.dart';
 import '../widgets/cosmetic_type_selector.dart';
 
@@ -16,6 +17,26 @@ class CosmeticsShopScreen extends ConsumerStatefulWidget {
 
 class _CosmeticsShopScreenState extends ConsumerState<CosmeticsShopScreen> {
   CosmeticType _selectedType = CosmeticType.board;
+
+  @override
+  void initState() {
+    super.initState();
+    // Log shop opened event
+    _logShopOpened();
+  }
+
+  Future<void> _logShopOpened() async {
+    // Create analytics service instance and log event
+    const analyticsService = AnalyticsService();
+    await analyticsService.logCosmeticsShopOpened();
+  }
+
+  Future<void> _logTypeFilterApplied(CosmeticType type) async {
+    const analyticsService = AnalyticsService();
+    await analyticsService.logCosmeticsShopFiltered(
+      filterType: type.typeString,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +59,8 @@ class _CosmeticsShopScreenState extends ConsumerState<CosmeticsShopScreen> {
                 setState(() {
                   _selectedType = type;
                 });
+                // Log type filter applied
+                _logTypeFilterApplied(type);
               },
             ),
             const SizedBox(height: 16),
