@@ -115,8 +115,8 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            userPreference.whenData(
-                              (pref) {
+                            userPreference.when(
+                              data: (pref) {
                                 final isActive = pref.activeCosmeticIds
                                     .contains(widget.cosmetic.id);
                                 return SizedBox(
@@ -150,7 +150,25 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
                                         ),
                                 );
                               },
-                            ).unwrap(),
+                              loading: () => const SizedBox(
+                                height: 28,
+                                width: double.infinity,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                              error: (_, __) => const SizedBox(
+                                height: 28,
+                                width: double.infinity,
+                                child: Text(
+                                  'エラー',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         );
                       } else {
