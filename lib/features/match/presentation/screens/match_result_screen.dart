@@ -8,6 +8,7 @@ import '../widgets/streak_display_widget.dart';
 import '../widgets/milestone_reached_dialog.dart';
 import '../screens/cosmetic_collection_screen.dart';
 import '../../../shared/services/analytics_service.dart';
+import '../../../shared/models/cosmetic_item.dart';
 
 /// Match result screen showing game outcome, streak progress, and cosmetic rewards
 ///
@@ -52,6 +53,9 @@ class _MatchResultScreenState extends ConsumerState<MatchResultScreen>
       vsync: this,
     );
 
+    // Log match completion with active cosmetic
+    _logMatchCompletion();
+
     // Check for milestone achievement after animation delay
     Future.delayed(const Duration(milliseconds: 800), _checkMilestoneReached);
   }
@@ -60,6 +64,35 @@ class _MatchResultScreenState extends ConsumerState<MatchResultScreen>
   void dispose() {
     _celebrationController.dispose();
     super.dispose();
+  }
+
+  /// Log match completion with active cosmetic
+  ///
+  /// Fires analytics event to track cosmetic usage in actual gameplay.
+  /// This data helps us understand which cosmetics drive engagement.
+  Future<void> _logMatchCompletion() async {
+    try {
+      final streak = ref.read(currentStreakProvider);
+      final result = widget.matchResult['result'] as String? ?? 'draw';
+      final durationSeconds = widget.matchResult['durationSeconds'] as int? ?? 0;
+
+      // TODO: Get active cosmetic ID from user preferences
+      // For now, using a placeholder until cosmetic_state provider is available
+      const activeCosmeticId = 'default_board';
+      const activeCosmeticType = 'board';
+
+      final analytics = AnalyticsService();
+      await analytics.logMatchCompletedWithCosmetic(
+        matchId: widget.matchId,
+        result: result,
+        currentStreak: streak,
+        matchDurationSeconds: durationSeconds,
+        cosmeticId: activeCosmeticId,
+        cosmeticType: activeCosmeticType,
+      );
+    } catch (e) {
+      // Silent fail — analytics should never block game flow
+    }
   }
 
   /// Check if player reached a milestone and show celebration

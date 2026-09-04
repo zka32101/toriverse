@@ -2,14 +2,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:toriverse/shared/models/cosmetic_item.dart';
+import 'package:toriverse/shared/services/revenucat_service.dart';
 import '../services/cosmetics_shop_service.dart';
+
+/// Provider for RevenueCat service
+final revenuecatServiceProvider = Provider<RevenueCatService>((ref) {
+  return RevenueCatService();
+});
 
 /// Provider for CosmeticsShopService
 final cosmeticsShopServiceProvider =
     Provider((ref) {
+  final revenuecatService = ref.watch(revenuecatServiceProvider);
   return CosmeticsShopService(
     firestore: FirebaseFirestore.instance,
     analytics: FirebaseAnalytics.instance,
+    revenuecatService: revenuecatService,
   );
 });
 
