@@ -1,17 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:toriverse/shared/models/cosmetic_item.dart';
+import 'package:toriverse/shared/services/revenucat_service.dart';
 
 /// Service for managing cosmetics shop operations
 class CosmeticsShopService {
   final FirebaseFirestore _firestore;
   final FirebaseAnalytics _analytics;
+  final RevenueCatService _revenuecatService;
 
-  const CosmeticsShopService({
+  CosmeticsShopService({
     required FirebaseFirestore firestore,
     required FirebaseAnalytics analytics,
+    required RevenueCatService revenuecatService,
   })  : _firestore = firestore,
-        _analytics = analytics;
+        _analytics = analytics,
+        _revenuecatService = revenuecatService;
 
   /// Fetch all available cosmetics (including limited edition)
   Future<List<CosmeticItem>> fetchAvailableCosmetics() async {
@@ -120,7 +124,10 @@ class CosmeticsShopService {
     }
   }
 
-  /// Purchase cosmetic (simulated - real implementation uses RevenueCat)
+  /// Purchase cosmetic with RevenueCat payment validation
+  ///
+  /// Validates purchase through RevenueCat backend, then records in Firestore.
+  /// This prevents fraud and ensures purchases are genuine.
   Future<bool> purchaseCosmetic(
     String userId,
     CosmeticItem cosmetic,
@@ -132,7 +139,35 @@ class CosmeticsShopService {
         return false; // Already owned
       }
 
-      // Record purchase in Firestore
+      // Initialize RevenueCat if not already done
+      await _revenuecatService.initialize();
+
+      // Fetch product from app store via RevenueCat
+      final products = await _revenuecatService.getShopProducts(
+        offering: 'cosmetics_shop',
+      );
+
+      // Find matching product by cosmetic ID
+      final product = products.firstWhere(
+        (p) => p.identifier == cosmetic.id,
+        orElse: () => throw Exception('Product not found: ${cosmetic.id}'),
+      );
+
+      // Execute purchase through app store (RevenueCat handles receipt validation)
+      final customerInfo = await _revenuecatService.purchaseCosmeticItem(
+        product: product,
+      );
+
+      // Verify purchase was successful via RevenueCat backend validation
+      final ownsCosmetic = await _revenuecatService.userOwnsCosmetic(
+        cosmeticId: cosmetic.id,
+      );
+
+      if (!ownsCosmetic) {
+        throw Exception('Purchase validation failed');
+      }
+
+      // Record purchase in Firestore for app state
       await _firestore
           .collection('users')
           .doc(userId)
@@ -142,7 +177,8 @@ class CosmeticsShopService {
             'cosmetic_id': cosmetic.id,
             'purchased_at': FieldValue.serverTimestamp(),
             'purchase_source': 'shop',
-            'revenueket_product_id': cosmetic.revenuekatProductId,
+            'revenucat_product_id': cosmetic.id,
+            'revenucat_transaction_id': customerInfo.originalAppUserId,
           });
 
       // Track analytics
@@ -151,9 +187,10 @@ class CosmeticsShopService {
         parameters: {
           'cosmetic_id': cosmetic.id,
           'cosmetic_name': cosmetic.name,
-          'price': cosmetic.price,
+          'price_yen': cosmetic.priceJpy,
           'type': cosmetic.typeString,
           'rarity': cosmetic.rarity.name,
+          'payment_method': 'revenucat_validated',
         },
       );
 
@@ -166,7 +203,7 @@ class CosmeticsShopService {
         name: 'cosmetics_purchase_failed',
         parameters: {
           'cosmetic_id': cosmetic.id,
-          'reason': 'firestore_error',
+          'reason': e.toString(),
         },
       );
 
