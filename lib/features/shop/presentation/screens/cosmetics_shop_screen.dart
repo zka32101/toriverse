@@ -27,12 +27,12 @@ class _CosmeticsShopScreenState extends ConsumerState<CosmeticsShopScreen> {
 
   Future<void> _logShopOpened() async {
     // Create analytics service instance and log event
-    const analyticsService = AnalyticsService();
+    final analyticsService = AnalyticsService();
     await analyticsService.logCosmeticsShopOpened();
   }
 
   Future<void> _logTypeFilterApplied(CosmeticType type) async {
-    const analyticsService = AnalyticsService();
+    final analyticsService = AnalyticsService();
     await analyticsService.logCosmeticsShopFiltered(
       filterType: type.typeString,
     );

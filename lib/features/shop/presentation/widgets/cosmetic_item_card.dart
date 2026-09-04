@@ -232,7 +232,7 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
   }
 
   void _logCosmeticPreview(bool isOwned) {
-    const analyticsService = AnalyticsService();
+    final analyticsService = AnalyticsService();
     analyticsService.logCosmeticItemPreviewed(
       cosmeticId: widget.cosmetic.id,
       cosmeticType: widget.cosmetic.typeString,
@@ -274,7 +274,7 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
   }
 
   void _logCosmeticPurchaseSuccess() {
-    const analyticsService = AnalyticsService();
+    final analyticsService = AnalyticsService();
     analyticsService.logCosmeticPurchased(
       cosmeticId: widget.cosmetic.id,
       cosmeticType: widget.cosmetic.typeString,
@@ -285,7 +285,7 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
   }
 
   void _logCosmeticPurchaseFailed(String error) {
-    const analyticsService = AnalyticsService();
+    final analyticsService = AnalyticsService();
     String failureReason = 'unknown';
     if (error.contains('insufficient')) {
       failureReason = 'insufficient_balance';
@@ -324,7 +324,7 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
   }
 
   void _logCosmeticApplied() {
-    const analyticsService = AnalyticsService();
+    final analyticsService = AnalyticsService();
     analyticsService.logCosmeticAppliedToMatch(
       cosmeticId: widget.cosmetic.id,
       cosmeticType: widget.cosmetic.typeString,
