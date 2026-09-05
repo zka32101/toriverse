@@ -39,3 +39,5 @@ targets:
           - lib/features/social/data/models/match_room_model.dart
           - lib/features/social/data/models/replay_model.dart
           - lib/features/social/data/models/user_public_profile_model.dart
+      mockito:mockBuilder:
+        enabled: false
