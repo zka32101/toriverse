@@ -1,10 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../data/models/event_model.dart';
 import '../../domain/services/event_service.dart';
-
-part 'event_providers.freezed.dart';
 
 // Firebase instance
 final firebaseProvider = Provider<FirebaseFirestore>((ref) {
