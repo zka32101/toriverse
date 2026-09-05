@@ -23,9 +23,17 @@ targets:
         enabled: false
       freezed:
         generate_for:
-          - lib/shared/services/**
-          - lib/features/match/**
+          - lib/features/match/data/models/cosmetic_item_model.dart
+          - lib/features/match/data/models/match_model.dart
+          - lib/features/match/data/models/rescue_card_model.dart
+          - lib/features/match/data/models/round_result_model.dart
+          - lib/features/match/data/models/user_model.dart
+          - lib/features/match/data/models/weak_bonus_model.dart
       json_serializable:
         generate_for:
-          - lib/shared/services/**
-          - lib/features/match/**
+          - lib/features/match/data/models/cosmetic_item_model.dart
+          - lib/features/match/data/models/match_model.dart
+          - lib/features/match/data/models/rescue_card_model.dart
+          - lib/features/match/data/models/round_result_model.dart
+          - lib/features/match/data/models/user_model.dart
+          - lib/features/match/data/models/weak_bonus_model.dart
