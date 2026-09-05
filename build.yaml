@@ -22,8 +22,6 @@ targets:
       riverpod_generator:riverpod_generator:
         enabled: false
       freezed:
-        generate_for:
-          - lib/features/shop/**
+        enabled: false
       json_serializable:
-        generate_for:
-          - lib/features/shop/**
+        enabled: false
