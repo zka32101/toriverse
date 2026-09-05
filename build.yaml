@@ -25,3 +25,5 @@ targets:
         enabled: false
       json_serializable:
         enabled: false
+      mockito:mockBuilder:
+        enabled: false
