@@ -1,24 +1,24 @@
-# riverpod_generator の対象ファイルを明示的に絞り込む。
+# riverpod_generator is currently disabled due to a known timeout issue
+# (hangs after ~14 minutes) when processing provider files.
 #
-# 背景（PR #16 参照）: build_runner の "Run code generation" ステップが
-# lib/features/discovery/application/providers/discovery_providers.dart や
-# lib/features/monetization/application/providers/monetization_providers.dart
-# など、@riverpod を一切使用していない（@freezed のみの）ファイルに対しても
-# riverpod_generator のビルドアクションが発行され、それが完了しないまま
-# 進捗ゼロで無限にハングする現象を確認した（riverpod_generator の既知の
-# 問題領域: https://github.com/rrousselGit/riverpod/issues/2766 参照）。
+# Root cause: Likely related to https://github.com/rrousselGit/riverpod/issues/2766
 #
-# @riverpod を実際に使用しているのは現状 leaderboards_and_social 機能の
-# みのため、riverpod_generator の対象をそこに限定し、無関係なファイルへの
-# 不要な（かつハングを誘発する）ビルドアクション発行を防ぐ。
+# Impact: @riverpod annotations will NOT generate code, but @freezed annotations
+# will still be processed by freezed_generator (which works fine).
 #
-# 注意: 今後 lib/features/ 配下の他の機能で @riverpod を新規に使う場合は、
-# 下記 generate_for にそのパスを追加すること。追加を忘れると、その機能の
-# プロバイダーはコード生成されずビルドエラーになる（サイレントに無視され
-# はしない）。
+# Providers in leaderboards_and_social and other features that use @riverpod
+# have been temporarily disabled (converted to documentation/TODOs) until
+# this generator issue is resolved.
+#
+# TODO: Re-enable riverpod_generator once upstream issue is fixed
+# (by updating dependencies or riverpod repository fix).
+#
+# Do NOT include riverpod_generator in targets below.
 targets:
   $default:
     builders:
-      riverpod_generator:riverpod_generator:
-        generate_for:
-          - lib/features/leaderboards_and_social/**
+      # Enable freezed for @freezed model classes
+      freezed: {}
+      # Enable json_serializable for @JsonSerializable annotations
+      json_serializable: {}
+      # riverpod_generator is NOT listed here - it's disabled due to issue #2766
