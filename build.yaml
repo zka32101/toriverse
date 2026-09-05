@@ -22,3 +22,13 @@ targets:
       riverpod_generator:riverpod_generator:
         generate_for:
           - lib/features/social/**
+      freezed:
+        generate_for:
+          - lib/features/shop/**
+          - lib/features/social/**
+          - lib/features/events/**
+      json_serializable:
+        generate_for:
+          - lib/features/shop/**
+          - lib/features/social/**
+          - lib/features/events/**
