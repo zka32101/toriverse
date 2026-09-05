@@ -21,3 +21,11 @@ targets:
     builders:
       riverpod_generator:riverpod_generator:
         enabled: false
+      freezed:
+        generate_for:
+          - lib/shared/services/**
+          - lib/features/match/**
+      json_serializable:
+        generate_for:
+          - lib/shared/services/**
+          - lib/features/match/**
