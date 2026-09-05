@@ -16,4 +16,9 @@
 # Do NOT include riverpod_generator in targets below.
 targets:
   $default:
-    builders: {}
+    builders:
+      # Enable freezed for @freezed model classes
+      freezed: {}
+      # Enable json_serializable for @JsonSerializable annotations
+      json_serializable: {}
+      # riverpod_generator is NOT listed here - it's disabled due to issue #2766
