@@ -20,15 +20,22 @@ targets:
   $default:
     builders:
       riverpod_generator:riverpod_generator:
-        generate_for:
-          - lib/features/social/**
+        enabled: false
       freezed:
         generate_for:
-          - lib/features/shop/**
-          - lib/features/social/**
-          - lib/features/events/**
+          - lib/features/events/data/models/cosmetic_model.dart
+          - lib/features/events/data/models/event_model.dart
+          - lib/features/events/data/models/leaderboard_model.dart
+          - lib/features/social/data/models/friend_model.dart
+          - lib/features/social/data/models/match_room_model.dart
+          - lib/features/social/data/models/replay_model.dart
+          - lib/features/social/data/models/user_public_profile_model.dart
       json_serializable:
         generate_for:
-          - lib/features/shop/**
-          - lib/features/social/**
-          - lib/features/events/**
+          - lib/features/events/data/models/cosmetic_model.dart
+          - lib/features/events/data/models/event_model.dart
+          - lib/features/events/data/models/leaderboard_model.dart
+          - lib/features/social/data/models/friend_model.dart
+          - lib/features/social/data/models/match_room_model.dart
+          - lib/features/social/data/models/replay_model.dart
+          - lib/features/social/data/models/user_public_profile_model.dart
