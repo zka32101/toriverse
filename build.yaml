@@ -20,5 +20,4 @@ targets:
   $default:
     builders:
       riverpod_generator:riverpod_generator:
-        generate_for:
-          - lib/features/leaderboards_and_social/**
+        enabled: false
