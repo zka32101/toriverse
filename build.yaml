@@ -16,9 +16,18 @@
 # 下記 generate_for にそのパスを追加すること。追加を忘れると、その機能の
 # プロバイダーはコード生成されずビルドエラーになる（サイレントに無視され
 # はしない）。
+# riverpod_generator is currently disabled for leaderboards_and_social feature
+# due to a known issue causing timeouts during code generation (>15 minutes).
+# This appears to be related to riverpod_generator issue:
+# https://github.com/rrousselGit/riverpod/issues/2766
+#
+# Workaround: Manually manage generated .g.dart and .freezed.dart files
+# by running `dart run build_runner build --delete-conflicting-outputs` with
+# a higher timeout, or by updating riverpod_generator to a newer version.
+#
+# TODO: Re-enable once the underlying generator issue is resolved.
 targets:
   $default:
     builders:
       riverpod_generator:riverpod_generator:
-        generate_for:
-          - lib/features/leaderboards_and_social/**
+        generate_for: []
