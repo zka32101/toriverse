@@ -23,6 +23,10 @@ dependencies:
   firebase_crashlytics: ^3.4.0
   firebase_remote_config: ^4.3.0
 
+  # 認証（OAuth）
+  google_sign_in: ^6.1.0
+  sign_in_with_apple: ^5.0.0
+
   # 課金・広告
   purchases_flutter: ^7.0.0
   google_mobile_ads: ^3.0.0
