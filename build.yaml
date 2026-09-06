@@ -20,5 +20,22 @@ targets:
   $default:
     builders:
       riverpod_generator:riverpod_generator:
+        enabled: false
+      freezed:
         generate_for:
-          - lib/features/leaderboards_and_social/**
+          - lib/features/match/data/models/cosmetic_item_model.dart
+          - lib/features/match/data/models/match_model.dart
+          - lib/features/match/data/models/rescue_card_model.dart
+          - lib/features/match/data/models/round_result_model.dart
+          - lib/features/match/data/models/user_model.dart
+          - lib/features/match/data/models/weak_bonus_model.dart
+      json_serializable:
+        generate_for:
+          - lib/features/match/data/models/cosmetic_item_model.dart
+          - lib/features/match/data/models/match_model.dart
+          - lib/features/match/data/models/rescue_card_model.dart
+          - lib/features/match/data/models/round_result_model.dart
+          - lib/features/match/data/models/user_model.dart
+          - lib/features/match/data/models/weak_bonus_model.dart
+      mockito:mockBuilder:
+        enabled: false
