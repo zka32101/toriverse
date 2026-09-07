@@ -73,7 +73,6 @@ class AIPlayer {
     // 合法手がないターンをスキップ
     if (validMoves.isEmpty) {
       // 別のプレイヤーのターンへ（簡略化のため現在は敵プレイヤーのみ）
-      final nextPlayer = (currentPlayer + 1) % 3;
       return _minimax(board, depth, aiPlayer, !isMaximizing);
     }
 
