@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../application/providers/auth_provider.dart';
-import '../../application/providers/match_initialization_state.dart';
+import 'package:toriverse/features/auth/application/providers/auth_provider.dart';
+import 'package:toriverse/features/match/application/providers/match_initialization_state.dart';
 
 /// Home screen: main menu with matching, friend match, and shop buttons
 class HomeScreen extends ConsumerWidget {

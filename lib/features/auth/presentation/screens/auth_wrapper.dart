@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../application/providers/auth_provider.dart';
+import 'package:toriverse/features/auth/application/providers/auth_provider.dart';
 
 /// Authentication wrapper - routes to login or home based on auth state
 class AuthWrapper extends ConsumerWidget {
