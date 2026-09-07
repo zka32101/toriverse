@@ -311,12 +311,12 @@ void main() {
 
     test('randomizeOrder can produce different results', () {
       final players = ['player1', 'player2', 'player3'];
-      final orders = <List<String>>{};
+      final orders = <String>{};
 
       // Generate multiple random orders
       for (int i = 0; i < 10; i++) {
         final order = ProcessOrderRandomizer.randomizeOrder(players);
-        orders.add(order);
+        orders.add(order.join(','));
       }
 
       // Should have multiple distinct orders (very unlikely to be all same)
