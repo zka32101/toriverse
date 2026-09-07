@@ -1,4 +1,5 @@
 import 'dart:math';
+import '../../application/services/remote_config_service.dart';
 import '../../data/models/round_result_model.dart';
 import '../../domain/entities/board.dart';
 import '../../domain/services/bonus_calculator.dart';
@@ -10,7 +11,9 @@ class MoveApplicator {
   ///
   /// Returns a [RoundResultModel] capturing the round's outcome
   ///
-  /// Optional [bonusCalculator] enables weak bonus checking. If null, bonus is not computed.
+  /// Bonus tracking:
+  /// - [previousBonusActivations]: activation counts per player for weak bonus (default: [0, 0, 0])
+  /// - [configService]: RemoteConfigService for bonus thresholds (optional, uses defaults if null)
   static RoundResultModel applyRoundMoves({
     required String matchId,
     required int roundIndex,
@@ -21,6 +24,8 @@ class MoveApplicator {
     required RivalryTracker? rivalryTracker,
     BonusCalculator? bonusCalculator,
     List<ReplayEvent> replayEvents = const [],
+    List<int> previousBonusActivations = const [0, 0, 0],
+    RemoteConfigService? configService,
   }) {
     // Step 1: Detect same-square collisions
     final collisions = _detectCollisions(submittedPositions, playerIds);
@@ -64,29 +69,56 @@ class MoveApplicator {
 
     // Step 4: Check if weak bonus should trigger (if calculator provided)
     String bonusTriggeredPlayerId = '';
+    final bonusTriggersThisRound = <String>[];
+
     if (bonusCalculator != null) {
       // Check each player for weak bonus eligibility
-      // Bonus applies to player in bottom 20% of stone count at round ≤ 11
+      // Bonus applies to player in bottom 20% of stone count when remaining rounds ≤ 11
       final stoneCounts = boardBefore.countStones();
-      final playerStones = <String, int>{};
-      for (int i = 0; i < playerIds.length; i++) {
-        final stoneType = i == 0 ? Board.black : (i == 1 ? Board.white : Board.red);
-        playerStones[playerIds[i]] = stoneCounts[stoneType] ?? 0;
-      }
+      final totalRounds = 64; // 8x8 board = 64 positions max
+      final roundsRemaining = totalRounds - roundIndex;
 
-      // For now, check if any player qualifies (full logic requires match history)
-      // This is a simplified check - full implementation would need:
-      // - Previous stone diffs
-      // - Match-level activation count
-      // - Proper percentile calculation
-      if (roundIndex <= 10) {
-        // Placeholder: could improve with proper percentile logic
-        // Bonus would be applied during move processing if triggered
-        // bonusTriggeredPlayerId = ...computed logic...
+      for (int playerIndex = 0; playerIndex < playerIds.length; playerIndex++) {
+        final playerId = playerIds[playerIndex];
+        final stoneType = playerIndex == 0 ? Board.black : (playerIndex == 1 ? Board.white : Board.red);
+        final stoneCounts_list = [
+          stoneCounts[Board.black] ?? 0,
+          stoneCounts[Board.white] ?? 0,
+          stoneCounts[Board.red] ?? 0,
+        ];
+
+        // Check weak bonus eligibility
+        final previousActivations = previousBonusActivations[playerIndex];
+        if (BonusCalculator.shouldActivateBonus(
+          roundsRemaining: roundsRemaining,
+          stoneCounts: stoneCounts_list,
+          previousActivations: previousActivations,
+          playerIndex: playerIndex,
+          configService: configService,
+        )) {
+          bonusTriggersThisRound.add(playerId);
+          bonusTriggeredPlayerId = playerId; // Last qualifying player gets the bonus
+        }
       }
     }
 
-    // Step 5: Build result model
+    // Step 5: Add bonus trigger events to replay sequence
+    final finalReplayEvents = [...replayEvents];
+    for (final playerId in bonusTriggersThisRound) {
+      // Add weak bonus animation event
+      finalReplayEvents.add(
+        ReplayEvent(
+          type: 'weak_bonus_triggered',
+          data: {
+            'playerId': playerId,
+            'description': '弱者ボーナス発動！',
+          },
+          delayMs: 500,
+        ),
+      );
+    }
+
+    // Step 6: Build result model
     return RoundResultModel(
       id: '${matchId}_$roundIndex',
       matchId: matchId,
@@ -94,7 +126,7 @@ class MoveApplicator {
       submittedMoves: submittedMoves,
       collisionResolved: collisions,
       processOrder: processOrder,
-      replayEvents: replayEvents,
+      replayEvents: finalReplayEvents,
       createdAt: DateTime.now(),
       processedAt: DateTime.now(),
       bonusTriggered: bonusTriggeredPlayerId,
