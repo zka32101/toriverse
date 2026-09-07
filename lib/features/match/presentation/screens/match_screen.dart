@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toriverse/config/theme.dart';
+import 'package:toriverse/features/auth/application/providers/auth_provider.dart';
 import 'package:toriverse/features/match/application/providers/ai_takeover_state.dart';
 import 'package:toriverse/features/match/application/providers/game_state.dart';
 import 'package:toriverse/features/match/application/providers/inactivity_provider.dart';
@@ -41,10 +42,14 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
   @override
   void initState() {
     super.initState();
-    _currentPlayerId = 'player_0'; // TODO: Get from user auth context
+
+    // Initialize current player ID - will be updated in build
+    _currentPlayerId = '';
 
     // Start first round and schedule AI moves sequentially
-    _startNewRoundAndSchedule();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startNewRoundAndSchedule();
+    });
   }
 
   Future<void> _startNewRoundAndSchedule() async {
@@ -390,6 +395,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserId = ref.watch(currentUserIdProvider);
     final gameState = ref.watch(gameStateProvider);
     final roundPhase = ref.watch(roundPhaseProvider);
     final roundSubmission = ref.watch(roundSubmissionProvider);
@@ -398,7 +404,12 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     final rivalryState = ref.watch(rivalryProvider);
     final aiTakeoverState = ref.watch(aiTakeoverProvider);
 
-    if (gameState == null) {
+    // Update current player ID from auth
+    if (currentUserId != null && _currentPlayerId.isEmpty) {
+      _currentPlayerId = currentUserId;
+    }
+
+    if (gameState == null || currentUserId == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('マッチ')),
         body: const Center(child: CircularProgressIndicator()),
