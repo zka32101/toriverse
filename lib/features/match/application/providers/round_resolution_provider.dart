@@ -1,6 +1,6 @@
 import 'package:riverpod/riverpod.dart';
-import '../../application/services/remote_config_service.dart';
-import '../../application/services/round_processor.dart';
+import '../services/remote_config_service.dart';
+import '../services/round_processor.dart';
 import '../../data/models/round_result_model.dart';
 import '../../domain/entities/board.dart';
 import '../services/move_applicator.dart';
