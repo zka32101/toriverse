@@ -312,22 +312,23 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
   void _applyRoundMoves() async {
     final gameState = ref.read(gameStateProvider);
     final roundSubmission = ref.read(roundSubmissionProvider);
+    final currentResolution = _currentResolution;
 
-    if (gameState == null || roundSubmission == null || _currentResolution == null) {
+    if (gameState == null || roundSubmission == null || currentResolution == null) {
       return;
     }
 
     try {
       // Get the resolved board state
-      final newBoard = _currentResolution!.boardAfter;
+      final newBoard = currentResolution.boardAfter;
 
       // Compute attack breakdown for rivalry tracking from the resolution
       final roundBreakdown = <int, Map<int, int>>{};
 
       // Use the processor from the resolution to get attack breakdown
-      final roundResult = _currentResolution!.result;
+      final roundResult = currentResolution.result;
       if (roundResult.boardAfter != null) {
-        for (final playerId in _currentResolution!.result.processOrder) {
+        for (final playerId in currentResolution.result.processOrder) {
           final move = roundSubmission.submittedPositions[playerId];
           if (move != null) {
             final playerIndex = gameState.playerIds.indexOf(playerId);
@@ -353,7 +354,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
       // Clean up and prepare for next round
       ref.read(roundResultProvider.notifier).clear();
 
-      if (_currentResolution!.isGameOver) {
+      if (currentResolution.isGameOver) {
         // Update game state to finished
         ref.read(gameStateProvider.notifier).updateGameState(
           board: newBoard,
