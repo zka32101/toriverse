@@ -309,7 +309,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     }
   }
 
-  void _applyRoundMoves() async {
+  Future<void> _applyRoundMoves() async {
     final gameState = ref.read(gameStateProvider);
     final roundSubmission = ref.read(roundSubmissionProvider);
     final currentResolution = _currentResolution;
