@@ -6,10 +6,10 @@ import '../services/remote_config_service.dart';
 /// Tracks consecutive attacks and rescue card state per player per match
 class RescueCardNotifier extends StateNotifier<Map<String, RescueCardModel>> {
   RescueCardNotifier({
-    required this.configService,
+    this.configService,
   }) : super({});
 
-  final RemoteConfigService configService;
+  final RemoteConfigService? configService;
 
   /// Initialize rescue cards for a match (all players start at 0 attacks)
   void initializeMatch(String matchId, List<String> playerIds) {
