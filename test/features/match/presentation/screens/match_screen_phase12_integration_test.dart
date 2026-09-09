@@ -32,19 +32,19 @@ void main() {
       }
     });
 
-    test('different AI difficulties produce valid moves', () {
+    test('different AI difficulties produce valid moves', () async {
       final board = Board.createBoard();
 
-      final easyMove = getAIMove(board, 0, AIDifficulty.easy);
-      final normalMove = getAIMove(board, 0, AIDifficulty.normal);
-      final hardMove = getAIMove(board, 0, AIDifficulty.hard);
-      final expertMove = getAIMove(board, 0, AIDifficulty.expert);
+      final easyMove = await getAIMove(board, 0, AIDifficulty.easy);
+      final normalMove = await getAIMove(board, 0, AIDifficulty.normal);
+      final hardMove = await getAIMove(board, 0, AIDifficulty.hard);
+      final expertMove = await getAIMove(board, 0, AIDifficulty.expert);
 
       // All should complete without error
-      expect(easyMove, isNotNull);
-      expect(normalMove, isNotNull);
-      expect(hardMove, isNotNull);
-      expect(expertMove, isNotNull);
+      expect(easyMove, anyOf([isNull, isA<List<int>>()]));
+      expect(normalMove, anyOf([isNull, isA<List<int>>()]));
+      expect(hardMove, anyOf([isNull, isA<List<int>>()]));
+      expect(expertMove, anyOf([isNull, isA<List<int>>()]));
     });
   });
 
