@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:toriverse/features/match/application/providers/ai_difficulty_provider.dart';
 import 'package:toriverse/features/match/application/providers/round_resolution_provider.dart';
 import 'package:toriverse/features/match/application/providers/rescue_card_state.dart';
+import 'package:toriverse/features/match/application/services/round_processor.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
 
 void main() {
