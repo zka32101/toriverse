@@ -364,11 +364,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
 
         // Navigate to results screen
         if (mounted) {
-          context.pushNamed(
-            'results',
-            pathParameters: {'matchId': widget.matchId},
-            extra: _currentResolution!.winners,
-          );
+          context.push('/results/${widget.matchId}');
         }
       } else {
         // Update game state to continue
