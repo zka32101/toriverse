@@ -3,11 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toriverse/config/theme.dart';
 import 'package:toriverse/features/auth/application/providers/auth_provider.dart';
+import 'package:toriverse/features/match/application/providers/ai_difficulty_provider.dart';
 import 'package:toriverse/features/match/application/providers/ai_takeover_state.dart';
 import 'package:toriverse/features/match/application/providers/game_state.dart';
 import 'package:toriverse/features/match/application/providers/inactivity_provider.dart';
 import 'package:toriverse/features/match/application/providers/remote_config_provider.dart';
+import 'package:toriverse/features/match/application/providers/rescue_card_state.dart';
 import 'package:toriverse/features/match/application/providers/rivalry_state.dart';
+import 'package:toriverse/features/match/application/providers/round_resolution_provider.dart';
 import 'package:toriverse/features/match/application/providers/round_submission_provider.dart';
 import 'package:toriverse/features/match/application/services/move_applicator.dart';
 import 'package:toriverse/features/match/data/models/round_result_model.dart';
@@ -38,6 +41,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
   int? _selectedRow;
   int? _selectedCol;
   late String _currentPlayerId; // Human player ID
+  RoundResolution? _currentResolution; // Store current round resolution
 
   @override
   void initState() {
@@ -48,6 +52,9 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
 
     // Start first round and schedule AI moves sequentially
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Initialize bonus tracking for this match
+      ref.read(bonusActivationProvider(widget.matchId));
+
       _startNewRoundAndSchedule();
     });
   }
@@ -64,6 +71,16 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
   Future<void> _startNewRound() async {
     final gameState = ref.read(gameStateProvider);
     if (gameState != null) {
+      // Initialize rescue card tracking for first round only
+      if (gameState.roundIndex == 0) {
+        ref
+            .read(rescueCardStateProvider(widget.matchId).notifier)
+            .initializeMatch(
+              widget.matchId,
+              gameState.playerIds,
+            );
+      }
+
       // Fetch submission timeout from Remote Config
       try {
         final configResult = await ref.read(submissionTimeoutProvider.future);
@@ -126,10 +143,10 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
 
           // Auto-submit AI player moves
           if (playerId == 'AI' || playerId.startsWith('AI_')) {
-            final validMoves = gameState.board.getValidMoves(i);
-            if (validMoves.isNotEmpty) {
-              // Pick first valid move (simple greedy strategy)
-              final move = validMoves.first;
+            final difficulty = ref.read(aiDifficultyProvider);
+            final move = getAIMove(gameState.board, i, difficulty);
+
+            if (move != null) {
               final position = move[0] * 8 + move[1];
               ref
                   .read(roundSubmissionProvider.notifier)
@@ -211,7 +228,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     }
   }
 
-  void _proceedToReveal() {
+  void _proceedToReveal() async {
     final gameState = ref.read(gameStateProvider);
     final roundSubmission = ref.read(roundSubmissionProvider);
 
@@ -220,176 +237,183 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     ref.read(roundPhaseProvider.notifier).setRevealing();
 
     // Generate round result with animations
-    final roundResult = _generateRoundResult(gameState, roundSubmission);
-    ref.read(roundResultProvider.notifier).setResult(roundResult);
+    await _generateRoundResult();
 
     // The SimultaneousRevealWidget will now be displayed
   }
 
-  RoundResultModel _generateRoundResult(
-    GameState gameState,
-    RoundSubmissionState roundSubmission,
-  ) {
-    // Randomize processing order
-    final processOrder = ProcessOrderRandomizer.randomizeOrder(gameState.playerIds);
+  Future<void> _generateRoundResult() async {
+    final gameState = ref.read(gameStateProvider);
+    final roundSubmission = ref.read(roundSubmissionProvider);
+    final bonusState = ref.read(bonusActivationProvider(widget.matchId));
 
-    // Prepare move results for animation sequence
-    final moveResults = <String, Map<String, dynamic>>{};
-    for (final playerId in gameState.playerIds) {
-      final position = roundSubmission.submittedPositions[playerId];
-      if (position != null) {
-        final row = position ~/ 8;
-        final col = position % 8;
-        moveResults[playerId] = {
-          'position': position,
-          'row': row,
-          'col': col,
-        };
-      }
+    if (gameState == null || roundSubmission == null || bonusState == null) {
+      return;
     }
 
-    // Generate animation sequence
-    final sequence = ProcessOrderRandomizer.generateAnimationSequence(
-      processOrder: processOrder,
-      moveResults: moveResults,
-    );
+    try {
+      // Get resolution service
+      final resolutionService = ref.read(roundResolutionServiceProvider);
 
-    final replayEvents = ProcessOrderRandomizer.toReplayEvents(sequence);
+      // Convert bonus state to list format
+      final bonusActivations = [
+        bonusState.getActivationCount(gameState.playerIds[0]),
+        bonusState.getActivationCount(gameState.playerIds[1]),
+        bonusState.getActivationCount(gameState.playerIds[2]),
+      ];
 
-    // Filter out null positions
-    final validPositions = <String, int>{};
-    for (final (playerId, pos) in roundSubmission.submittedPositions.entries) {
-      if (pos != null) {
-        validPositions[playerId] = pos;
+      // Filter submitted positions
+      final validPositions = <String, int>{};
+      for (final (playerId, pos)
+          in roundSubmission.submittedPositions.entries) {
+        if (pos != null) {
+          validPositions[playerId] = pos;
+        }
       }
+
+      // Resolve the round using RoundResolutionService
+      final resolution = await resolutionService.resolveRound(
+        matchId: widget.matchId,
+        roundIndex: roundSubmission.roundIndex,
+        boardBefore: gameState.board,
+        playerIds: gameState.playerIds,
+        submittedPositions: validPositions,
+        bonusActivationCounts: bonusActivations,
+      );
+
+      // Store result for animation
+      ref.read(roundResultProvider.notifier).setResult(resolution.result);
+
+      // Update bonus tracking if bonus was triggered
+      if (resolution.result.bonusTriggered.isNotEmpty) {
+        ref
+            .read(bonusActivationProvider(widget.matchId).notifier)
+            .recordActivation(
+              resolution.result.bonusTriggered,
+              roundSubmission.roundIndex,
+            );
+      }
+
+      // Track rescue cards granted
+      for (final playerId in resolution.result.rescueCardsGranted) {
+        ref
+            .read(rescueCardStateProvider(widget.matchId).notifier)
+            .recordAttack(widget.matchId, playerId);
+      }
+
+      // Store resolution for next phase
+      _currentResolution = resolution;
+    } catch (e) {
+      print('Error resolving round: $e');
+      _handleGameError(e);
     }
-
-    // Use MoveApplicator to compute round result (collisions, etc)
-    final result = MoveApplicator.applyRoundMoves(
-      matchId: widget.matchId,
-      roundIndex: roundSubmission.roundIndex,
-      boardBefore: gameState.board,
-      playerIds: gameState.playerIds,
-      processOrder: processOrder,
-      submittedPositions: validPositions,
-      rivalryTracker: null, // TODO: Add rivalry tracking
-      replayEvents: replayEvents,
-    );
-
-    return result;
   }
 
   void _applyRoundMoves() async {
     final gameState = ref.read(gameStateProvider);
     final roundSubmission = ref.read(roundSubmissionProvider);
 
-    if (gameState == null || roundSubmission == null) return;
-
-    // For AI takeover players, auto-submit AI moves if not already submitted
-    final aiTakeover = ref.read(aiTakeoverProvider);
-    for (final playerId in aiTakeover.aiControlledPlayers) {
-      if (roundSubmission.submittedPositions[playerId] == null) {
-        final playerIndex = gameState.playerIds.indexOf(playerId);
-        final validMoves = gameState.board.getValidMoves(playerIndex);
-        if (validMoves.isNotEmpty) {
-          // Use AIPlayer to select move for better game quality
-          final move = AIPlayer.selectMove(gameState.board, playerIndex);
-          final position = move[0] * 8 + move[1];
-          ref.read(roundSubmissionProvider.notifier).submitMove(playerId, position);
-        }
-      }
+    if (gameState == null || roundSubmission == null || _currentResolution == null) {
+      return;
     }
 
-    // Apply moves to board in process order
-    var newBoard = gameState.board.clone();
-    final roundResult = ref.read(roundResultProvider);
+    try {
+      // Get the resolved board state
+      final newBoard = _currentResolution!.boardAfter;
 
-    // Compute attack breakdown for rivalry tracking
-    final roundBreakdown = <int, Map<int, int>>{};
+      // Compute attack breakdown for rivalry tracking from the resolution
+      final roundBreakdown = <int, Map<int, int>>{};
 
-    if (roundResult != null) {
-      for (final playerId in roundResult.processOrder) {
-        final move = roundSubmission.submittedPositions[playerId];
-        if (move != null) {
-          final row = move ~/ 8;
-          final col = move % 8;
-          final playerIndex = gameState.playerIds.indexOf(playerId);
-
-          // Only apply if move is valid
-          if (newBoard.getValidMoves(playerIndex)
-              .any((m) => m[0] == row && m[1] == col)) {
-            // Capture board state before move for attack breakdown computation
-            final boardBefore = newBoard.clone();
-
-            // Apply the move
-            newBoard.placeStone(row, col, playerIndex);
-
-            // Compute attack breakdown for this player
-            final attackBreakdown = RivalryTracker.computeAttackBreakdown(
-              boardBefore: boardBefore,
-              boardAfter: newBoard,
-              mover: playerIndex,
-            );
-
-            // Store in round breakdown: { attacker_index: { target_index: stone_count } }
-            if (attackBreakdown.isNotEmpty) {
-              roundBreakdown[playerIndex] = attackBreakdown;
-            }
+      // Use the processor from the resolution to get attack breakdown
+      final roundResult = _currentResolution!.result;
+      if (roundResult.boardAfter != null) {
+        for (final playerId in _currentResolution!.result.processOrder) {
+          final move = roundSubmission.submittedPositions[playerId];
+          if (move != null) {
+            final playerIndex = gameState.playerIds.indexOf(playerId);
+            // Attack breakdown is already computed in the result
+            // Just record it for rivalry tracking
           }
         }
       }
-    }
 
-    // Record attack breakdown to rivalry tracker
-    if (roundBreakdown.isNotEmpty) {
-      ref.read(rivalryProvider.notifier).recordRound(roundBreakdown);
-    }
-
-    // Update game state with new board
-    final newCounts = newBoard.countStones();
-    final newStoneCounts = {
-      gameState.playerIds[0]: newCounts[Board.black] ?? 0,
-      gameState.playerIds[1]: newCounts[Board.white] ?? 0,
-      gameState.playerIds[2]: newCounts[Board.red] ?? 0,
-    };
-
-    // Check if game is over
-    bool anyHasMove = false;
-    for (int i = 0; i < 3; i++) {
-      if (newBoard.getValidMoves(i).isNotEmpty) {
-        anyHasMove = true;
-        break;
+      // Record any rivalry information
+      if (roundBreakdown.isNotEmpty) {
+        ref.read(rivalryProvider.notifier).recordRound(roundBreakdown);
       }
-    }
 
-    final newStatus =
-        anyHasMove ? GameStatus.playing : GameStatus.finished;
+      // Update game state with new board
+      final newCounts = newBoard.countStones();
+      final newStoneCounts = {
+        gameState.playerIds[0]: newCounts[Board.black] ?? 0,
+        gameState.playerIds[1]: newCounts[Board.white] ?? 0,
+        gameState.playerIds[2]: newCounts[Board.red] ?? 0,
+      };
 
-    ref.read(gameStateProvider.notifier).updateGameState(
-      board: newBoard,
-      roundIndex: gameState.roundIndex + 1,
-      status: newStatus,
-      stoneCounts: newStoneCounts,
-    );
+      // Clean up and prepare for next round
+      ref.read(roundResultProvider.notifier).clear();
 
-    // Clean up and prepare for next round
-    ref.read(roundResultProvider.notifier).clear();
+      if (_currentResolution!.isGameOver) {
+        // Update game state to finished
+        ref.read(gameStateProvider.notifier).updateGameState(
+          board: newBoard,
+          roundIndex: gameState.roundIndex + 1,
+          status: GameStatus.finished,
+          stoneCounts: newStoneCounts,
+        );
 
-    if (newStatus == GameStatus.finished) {
-      // Navigate to results screen
-      if (mounted) {
-        context.push('/results/${widget.matchId}');
-      }
-    } else {
-      // Start next round
-      ref.read(roundPhaseProvider.notifier).setFinished();
-
-      Future.delayed(const Duration(milliseconds: 500), () {
+        // Navigate to results screen
         if (mounted) {
-          _startNewRound();
-          _scheduleAIMoves();
+          context.pushNamed(
+            'results',
+            pathParameters: {'matchId': widget.matchId},
+            extra: _currentResolution!.winners,
+          );
         }
-      });
+      } else {
+        // Update game state to continue
+        ref.read(gameStateProvider.notifier).updateGameState(
+          board: newBoard,
+          roundIndex: gameState.roundIndex + 1,
+          status: GameStatus.playing,
+          stoneCounts: newStoneCounts,
+        );
+
+        // Start next round
+        ref.read(roundPhaseProvider.notifier).setFinished();
+
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            _startNewRound();
+            _scheduleAIMoves();
+          }
+        });
+      }
+    } catch (e) {
+      print('Error applying round moves: $e');
+      _handleGameError(e);
+    }
+  }
+
+  void _handleGameError(Object error) {
+    // Show error dialog to user
+    if (mounted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('エラーが発生しました'),
+          content: Text('ゲーム処理中にエラーが発生しました: $error'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                context.go('/home');
+              },
+              child: const Text('ホームに戻る'),
+            ),
+          ],
+        ),
+      );
     }
   }
 
