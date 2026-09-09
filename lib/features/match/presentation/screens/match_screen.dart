@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -304,7 +305,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
       // Store resolution for next phase
       _currentResolution = resolution;
     } catch (e) {
-      print('Error resolving round: $e');
+      debugPrint('Error resolving round: $e');
       _handleGameError(e);
     }
   }
@@ -387,7 +388,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
         });
       }
     } catch (e) {
-      print('Error applying round moves: $e');
+      debugPrint('Error applying round moves: $e');
       _handleGameError(e);
     }
   }
