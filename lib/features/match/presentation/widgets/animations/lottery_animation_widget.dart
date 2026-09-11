@@ -162,13 +162,14 @@ class _LotteryAnimationWidgetState extends State<LotteryAnimationWidget>
       final playerName = widget.playerNames[i];
       final playerIndexInList = widget.playerIndices[i];
       final stoneColor = ToriverseTheme.getStoneColor(playerIndexInList);
+      final cardIndex = i; // Capture loop variable for closure
 
       cards.add(
         AnimatedBuilder(
           animation: _mainController,
           builder: (context, child) {
             // Calculate when this card should appear
-            final cardStartTime = (i * 1000.0) / _mainController.duration!.inMilliseconds;
+            final cardStartTime = (cardIndex * 1000.0) / _mainController.duration!.inMilliseconds;
             final cardProgress = (_mainController.value - cardStartTime).clamp(0.0, 1.0);
 
             return ScaleTransition(
@@ -217,7 +218,7 @@ class _LotteryAnimationWidgetState extends State<LotteryAnimationWidget>
                         ),
                         child: Center(
                           child: Text(
-                            '${i + 1}',
+                            '${cardIndex + 1}',
                             style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
@@ -242,7 +243,7 @@ class _LotteryAnimationWidgetState extends State<LotteryAnimationWidget>
                                   ),
                             ),
                             Text(
-                              '${i + 1}番目に反転',
+                              '${cardIndex + 1}番目に反転',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall
