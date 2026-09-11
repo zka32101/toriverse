@@ -148,34 +148,112 @@ final eventNotifierProvider =
   return EventNotifier(service, userId, ref);
 });
 
-@freezed
-class EventMutation with _$EventMutation {
-  const factory EventMutation.joinEvent({
-    required String eventId,
-  }) = _JoinEventMutation;
+sealed class EventMutation {
+  const EventMutation();
+}
 
-  const factory EventMutation.addScore({
-    required String eventId,
-    required int points,
-  }) = _AddScoreMutation;
+class JoinEventMutation extends EventMutation {
+  const JoinEventMutation({required this.eventId});
+  final String eventId;
 
-  const factory EventMutation.completeChallenge({
-    required String eventId,
-    required String challengeId,
-  }) = _CompletechallengeMutation;
+  @override
+  int get hashCode => eventId.hashCode;
 
-  const factory EventMutation.unlockCosmetic({
-    required String eventId,
-    required String cosmeticId,
-  }) = _UnlockCosmeticMutation;
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is JoinEventMutation && eventId == other.eventId;
+}
 
-  const factory EventMutation.updateLeaderboardEntry({
-    required String eventId,
-    required String displayName,
-    required int score,
-    required int completedChallenges,
-    required int unlockedCosmetics,
-  }) = _UpdateLeaderboardEntryMutation;
+class AddScoreMutation extends EventMutation {
+  const AddScoreMutation({
+    required this.eventId,
+    required this.points,
+  });
+  final String eventId;
+  final int points;
+
+  @override
+  int get hashCode => Object.hash(eventId, points);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AddScoreMutation &&
+          eventId == other.eventId &&
+          points == other.points;
+}
+
+class CompletechallengeMutation extends EventMutation {
+  const CompletechallengeMutation({
+    required this.eventId,
+    required this.challengeId,
+  });
+  final String eventId;
+  final String challengeId;
+
+  @override
+  int get hashCode => Object.hash(eventId, challengeId);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CompletechallengeMutation &&
+          eventId == other.eventId &&
+          challengeId == other.challengeId;
+}
+
+class UnlockCosmeticMutation extends EventMutation {
+  const UnlockCosmeticMutation({
+    required this.eventId,
+    required this.cosmeticId,
+  });
+  final String eventId;
+  final String cosmeticId;
+
+  @override
+  int get hashCode => Object.hash(eventId, cosmeticId);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UnlockCosmeticMutation &&
+          eventId == other.eventId &&
+          cosmeticId == other.cosmeticId;
+}
+
+class UpdateLeaderboardEntryMutation extends EventMutation {
+  const UpdateLeaderboardEntryMutation({
+    required this.eventId,
+    required this.displayName,
+    required this.score,
+    required this.completedChallenges,
+    required this.unlockedCosmetics,
+  });
+  final String eventId;
+  final String displayName;
+  final int score;
+  final int completedChallenges;
+  final int unlockedCosmetics;
+
+  @override
+  int get hashCode => Object.hash(
+    eventId,
+    displayName,
+    score,
+    completedChallenges,
+    unlockedCosmetics,
+  );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UpdateLeaderboardEntryMutation &&
+          eventId == other.eventId &&
+          displayName == other.displayName &&
+          score == other.score &&
+          completedChallenges == other.completedChallenges &&
+          unlockedCosmetics == other.unlockedCosmetics;
 }
 
 class EventNotifier extends StateNotifier<AsyncValue<void>> {

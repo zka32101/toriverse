@@ -1,68 +1,148 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../data/repositories/analytics_and_moderation_repository.dart';
 import '../../domain/models/analytics_and_moderation.dart';
 
-part 'analytics_and_moderation_providers.freezed.dart';
-
 // ===== PROVIDER PARAMETER CLASSES =====
 
-@freezed
-class RevenueAnalyticsParam with _$RevenueAnalyticsParam {
-  const factory RevenueAnalyticsParam({
-    required String creatorId,
-    @Default('monthly') String period,
-  }) = _RevenueAnalyticsParam;
+class RevenueAnalyticsParam {
+  const RevenueAnalyticsParam({
+    required this.creatorId,
+    this.period = 'monthly',
+  });
+
+  final String creatorId;
+  final String period;
+
+  @override
+  int get hashCode => Object.hash(creatorId, period);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RevenueAnalyticsParam &&
+          creatorId == other.creatorId &&
+          period == other.period;
 }
 
-@freezed
-class TopContentParam with _$TopContentParam {
-  const factory TopContentParam({
-    required String creatorId,
-    @Default(10) int limit,
-    @Default('month') String period,
-  }) = _TopContentParam;
+class TopContentParam {
+  const TopContentParam({
+    required this.creatorId,
+    this.limit = 10,
+    this.period = 'month',
+  });
+
+  final String creatorId;
+  final int limit;
+  final String period;
+
+  @override
+  int get hashCode => Object.hash(creatorId, limit, period);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TopContentParam &&
+          creatorId == other.creatorId &&
+          limit == other.limit &&
+          period == other.period;
 }
 
-@freezed
-class GrowthTrendsParam with _$GrowthTrendsParam {
-  const factory GrowthTrendsParam({
-    required String creatorId,
-    @Default('month') String period,
-  }) = _GrowthTrendsParam;
+class GrowthTrendsParam {
+  const GrowthTrendsParam({
+    required this.creatorId,
+    this.period = 'month',
+  });
+
+  final String creatorId;
+  final String period;
+
+  @override
+  int get hashCode => Object.hash(creatorId, period);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is GrowthTrendsParam &&
+          creatorId == other.creatorId &&
+          period == other.period;
 }
 
-@freezed
-class ReportsQueueParam with _$ReportsQueueParam {
-  const factory ReportsQueueParam({
-    @Default(ReportStatus.open) ReportStatus status,
-    @Default(50) int limit,
-  }) = _ReportsQueueParam;
+class ReportsQueueParam {
+  const ReportsQueueParam({
+    this.status = ReportStatus.open,
+    this.limit = 50,
+  });
+
+  final ReportStatus status;
+  final int limit;
+
+  @override
+  int get hashCode => Object.hash(status, limit);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReportsQueueParam &&
+          status == other.status &&
+          limit == other.limit;
 }
 
-@freezed
-class NotificationHistoryParam with _$NotificationHistoryParam {
-  const factory NotificationHistoryParam({
-    required String userId,
-    @Default(50) int limit,
-  }) = _NotificationHistoryParam;
+class NotificationHistoryParam {
+  const NotificationHistoryParam({
+    required this.userId,
+    this.limit = 50,
+  });
+
+  final String userId;
+  final int limit;
+
+  @override
+  int get hashCode => Object.hash(userId, limit);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NotificationHistoryParam &&
+          userId == other.userId &&
+          limit == other.limit;
 }
 
-@freezed
-class FeatureUsageParam with _$FeatureUsageParam {
-  const factory FeatureUsageParam({
-    required String featureId,
-    @Default('daily') String period,
-  }) = _FeatureUsageParam;
+class FeatureUsageParam {
+  const FeatureUsageParam({
+    required this.featureId,
+    this.period = 'daily',
+  });
+
+  final String featureId;
+  final String period;
+
+  @override
+  int get hashCode => Object.hash(featureId, period);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FeatureUsageParam &&
+          featureId == other.featureId &&
+          period == other.period;
 }
 
-@freezed
-class PlatformMetricsParam with _$PlatformMetricsParam {
-  const factory PlatformMetricsParam({
-    @Default('daily') String period,
-  }) = _PlatformMetricsParam;
+class PlatformMetricsParam {
+  const PlatformMetricsParam({
+    this.period = 'daily',
+  });
+
+  final String period;
+
+  @override
+  int get hashCode => period.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PlatformMetricsParam && period == other.period;
 }
 
 // ===== REPOSITORY PROVIDER =====

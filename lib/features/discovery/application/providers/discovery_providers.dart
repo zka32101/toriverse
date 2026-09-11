@@ -1,40 +1,81 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import '../../data/repositories/discovery_repository.dart';
 import '../../domain/models/discovery.dart';
 
-part 'discovery_providers.freezed.dart';
-
 // ===== PROVIDER PARAMETER CLASSES =====
 
-@freezed
-class SearchParam with _$SearchParam {
-  const factory SearchParam({
-    required String query,
-    required SearchType searchType,
-    Map<String, dynamic>? filters,
-    @Default(20) int limit,
-  }) = _SearchParam;
+class SearchParam {
+  const SearchParam({
+    required this.query,
+    required this.searchType,
+    this.filters,
+    this.limit = 20,
+  });
+
+  final String query;
+  final SearchType searchType;
+  final Map<String, dynamic>? filters;
+  final int limit;
+
+  @override
+  int get hashCode => Object.hash(query, searchType, filters, limit);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SearchParam &&
+          query == other.query &&
+          searchType == other.searchType &&
+          filters == other.filters &&
+          limit == other.limit;
 }
 
-@freezed
-class RecommendationParam with _$RecommendationParam {
-  const factory RecommendationParam({
-    required String userId,
-    required RecommendationFeedType feedType,
-    @Default(20) int limit,
-  }) = _RecommendationParam;
+class RecommendationParam {
+  const RecommendationParam({
+    required this.userId,
+    required this.feedType,
+    this.limit = 20,
+  });
+
+  final String userId;
+  final RecommendationFeedType feedType;
+  final int limit;
+
+  @override
+  int get hashCode => Object.hash(userId, feedType, limit);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is RecommendationParam &&
+          userId == other.userId &&
+          feedType == other.feedType &&
+          limit == other.limit;
 }
 
-@freezed
-class TrendingParam with _$TrendingParam {
-  const factory TrendingParam({
-    required ContentTypeEnum contentType,
-    @Default('week') String timeframe,
-    @Default(20) int limit,
-  }) = _TrendingParam;
+class TrendingParam {
+  const TrendingParam({
+    required this.contentType,
+    this.timeframe = 'week',
+    this.limit = 20,
+  });
+
+  final ContentTypeEnum contentType;
+  final String timeframe;
+  final int limit;
+
+  @override
+  int get hashCode => Object.hash(contentType, timeframe, limit);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TrendingParam &&
+          contentType == other.contentType &&
+          timeframe == other.timeframe &&
+          limit == other.limit;
 }
 
 // ===== REPOSITORY PROVIDER =====
