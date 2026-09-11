@@ -1,10 +1,10 @@
 # Toriverse - Project Status & Development Progress
 
 **Project**: トリバース (Tri-Verse) - 3-Player Asynchronous Othello  
-**Status**: MVP DEVELOPMENT - Phase 15 Complete, Phase 16 (1-4) In Progress  
-**Last Updated**: 2026-09-11 (16:45 JST)  
+**Status**: MVP DEVELOPMENT - Phase 16 Complete, TestFlight Ready  
+**Last Updated**: 2026-09-11 (17:30 JST)  
 **Branch**: `claude/triverse-development-r2e05a`  
-**MVP Completion**: 90% → 95%* (*Phase 16.1-16.4 backend complete, Phase 16.5 UI in progress)
+**MVP Completion**: 95% → 98%* (*Phase 16 complete: backend + UI + navigation, ready for TestFlight QA)
 
 ---
 
@@ -34,7 +34,7 @@ Toriverse is a 3-color Othello game emphasizing asynchronous play with simultane
 | **16.2** | **Friend System Backend** | **✅ COMPLETE** | **700** | **25** | **Services, presence tracking** |
 | **16.3** | **Social Match Integration** | **✅ COMPLETE** | **450** | **20** | **Match ranking, friend challenges** |
 | **16.4** | **Player Profile Service** | **✅ COMPLETE** | **500** | **15** | **Profiles, achievements, stats** |
-| **16.5** | **UI Components & Navigation** | **🔄 IN PROGRESS** | *Plan: 400* | *Plan: 20* | **Screens, widgets, flow integration** |
+| **16.5** | **UI Components & Navigation** | **✅ COMPLETE** | **420** | **39** | **Screens, widgets, routes, tests** |
 
 ---
 
@@ -42,38 +42,41 @@ Toriverse is a 3-color Othello game emphasizing asynchronous play with simultane
 
 ### Code Statistics
 ```
-Production Code:        21,500+ LOC (added 3,500 in Phase 16.1-16.4)
-Test Code:              5,000+ LOC (added 2,200 in Phase 16.1-16.4)
+Production Code:        22,200+ LOC (added 3,800 in Phase 16)
+Test Code:              5,300+ LOC (added 2,500 in Phase 16)
 Documentation:          2,000+ LOC
 Configuration:          500+ LOC
 ────────────────────────────────
-Total:                  29,000+ LOC
+Total:                  30,000+ LOC
 
-Git Commits:            144+ commits
+Git Commits:            146+ commits
 Active Developers:      1 (Claude)
 Development Duration:   6 weeks (2026-08 to 2026-09)
-Phase 16 Duration:      4 commits in ~2 hours (backend complete)
+Phase 16 Duration:      5 commits in ~3 hours (complete: backend + UI + nav)
 ```
 
 ### Test Coverage
 ```
-Unit Tests:             538+ tests (added 88 in Phase 16.1-16.4)
-Widget Tests:           50+ tests
+Unit Tests:             538+ tests (added 88 in Phase 16 backend)
+Widget Tests:           89+ tests (added 39 in Phase 16.5 UI)
 Integration Tests:      15+ tests
 Total Pass Rate:        99.5% ✅
 
-Build Status:           ✅ Passing (Phase 16.1-16.4 tested)
+Build Status:           ✅ Passing (Phase 16 complete)
 Code Analysis:          ✅ Clean
 Type Safety:            ✅ Strict (null-safe Dart)
 
-Phase 16.1-16.4 Tests:
-  - LeaderboardService:         15 tests
-  - RankCalculationService:     13 tests
-  - FriendService:              15 tests
-  - PresenceService:            10 tests
-  - SocialMatchService:         20 tests
-  - PlayerProfileService:       15 tests
-  Total:                        88 tests ✅
+Phase 16 Tests:
+  - LeaderboardService:         15 tests (backend)
+  - RankCalculationService:     13 tests (backend)
+  - FriendService:              15 tests (backend)
+  - PresenceService:            10 tests (backend)
+  - SocialMatchService:         20 tests (backend)
+  - PlayerProfileService:       15 tests (backend)
+  - LeaderboardScreen:          10 tests (UI)
+  - PlayerProfileScreen:        15 tests (UI)
+  - FriendsScreen:              14 tests (UI)
+  Total:                       127 tests ✅
 ```
 
 ### Performance Metrics
@@ -139,9 +142,14 @@ Leaderboard Query:      <1 second
 - ✅ Real-time match listening
 - ✅ Offline mode with automatic sync
 
-### Planned Features (Phases 16-18)
-- 🔄 Leaderboards (Phase 16)
-- 🔄 Friend system (Phase 16)
+### Completed Features (Phase 16)
+- ✅ Leaderboards (global ranking, friend leaderboards)
+- ✅ Friend system (requests, blocking, presence tracking)
+- ✅ Player profiles (stats, achievements, visibility settings)
+- ✅ Social integration (match ranking, friend challenges)
+- ✅ Navigation flow (home → leaderboard/profile/friends)
+
+### Planned Features (Phases 17-18)
 - ⏳ Real-time observation (Phase 17)
 - ⏳ Tournaments (Phase 18)
 - ⏳ Social streaming (Phase 18)
