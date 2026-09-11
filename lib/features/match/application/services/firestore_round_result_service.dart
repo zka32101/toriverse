@@ -3,21 +3,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../data/models/round_result_model.dart';
 import '../providers/firestore_match_provider.dart';
+import 'offline_queue_service.dart';
 
 /// Firestore Round Result Service
 ///
 /// Handles saving round results with retry logic and error handling.
 /// - Retries transient errors (network, timeout) with exponential backoff
 /// - Handles permanent errors (validation, permissions) gracefully
-/// - Provides fallback to local storage if Firestore unavailable
+/// - Queues failed operations to offline queue for later retry
 class FirestoreRoundResultService {
   final FirestoreMatchRepository _repository;
+  final OfflineQueueService? _offlineQueue;
   static const int maxRetries = 3;
   static const int initialDelayMs = 500;
 
   FirestoreRoundResultService({
     FirestoreMatchRepository? repository,
-  }) : _repository = repository ?? FirestoreMatchRepository();
+    OfflineQueueService? offlineQueue,
+  })  : _repository = repository ?? FirestoreMatchRepository(),
+        _offlineQueue = offlineQueue;
 
   /// Save round result with retry logic
   ///
@@ -42,6 +46,12 @@ class FirestoreRoundResultService {
         if (!_isRetryableError(e) || retryCount >= maxRetries) {
           debugPrint('Failed to save round result (${result.id}): ${e.code}');
           _logError(e, result);
+
+          // Queue operation for later retry if offline queue available
+          if (_offlineQueue != null && retryCount >= maxRetries) {
+            await _queueRoundSaveOperation(result);
+          }
+
           return false;
         }
 
@@ -111,6 +121,18 @@ class FirestoreRoundResultService {
       } on FirebaseException catch (e) {
         if (!_isRetryableError(e) || retryCount >= maxRetries) {
           debugPrint('Failed to update match state ($matchId): ${e.code}');
+
+          // Queue operation for later retry if offline queue available
+          if (_offlineQueue != null && retryCount >= maxRetries) {
+            await _queueMatchStateUpdateOperation(
+              matchId: matchId,
+              roundIndex: roundIndex,
+              status: status,
+              stoneCounts: stoneCounts,
+              isGameOver: isGameOver,
+            );
+          }
+
           return false;
         }
 
@@ -186,6 +208,45 @@ class FirestoreRoundResultService {
     } catch (e) {
       debugPrint('Error fetching round results ($matchId): $e');
       return [];
+    }
+  }
+
+  /// Queue a round save operation for offline retry
+  Future<void> _queueRoundSaveOperation(RoundResultModel result) async {
+    try {
+      if (_offlineQueue == null) return;
+
+      await _offlineQueue!.queueRoundSave(
+        matchId: result.matchId,
+        roundResult: result,
+      );
+      debugPrint('Queued round save operation for offline retry (${result.id})');
+    } catch (e) {
+      debugPrint('Error queuing round save operation: $e');
+    }
+  }
+
+  /// Queue a match state update operation for offline retry
+  Future<void> _queueMatchStateUpdateOperation({
+    required String matchId,
+    required int roundIndex,
+    required String status,
+    required Map<String, int> stoneCounts,
+    required bool isGameOver,
+  }) async {
+    try {
+      if (_offlineQueue == null) return;
+
+      await _offlineQueue!.queueMatchStateUpdate(
+        matchId: matchId,
+        roundIndex: roundIndex,
+        status: status,
+        stoneCounts: stoneCounts,
+        isGameOver: isGameOver,
+      );
+      debugPrint('Queued match state update operation for offline retry ($matchId)');
+    } catch (e) {
+      debugPrint('Error queuing match state update operation: $e');
     }
   }
 }
