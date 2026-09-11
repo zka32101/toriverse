@@ -1,9 +1,6 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:toriverse/features/monetization/data/repositories/monetization_repository.dart';
 import 'package:toriverse/features/monetization/domain/models/monetization.dart';
-
-part 'monetization_providers.freezed.dart';
 
 // ==================== Repository Provider ====================
 
@@ -11,61 +8,144 @@ final monetizationRepositoryProvider = Provider(
   (ref) => MonetizationRepository(),
 );
 
-// ==================== Parameter Classes ====================
+// ==================== Parameter Classes (Simple, no Freezed) ====================
 
-@freezed
-class CreatorIdParam with _$CreatorIdParam {
-  const factory CreatorIdParam(String creatorId) = _CreatorIdParam;
+class CreatorIdParam {
+  const CreatorIdParam(this.creatorId);
+  final String creatorId;
+
+  @override
+  int get hashCode => creatorId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is CreatorIdParam && creatorId == other.creatorId;
 }
 
-@freezed
-class EarningsIdParam with _$EarningsIdParam {
-  const factory EarningsIdParam(String creatorId, String earningsId) = _EarningsIdParam;
+class EarningsIdParam {
+  const EarningsIdParam(this.creatorId, this.earningsId);
+  final String creatorId;
+  final String earningsId;
+
+  @override
+  int get hashCode => Object.hash(creatorId, earningsId);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is EarningsIdParam && creatorId == other.creatorId && earningsId == other.earningsId;
 }
 
-@freezed
-class TierIdParam with _$TierIdParam {
-  const factory TierIdParam(String creatorId, String tierId) = _TierIdParam;
+class TierIdParam {
+  const TierIdParam(this.creatorId, this.tierId);
+  final String creatorId;
+  final String tierId;
+
+  @override
+  int get hashCode => Object.hash(creatorId, tierId);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is TierIdParam && creatorId == other.creatorId && tierId == other.tierId;
 }
 
-@freezed
-class UserIdParam with _$UserIdParam {
-  const factory UserIdParam(String userId) = _UserIdParam;
+class UserIdParam {
+  const UserIdParam(this.userId);
+  final String userId;
+
+  @override
+  int get hashCode => userId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is UserIdParam && userId == other.userId;
 }
 
-@freezed
-class SubscriptionIdParam with _$SubscriptionIdParam {
-  const factory SubscriptionIdParam(String subscriptionId) = _SubscriptionIdParam;
+class SubscriptionIdParam {
+  const SubscriptionIdParam(this.subscriptionId);
+  final String subscriptionId;
+
+  @override
+  int get hashCode => subscriptionId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is SubscriptionIdParam && subscriptionId == other.subscriptionId;
 }
 
-@freezed
-class UserCreatorParam with _$UserCreatorParam {
-  const factory UserCreatorParam(String userId, String creatorId) = _UserCreatorParam;
+class UserCreatorParam {
+  const UserCreatorParam(this.userId, this.creatorId);
+  final String userId;
+  final String creatorId;
+
+  @override
+  int get hashCode => Object.hash(userId, creatorId);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is UserCreatorParam && userId == other.userId && creatorId == other.creatorId;
 }
 
-@freezed
-class GiftIdParam with _$GiftIdParam {
-  const factory GiftIdParam(String giftId) = _GiftIdParam;
+class GiftIdParam {
+  const GiftIdParam(this.giftId);
+  final String giftId;
+
+  @override
+  int get hashCode => giftId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is GiftIdParam && giftId == other.giftId;
 }
 
-@freezed
-class TransactionIdParam with _$TransactionIdParam {
-  const factory TransactionIdParam(String transactionId) = _TransactionIdParam;
+class TransactionIdParam {
+  const TransactionIdParam(this.transactionId);
+  final String transactionId;
+
+  @override
+  int get hashCode => transactionId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is TransactionIdParam && transactionId == other.transactionId;
 }
 
-@freezed
-class PayoutIdParam with _$PayoutIdParam {
-  const factory PayoutIdParam(String creatorId, String payoutId) = _PayoutIdParam;
+class PayoutIdParam {
+  const PayoutIdParam(this.creatorId, this.payoutId);
+  final String creatorId;
+  final String payoutId;
+
+  @override
+  int get hashCode => Object.hash(creatorId, payoutId);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is PayoutIdParam && creatorId == other.creatorId && payoutId == other.payoutId;
 }
 
-@freezed
-class PaymentMethodIdParam with _$PaymentMethodIdParam {
-  const factory PaymentMethodIdParam(String creatorId, String methodId) = _PaymentMethodIdParam;
+class PaymentMethodIdParam {
+  const PaymentMethodIdParam(this.creatorId, this.methodId);
+  final String creatorId;
+  final String methodId;
+
+  @override
+  int get hashCode => Object.hash(creatorId, methodId);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is PaymentMethodIdParam && creatorId == other.creatorId && methodId == other.methodId;
 }
 
-@freezed
-class AnalyticsIdParam with _$AnalyticsIdParam {
-  const factory AnalyticsIdParam(String creatorId, String analyticsId) = _AnalyticsIdParam;
+class AnalyticsIdParam {
+  const AnalyticsIdParam(this.creatorId, this.analyticsId);
+  final String creatorId;
+  final String analyticsId;
+
+  @override
+  int get hashCode => Object.hash(creatorId, analyticsId);
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) || other is AnalyticsIdParam && creatorId == other.creatorId && analyticsId == other.analyticsId;
 }
 
 // ==================== Creator Earnings ====================

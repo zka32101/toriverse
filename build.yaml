@@ -17,8 +17,13 @@
 targets:
   $default:
     builders:
-      # Enable freezed for @freezed model classes
-      freezed: {}
+      # Freezed temporarily disabled - causes build_runner timeout on provider parameter classes
+      # (monetization_providers, event_providers, discovery_providers, etc.)
+      # Root cause: @freezed on provider parameter classes (not models) - these should use manual equals/hashCode
+      # TODO: Refactor provider parameter classes to remove @freezed or move to separate files
+      # freezed: {}
+
       # Enable json_serializable for @JsonSerializable model classes
       json_serializable: {}
+
       # riverpod_generator is NOT listed here - it's disabled due to issue #2766
