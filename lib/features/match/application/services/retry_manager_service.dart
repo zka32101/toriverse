@@ -2,12 +2,15 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'offline_queue_service.dart';
 import 'firestore_round_result_service.dart';
+import 'offline_queue_analytics_service.dart';
 
 /// Manages retry processing for queued offline operations
 /// Processes queue on app resume and periodically while app is active
+/// Tracks metrics via analytics service when provided
 class RetryManagerService {
   final OfflineQueueService _queueService;
   final FirestoreRoundResultService _firestoreService;
+  final OfflineQueueAnalyticsService? _analyticsService;
 
   Timer? _retryTimer;
   bool _isProcessing = false;
@@ -17,8 +20,10 @@ class RetryManagerService {
   RetryManagerService({
     OfflineQueueService? queueService,
     FirestoreRoundResultService? firestoreService,
+    OfflineQueueAnalyticsService? analyticsService,
   })  : _queueService = queueService ?? OfflineQueueService(),
-        _firestoreService = firestoreService ?? FirestoreRoundResultService();
+        _firestoreService = firestoreService ?? FirestoreRoundResultService(),
+        _analyticsService = analyticsService;
 
   /// Start periodic retry attempts
   void startRetrying() {
@@ -85,6 +90,9 @@ class RetryManagerService {
       }
 
       debugPrint('RetryManager: Queue processing complete');
+
+      // Log queue status after processing
+      await _logQueueStatus();
     } catch (e) {
       debugPrint('RetryManager: Error processing queue: $e');
     } finally {
@@ -114,11 +122,33 @@ class RetryManagerService {
 
       if (success) {
         debugPrint('RetryManager: Operation ${operation.id} succeeded, removing from queue');
+
+        // Log successful sync to analytics
+        await _analyticsService?.logOperationSynced(
+          operationType: operation.operationType,
+          matchId: operation.matchId,
+          retriesNeeded: operation.retryCount,
+          syncLatencyMs: DateTime.now()
+              .difference(operation.enqueuedAt)
+              .inMilliseconds,
+        );
+
         await _queueService.removeFromQueue(operation.id);
       } else {
         debugPrint(
           'RetryManager: Operation ${operation.id} failed, incrementing retry count',
         );
+
+        // Check if this was a permanent failure (max retries exceeded)
+        if (!_queueService.shouldRetry(operation)) {
+          await _analyticsService?.logOperationFailed(
+            operationType: operation.operationType,
+            matchId: operation.matchId,
+            retryCount: operation.retryCount + 1,
+            errorCode: 'max_retries_exceeded',
+          );
+        }
+
         await _queueService.incrementRetryCount(operation.id);
       }
     } catch (e) {
@@ -179,6 +209,31 @@ class RetryManagerService {
   Future<void> clearQueue() async {
     await _queueService.clearQueue();
     debugPrint('RetryManager: Queue cleared');
+  }
+
+  /// Log current queue status and health metrics
+  Future<void> _logQueueStatus() async {
+    try {
+      if (_analyticsService == null) return;
+
+      final status = await _queueService.getQueueStatus();
+
+      // Log queue health metrics with success rate estimation
+      // (This would be enhanced with actual historical data in Phase 16+)
+      await _analyticsService!.logQueueStatus(
+        totalOperations: status['totalOperations'] as int? ?? 0,
+        roundSaveCount: status['roundSaves'] as int? ?? 0,
+        stateUpdateCount: status['matchStateUpdates'] as int? ?? 0,
+        oldestOperationAgeMs: status['oldestOperation'] != null
+            ? DateTime.now()
+                .difference(status['oldestOperation'] as DateTime)
+                .inMilliseconds
+            : null,
+        successRate: 0.95, // Placeholder - calculate from historical data
+      );
+    } catch (e) {
+      debugPrint('RetryManager: Error logging queue status: $e');
+    }
   }
 
   /// Cleanup resources
