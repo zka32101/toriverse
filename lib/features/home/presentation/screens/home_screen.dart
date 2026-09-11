@@ -40,29 +40,41 @@ class HomeScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User Profile Card
-              Card(
-                elevation: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        displayName ?? 'プレイヤー',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'UID: $currentUserId',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '連続完走: 0',
-                        style: Theme.of(context).textTheme.bodySmall,
-                      ),
-                    ],
+              // User Profile Card with Quick Link
+              GestureDetector(
+                onTap: () => context.push('/profile/$currentUserId?own=true'),
+                child: Card(
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          displayName ?? 'プレイヤー',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'UID: $currentUserId',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '連続完走: 0',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'プロフィールを見る →',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue[400],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -99,6 +111,35 @@ class HomeScreen extends ConsumerWidget {
                 child: OutlinedButton(
                   onPressed: () => context.push('/shop'),
                   child: const Text('ショップ'),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Social Section
+              Text(
+                'ソーシャル',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton.icon(
+                  onPressed: () => context.push('/leaderboard'),
+                  icon: const Icon(Icons.leaderboard),
+                  label: const Text('ランキング'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton.icon(
+                  onPressed: () => context.push('/friends'),
+                  icon: const Icon(Icons.people),
+                  label: const Text('フレンド'),
                 ),
               ),
             ],
