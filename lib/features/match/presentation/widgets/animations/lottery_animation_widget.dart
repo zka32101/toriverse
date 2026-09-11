@@ -173,10 +173,9 @@ class _LotteryAnimationWidgetState extends State<LotteryAnimationWidget>
             final cardProgress = (_mainController.value - cardStartTime).clamp(0.0, 1.0);
 
             return ScaleTransition(
-              scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                CurvedAnimation(
-                  parent: AlwaysStoppedAnimation(cardProgress),
-                  curve: Curves.elasticOut,
+              scale: AlwaysStoppedAnimation(
+                Tween<double>(begin: 0.8, end: 1.0).transform(
+                  Curves.elasticOut.transform(cardProgress),
                 ),
               ),
               child: Opacity(
