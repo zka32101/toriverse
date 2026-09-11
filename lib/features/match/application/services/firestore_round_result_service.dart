@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:riverpod/riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../data/models/round_result_model.dart';
 import '../providers/firestore_match_provider.dart';
 
@@ -40,9 +41,8 @@ class FirestoreRoundResultService {
       } on FirebaseException catch (e) {
         // Check if error is retryable
         if (!_isRetryableError(e) || retryCount >= maxRetries) {
-          debugPrint('Failed to save round result (${result.id}): ${e.code} - ${e.message}');
+          debugPrint('Failed to save round result (${result.id}): ${e.code}');
           _logError(e, result);
-          // Don't throw - return false to indicate failure
           return false;
         }
 
@@ -65,17 +65,6 @@ class FirestoreRoundResultService {
   }
 
   /// Check if a Firebase error is retryable
-  ///
-  /// Retryable errors:
-  /// - unavailable: Service temporarily down
-  /// - deadline-exceeded: Request timeout
-  /// - aborted: Transaction conflict
-  /// - internal: Internal server error
-  ///
-  /// Non-retryable errors:
-  /// - permission-denied: Auth/permission issue
-  /// - invalid-argument: Data validation failure
-  /// - not-found: Document doesn't exist
   bool _isRetryableError(FirebaseException exception) {
     final code = exception.code;
     return code == 'unavailable' ||
@@ -86,14 +75,7 @@ class FirestoreRoundResultService {
 
   /// Log error details for debugging
   void _logError(FirebaseException exception, RoundResultModel result) {
-    debugPrint('''
-Error Details:
-  Code: ${exception.code}
-  Message: ${exception.message}
-  Match ID: ${result.matchId}
-  Round Index: ${result.roundIndex}
-  Result ID: ${result.id}
-''');
+    debugPrint('Error: ${exception.code} - Match: ${result.matchId}');
   }
 
   /// Update match state after round completion
@@ -106,7 +88,7 @@ Error Details:
   Future<bool> updateMatchStateAfterRound({
     required String matchId,
     required int roundIndex,
-    required String status, // 'playing' or 'finished'
+    required String status,
     required Map<String, int> stoneCounts,
     required bool isGameOver,
   }) async {
