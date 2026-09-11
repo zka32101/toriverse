@@ -17,11 +17,10 @@
 targets:
   $default:
     builders:
-      # Freezed temporarily disabled - causes build_runner timeout on provider parameter classes
-      # (monetization_providers, event_providers, discovery_providers, etc.)
-      # Root cause: @freezed on provider parameter classes (not models) - these should use manual equals/hashCode
-      # TODO: Refactor provider parameter classes to remove @freezed or move to separate files
-      # freezed: {}
+      # Freezed re-enabled - provider parameter classes have been converted to manual value objects
+      # All @freezed annotations are now only on domain/data model files (not providers)
+      # This avoids the build_runner timeout that was triggered by @freezed on provider parameter classes
+      freezed: {}
 
       # Enable json_serializable for @JsonSerializable model classes
       json_serializable: {}
