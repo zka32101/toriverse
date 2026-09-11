@@ -16,6 +16,7 @@ import 'package:toriverse/features/match/application/providers/rivalry_state.dar
 import 'package:toriverse/features/match/application/providers/round_resolution_provider.dart';
 import 'package:toriverse/features/match/application/providers/round_submission_provider.dart';
 import 'package:toriverse/features/match/application/services/move_applicator.dart';
+import 'package:toriverse/features/match/application/services/firestore_round_result_service.dart';
 import 'package:toriverse/features/match/data/models/round_result_model.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
 import 'package:toriverse/features/match/domain/services/ai_player.dart';
@@ -384,6 +385,29 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
         gameState.playerIds[1]: newCounts[Board.white] ?? 0,
         gameState.playerIds[2]: newCounts[Board.red] ?? 0,
       };
+
+      // Save round result to Firestore
+      final firestoreService =
+          ref.read(firestoreRoundResultServiceProvider);
+      final roundSaved = await firestoreService
+          .saveRoundResultWithRetry(currentResolution.result);
+
+      if (!roundSaved) {
+        debugPrint(
+          'Warning: Failed to save round result to Firestore '
+          '(match: ${widget.matchId}, round: ${roundSubmission.roundIndex})',
+        );
+        // Continue anyway - game state is updated locally
+      }
+
+      // Update match state in Firestore
+      await firestoreService.updateMatchStateAfterRound(
+        matchId: widget.matchId,
+        roundIndex: gameState.roundIndex + 1,
+        status: currentResolution.isGameOver ? 'finished' : 'playing',
+        stoneCounts: newStoneCounts,
+        isGameOver: currentResolution.isGameOver,
+      );
 
       // Clean up and prepare for next round
       ref.read(roundResultProvider.notifier).clear();
