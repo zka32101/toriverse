@@ -18,9 +18,9 @@ class UserRelationship with _$UserRelationship {
     required String userId,
     required String relatedUserId,
     required RelationshipType type,
-    required FriendRequestStatus? friendRequestStatus,
+    FriendRequestStatus? friendRequestStatus,
     required DateTime followedAt,
-    required DateTime? acceptedAt,
+    DateTime? acceptedAt,
   }) = _UserRelationship;
 
   factory UserRelationship.fromJson(Map<String, dynamic> json) =>
@@ -37,8 +37,8 @@ class Friend with _$Friend {
     required String friendId,
     required FriendStatus status,
     required DateTime requestedAt,
-    required DateTime? acceptedAt,
-    required bool isFavorite,
+    DateTime? acceptedAt,
+    @Default(false) bool isFavorite,
   }) = _Friend;
 
   factory Friend.fromJson(Map<String, dynamic> json) =>

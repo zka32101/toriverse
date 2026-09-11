@@ -15,9 +15,9 @@ class UserMessage with _$UserMessage {
     required String recipientId,
     required String content,
     required DateTime sentAt,
-    required DateTime? readAt,
-    required bool isStarred,
-    required String? replyToMessageId,
+    DateTime? readAt,
+    @Default(false) bool isStarred,
+    String? replyToMessageId,
   }) = _UserMessage;
 
   factory UserMessage.fromJson(Map<String, dynamic> json) =>

@@ -25,11 +25,11 @@ class ActivityFeed with _$ActivityFeed {
     required String feedId,
     required String userId,
     required ActivityType activityType,
-    required String? relatedUserId,
-    required String? matchId,
-    required String? clipId,
-    required String? clanId,
-    required Map<String, dynamic>? metadata,
+    String? relatedUserId,
+    String? matchId,
+    String? clipId,
+    String? clanId,
+    Map<String, dynamic>? metadata,
     required DateTime createdAt,
   }) = _ActivityFeed;
 
@@ -45,8 +45,8 @@ class OnlineStatus with _$OnlineStatus {
     required String userId,
     required OnlineStatusType status,
     required DateTime lastSeenAt,
-    required String? currentMatchId,
-    required bool isBusyStatus,
+    String? currentMatchId,
+    @Default(false) bool isBusyStatus,
   }) = _OnlineStatus;
 
   factory OnlineStatus.fromJson(Map<String, dynamic> json) =>

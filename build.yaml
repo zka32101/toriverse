@@ -17,8 +17,8 @@
 targets:
   $default:
     builders:
-      # Disable freezed temporarily to debug build_runner issue
-      # freezed: {}
+      # Enable freezed for @freezed model classes
+      freezed: {}
       # Enable json_serializable for @JsonSerializable model classes
       json_serializable: {}
       # riverpod_generator is NOT listed here - it's disabled due to issue #2766
