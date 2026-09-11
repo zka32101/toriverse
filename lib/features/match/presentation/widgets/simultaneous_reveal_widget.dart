@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../config/theme.dart';
 import '../../data/models/round_result_model.dart';
+import 'animations/animations_barrel.dart';
 
 /// 同時公開・くじ引き演出ウィジェット（GAME_DESIGN_UI_REFORM.md §3.3）
 ///
@@ -98,7 +99,7 @@ class _SimultaneousRevealWidgetState extends State<SimultaneousRevealWidget> {
   Widget _buildStage(ReplayEvent event, {Key? key}) {
     switch (event.type) {
       case 'lottery':
-        return _LotteryStage(key: key);
+        return _LotteryStage(key: key, data: event.data);
       case 'announce_turn':
         return _AnnounceTurnStage(key: key, data: event.data);
       case 'flip_animation':
@@ -112,10 +113,14 @@ class _SimultaneousRevealWidgetState extends State<SimultaneousRevealWidget> {
 
 /// くじ引き演出: 処理順抽選中の"開封の快感"を作り込むステージ
 class _LotteryStage extends StatelessWidget {
-  const _LotteryStage({Key? key}) : super(key: key);
+  final Map<String, dynamic>? data;
+
+  const _LotteryStage({Key? key, this.data}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    // Simple placeholder animation
+    // When full data is available, this can be enhanced with LotteryAnimationWidget
     return Column(
       key: key,
       mainAxisSize: MainAxisSize.min,
