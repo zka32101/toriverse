@@ -17,10 +17,11 @@
 targets:
   $default:
     builders:
-      # Freezed re-enabled - provider parameter classes have been converted to manual value objects
-      # All @freezed annotations are now only on domain/data model files (not providers)
-      # This avoids the build_runner timeout that was triggered by @freezed on provider parameter classes
-      freezed: {}
+      # Freezed temporarily disabled - build_runner timeout persists even after removing @freezed from provider files
+      # Likely issue: @freezed on domain/data model files is still causing build_runner to hang
+      # Provider parameter classes have been successfully converted to manual value objects
+      # TODO: Debug why model file @freezed annotations cause timeouts and re-enable once resolved
+      # freezed: {}
 
       # Enable json_serializable for @JsonSerializable model classes
       json_serializable: {}
