@@ -6,9 +6,6 @@ import '../features/home/presentation/screens/home_screen.dart';
 import '../features/match/presentation/screens/match_screen.dart';
 import '../features/results/presentation/screens/results_screen.dart';
 import '../features/shop/presentation/screens/cosmetics_shop_screen.dart';
-import '../features/leaderboard/presentation/screens/leaderboard_screen.dart';
-import '../features/profile/presentation/screens/player_profile_screen.dart';
-import '../features/social/presentation/screens/friends_screen.dart';
 
 /// GoRouter configuration for Toriverse
 final goRouterProvider = Provider<GoRouter>((ref) {
@@ -40,25 +37,6 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/shop',
         builder: (context, state) => const CosmeticsShopScreen(),
-      ),
-      GoRoute(
-        path: '/leaderboard',
-        builder: (context, state) => const LeaderboardScreen(),
-      ),
-      GoRoute(
-        path: '/profile/:uid',
-        builder: (context, state) {
-          final uid = state.pathParameters['uid'] ?? '';
-          final isOwnProfile = state.uri.queryParameters['own'] == 'true';
-          return PlayerProfileScreen(
-            uid: uid,
-            isOwnProfile: isOwnProfile,
-          );
-        },
-      ),
-      GoRoute(
-        path: '/friends',
-        builder: (context, state) => const FriendsScreen(),
       ),
     ],
     errorBuilder: (context, state) {

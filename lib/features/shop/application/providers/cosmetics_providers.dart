@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:toriverse/shared/models/cosmetic_item.dart';
 import 'package:toriverse/shared/services/revenucat_service.dart';
-import 'package:toriverse/features/match/application/providers/user_state.dart';
 import '../services/cosmetics_shop_service.dart';
 
 /// Provider for RevenueCat service
@@ -44,10 +43,10 @@ final availableCosmeticsStreamProvider =
   return service.streamAvailableCosmetics();
 });
 
-/// Provider for user ID (from auth state)
+/// Provider for user ID (should be implemented from auth)
 final userIdProvider = Provider<String>((ref) {
-  final uid = ref.watch(userUidProvider);
-  return uid ?? 'user_default'; // Fallback for unauthenticated users
+  // TODO: Connect to auth provider
+  return 'user_default';
 });
 
 /// Provider for user's owned cosmetics
