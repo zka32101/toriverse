@@ -65,6 +65,41 @@
 
 ---
 
+## 🎯 現在のステータス
+
+### ✅ MVP v0.1.0+2 — TestFlight Ready
+- **Build Status**: ✅ コンパイル成功、全テスト合格
+- **Phases Complete**: 1-16（ゲーム本体・ショップ・ソーシャル・分析）
+- **Soft-Launch Phase**: 2026-09-11 開始（ベータテスター 45-75 名）
+- **Timeline**:
+  - 📅 Sep 11: Internal QA (5-10 testers)
+  - 📅 Sep 14: Content Creators (10-15 testers)
+  - 📅 Sep 18: General Beta (30-50 testers)
+  - 📅 Oct 2: Soft-Launch Wrap (bug fixes freeze)
+  - 📅 Oct 11: Build Expiry
+
+### 🎮 MVP Features (All Complete)
+- ✅ 3色オセロ（非同期同時公開制）
+- ✅ 弱者ボーナス機構
+- ✅ 連続被弾救済カード
+- ✅ AI自動引き継ぎ
+- ✅ 同マス被り ランダム抽選
+- ✅ リーダーボード・ソーシャル機能
+- ✅ コスメティックショップ
+- ✅ ランクパス課金 (¥300/月)
+- ✅ Firebase Analytics・Crashlytics
+- ✅ Remote Config ホットパッチ
+
+### 📊 Soft-Launch Success Gate
+| KPI | 目標 | 測定方法 |
+|-----|------|---------|
+| Day 1 リテンション | ≥25% | Firebase Analytics cohort |
+| クラッシュフリーレート | ≥99.5% | Crashlytics |
+| Aha体験（逆転） | ≥60% | `reversal_experienced` event |
+| 3人フル人間戦成立 | ≥40% | AI fill なし match rate |
+
+---
+
 ## 🚀 クイックスタート
 
 ### 前提条件
@@ -112,6 +147,9 @@ flutter run
 |-------------|------|
 | **[CLAUDE.md](./CLAUDE.md)** | プロジェクト概要・技術仕様・開発ガイド |
 | **[CODE_HANDOVER.md](./CODE_HANDOVER.md)** | コード引き継ぎ書・実装タスク・チェックリスト |
+| **[RELEASE_NOTES.md](./RELEASE_NOTES.md)** | TestFlight v0.1.0+2 リリースノート・機能一覧・既知の制限 |
+| **[TESTING_GUIDELINES.md](./TESTING_GUIDELINES.md)** | ベータテスター向けテスト手順・テストシナリオ・フィードバック方法 |
+| **[TESTFLIGHT_CHECKLIST.md](./TESTFLIGHT_CHECKLIST.md)** | 本番ローンチ前チェックリスト・成功メトリクス・ゲート条件 |
 | **[企画・設計書](./docs/toriverse_kikaku_sekkei_v1_0.md)** | 企画フェーズ・設計フェーズの完全ドキュメント |
 
 ---
