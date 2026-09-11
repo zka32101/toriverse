@@ -74,9 +74,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+  # アセット（アニメーション・フォント等）
+  assets:
+    - assets/animations/
+
   # 日本語フォント（オプション）
-  # assets:
-  #   - assets/fonts/
   # fonts:
   #   - family: CustomFont
   #     fonts:
