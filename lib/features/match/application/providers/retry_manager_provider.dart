@@ -1,7 +1,12 @@
 import 'package:riverpod/riverpod.dart';
 import '../services/retry_manager_service.dart';
 import '../services/offline_queue_service.dart';
-import '../services/firestore_round_result_service.dart';
+import 'firestore_round_result_service_provider.dart';
+
+/// Provides the OfflineQueueService singleton
+final offlineQueueServiceProvider = Provider<OfflineQueueService>((ref) {
+  return OfflineQueueService();
+});
 
 /// Provides the RetryManagerService singleton
 /// Automatically starts retry processing when first accessed
@@ -23,19 +28,6 @@ final retryManagerProvider = Provider<RetryManagerService>((ref) {
   });
 
   return retryManager;
-});
-
-/// Provides the OfflineQueueService singleton
-final offlineQueueServiceProvider = Provider<OfflineQueueService>((ref) {
-  return OfflineQueueService();
-});
-
-/// Provides the FirestoreRoundResultService with offline queue support
-final firestoreRoundResultServiceProvider = Provider<FirestoreRoundResultService>((ref) {
-  final offlineQueueService = ref.watch(offlineQueueServiceProvider);
-  return FirestoreRoundResultService(
-    offlineQueue: offlineQueueService,
-  );
 });
 
 /// Watch offline queue status
