@@ -16,7 +16,7 @@ import 'package:toriverse/features/match/application/providers/rivalry_state.dar
 import 'package:toriverse/features/match/application/providers/round_resolution_provider.dart';
 import 'package:toriverse/features/match/application/providers/round_submission_provider.dart';
 import 'package:toriverse/features/match/application/services/move_applicator.dart';
-import 'package:toriverse/features/match/application/services/firestore_round_result_service.dart';
+import 'package:toriverse/features/match/application/providers/firestore_round_result_service_provider.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
 import 'package:toriverse/features/match/domain/services/ai_player.dart';
 import 'package:toriverse/features/match/presentation/widgets/ai_takeover_indicator_widget.dart';
