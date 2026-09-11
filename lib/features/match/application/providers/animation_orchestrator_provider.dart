@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:riverpod/riverpod.dart';
 
@@ -69,7 +70,7 @@ class AnimationOrchestratorNotifier
     state = state.copyWith(
       queue: [...state.queue, animation],
     );
-    _processQueue();
+    unawaited(_processQueue());
   }
 
   /// Queue multiple animations in sequence
@@ -77,7 +78,7 @@ class AnimationOrchestratorNotifier
     state = state.copyWith(
       queue: [...state.queue, ...animations],
     );
-    _processQueue();
+    unawaited(_processQueue());
   }
 
   /// Clear all queued animations
@@ -120,7 +121,7 @@ class AnimationOrchestratorNotifier
 
     // Process next animation if available
     if (state.queue.isNotEmpty) {
-      _processQueue();
+      unawaited(_processQueue());
     }
   }
 }
