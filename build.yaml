@@ -17,13 +17,10 @@
 targets:
   $default:
     builders:
-      # Freezed temporarily disabled - build_runner timeout persists even after removing @freezed from provider files
-      # Likely issue: @freezed on domain/data model files is still causing build_runner to hang
-      # Provider parameter classes have been successfully converted to manual value objects
-      # TODO: Debug why model file @freezed annotations cause timeouts and re-enable once resolved
+      # All code generators temporarily disabled to isolate build_runner issue
+      # Both freezed and json_serializable cause timeout or failure
       # freezed: {}
+      # json_serializable: {}
 
-      # Enable json_serializable for @JsonSerializable model classes
-      json_serializable: {}
-
+      # Testing with NO generators to identify root cause of build_runner hang
       # riverpod_generator is NOT listed here - it's disabled due to issue #2766
