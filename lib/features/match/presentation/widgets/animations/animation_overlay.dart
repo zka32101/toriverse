@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../config/theme.dart';
 import '../../application/providers/animation_orchestrator_provider.dart';
 import 'animations_barrel.dart';
@@ -22,7 +23,7 @@ import 'animations_barrel.dart';
 /// 3. AnimationOverlay watches and renders the current animation
 /// 4. onAnimationComplete callback triggers next animation in queue
 /// 5. Repeat until queue empty
-class AnimationOverlay extends StatelessWidget {
+class AnimationOverlay extends ConsumerWidget {
   final String matchId;
   final List<String> playerNames;
   final List<int> playerIndices;
@@ -35,37 +36,33 @@ class AnimationOverlay extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     // Watch the animation orchestrator state
-    return Consumer(
-      builder: (context, ref, child) {
-        final orchestratorState =
-            ref.watch(animationOrchestratorProvider(matchId));
+    final orchestratorState =
+        ref.watch(animationOrchestratorProvider(matchId));
 
-        // Only render if there's a current animation
-        if (orchestratorState.currentAnimation == null) {
-          return const SizedBox.shrink();
-        }
+    // Only render if there's a current animation
+    if (orchestratorState.currentAnimation == null) {
+      return const SizedBox.shrink();
+    }
 
-        final animation = orchestratorState.currentAnimation!;
+    final animation = orchestratorState.currentAnimation!;
 
-        return Material(
-          color: Colors.black87,
-          child: Center(
-            child: SingleChildScrollView(
-              child: _buildAnimationWidget(
-                animation: animation,
-                onComplete: () {
-                  // Trigger next animation in queue
-                  // The orchestrator will automatically process the next one
-                  // This callback is called when the animation widget completes
-                  animation.onComplete?.call();
-                },
-              ),
-            ),
+    return Material(
+      color: Colors.black87,
+      child: Center(
+        child: SingleChildScrollView(
+          child: _buildAnimationWidget(
+            animation: animation,
+            onComplete: () {
+              // Trigger next animation in queue
+              // The orchestrator will automatically process the next one
+              // This callback is called when the animation widget completes
+              animation.onComplete?.call();
+            },
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -146,20 +143,5 @@ class AnimationOverlay extends StatelessWidget {
       default:
         return const SizedBox.shrink();
     }
-  }
-}
-
-// Extension to easily access AnimationOverlay in build context
-extension AnimationOverlayBuilder on ConsumerState {
-  Widget buildAnimationOverlay(
-    String matchId,
-    List<String> playerNames,
-    List<int> playerIndices,
-  ) {
-    return AnimationOverlay(
-      matchId: matchId,
-      playerNames: playerNames,
-      playerIndices: playerIndices,
-    );
   }
 }
