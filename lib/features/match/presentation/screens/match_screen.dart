@@ -17,13 +17,9 @@ import 'package:toriverse/features/match/application/providers/round_resolution_
 import 'package:toriverse/features/match/application/providers/round_submission_provider.dart';
 import 'package:toriverse/features/match/application/services/move_applicator.dart';
 import 'package:toriverse/features/match/application/services/firestore_round_result_service.dart';
-import 'package:toriverse/features/match/data/models/round_result_model.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
 import 'package:toriverse/features/match/domain/services/ai_player.dart';
-import 'package:toriverse/features/match/domain/services/bonus_calculator.dart';
-import 'package:toriverse/features/match/domain/services/rivalry_tracker.dart';
 import 'package:toriverse/features/match/presentation/widgets/ai_takeover_indicator_widget.dart';
-import 'package:toriverse/features/match/presentation/widgets/animations/animations_barrel.dart';
 import 'package:toriverse/features/match/presentation/widgets/animations/animation_overlay.dart';
 import 'package:toriverse/features/match/presentation/widgets/board_widget.dart';
 import 'package:toriverse/features/match/presentation/widgets/move_submission_panel.dart';
