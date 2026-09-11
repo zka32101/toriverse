@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:toriverse/features/match/application/providers/matching_state.dart';
-import 'package:toriverse/features/match/application/providers/user_state.dart';
+import 'package:toriverse/features/auth/application/providers/auth_provider.dart';
+import 'package:toriverse/features/match/application/providers/match_initialization_state.dart';
 
 /// Home screen: main menu with matching, friend match, and shop buttons
 class HomeScreen extends ConsumerWidget {
@@ -10,15 +10,11 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isLoggedIn = ref.watch(isLoggedInProvider);
-    final userUid = ref.watch(userUidProvider);
-    final displayName = ref.watch(userDisplayNameProvider);
-    final rankPoints = ref.watch(rankPointsProvider);
-    final streak = ref.watch(streakProvider);
-    final hasFreeMatch = ref.watch(hasFreeMatchProvider);
-    final isSubscribed = ref.watch(isSubscribedProvider);
+    final currentUserId = ref.watch(currentUserIdProvider);
+    final displayName = ref.watch(currentUserDisplayNameProvider);
+    final isMatchmaking = ref.watch(isMatchmakingProvider(currentUserId ?? ''));
 
-    if (!isLoggedIn) {
+    if (currentUserId == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('トリバース')),
         body: const Center(
@@ -31,6 +27,12 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('トリバース'),
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            onPressed: () => _logout(context, ref),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -38,75 +40,41 @@ class HomeScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // User Profile Card
-              Card(
-                elevation: 2,
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        displayName ?? 'プレイヤー',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('UID: $userUid'),
-                              const SizedBox(height: 4),
-                              Text('ランクポイント: $rankPoints'),
-                              const SizedBox(height: 4),
-                              Text('連続完走: $streak'),
-                            ],
-                          ),
-                          if (isSubscribed)
-                            Chip(label: const Text('購読中'))
-                          else
-                            Chip(label: const Text('トライアル')),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Free Match Status
-              Card(
-                color: Colors.blue.shade50,
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: [
-                      Icon(
-                        hasFreeMatch ? Icons.check_circle : Icons.block,
-                        color: hasFreeMatch ? Colors.green : Colors.red,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'マッチング無料枠',
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              hasFreeMatch
-                                  ? '本日の無料マッチ: 利用可'
-                                  : '本日の無料マッチ: 利用済み',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                          ],
+              // User Profile Card with Quick Link
+              GestureDetector(
+                onTap: () => context.push('/profile/$currentUserId?own=true'),
+                child: Card(
+                  elevation: 2,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          displayName ?? 'プレイヤー',
+                          style: Theme.of(context).textTheme.headlineSmall,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 12),
+                        Text(
+                          'UID: $currentUserId',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '連続完走: 0',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'プロフィールを見る →',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blue[400],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -117,13 +85,13 @@ class HomeScreen extends ConsumerWidget {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: () => _startMatching(context, ref),
+                  onPressed: isMatchmaking ? null : () => _startMatching(context, ref, currentUserId),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                   ),
-                  child: const Text(
-                    'マッチング開始',
-                    style: TextStyle(fontSize: 18, color: Colors.white),
+                  child: Text(
+                    isMatchmaking ? 'マッチング中...' : 'マッチング開始',
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
               ),
@@ -147,12 +115,31 @@ class HomeScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 24),
 
-              // Settings & Logout
-              Center(
-                child: TextButton.icon(
-                  onPressed: () => _logout(context, ref),
-                  icon: const Icon(Icons.logout),
-                  label: const Text('ログアウト'),
+              // Social Section
+              Text(
+                'ソーシャル',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton.icon(
+                  onPressed: () => context.push('/leaderboard'),
+                  icon: const Icon(Icons.leaderboard),
+                  label: const Text('ランキング'),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton.icon(
+                  onPressed: () => context.push('/friends'),
+                  icon: const Icon(Icons.people),
+                  label: const Text('フレンド'),
                 ),
               ),
             ],
@@ -162,12 +149,21 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  void _startMatching(BuildContext context, WidgetRef ref) {
-    final userUid = ref.read(userUidProvider);
-    if (userUid != null) {
-      ref.read(matchingStateProvider.notifier).startMatching(userUid);
-      context.push('/matching');
-    }
+  void _startMatching(BuildContext context, WidgetRef ref, String userId) async {
+    await ref.read(matchInitializationProvider(userId).notifier).startMatchmaking();
+
+    // Watch for match ready
+    ref.listen(
+      isMatchReadyProvider(userId),
+      (previous, next) {
+        if (next && context.mounted) {
+          final matchId = ref.read(currentMatchIdProvider(userId));
+          if (matchId != null) {
+            context.push('/match/$matchId');
+          }
+        }
+      },
+    );
   }
 
   void _startFriendMatch(BuildContext context) {
@@ -178,7 +174,7 @@ class HomeScreen extends ConsumerWidget {
   }
 
   void _logout(BuildContext context, WidgetRef ref) {
-    ref.read(userStateProvider.notifier).logout();
-    context.go('/login');
+    ref.read(authProvider.notifier).signOut();
+    context.go('/');
   }
 }

@@ -1,9 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../leaderboards_and_social/domain/models/leaderboards_and_social.dart';
-
-part 'leaderboards_and_social_repository.g.dart';
 
 class LeaderboardsAndSocialRepository {
   final FirebaseFirestore _firestore;

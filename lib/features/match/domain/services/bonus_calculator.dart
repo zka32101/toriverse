@@ -1,33 +1,41 @@
 import 'dart:math';
 
+import '../../application/services/remote_config_service.dart';
 import '../../data/models/round_result_model.dart';
 
 /// 弱者ボーナス判定ロジック
 ///
 /// 発動条件（すべてを満たす必要がある）:
-/// 1. 残りラウンド数が11手以下（終盤）
-/// 2. 石差が下位20%以下（劣勢）
-/// 3. 1局最大2回までの発動上限
+/// 1. 残りラウンド数が11手以下（終盤） ← Remote Config で調整可能
+/// 2. 石差が下位20%以下（劣勢） ← Remote Config で調整可能
+/// 3. 1局最大2回までの発動上限 ← Remote Config で調整可能
 class BonusCalculator {
   /// 弱者ボーナスを発動できるかチェック
+  ///
+  /// Remote Config に基づいて判定条件をチューニング可能
   static bool shouldActivateBonus({
     required int roundsRemaining,     // 残りラウンド数
     required List<int> stoneCounts,   // 各プレイヤーの石数
     required int previousActivations, // これまでの発動回数（0-2）
     required int playerIndex,         // このプレイヤーのインデックス
+    RemoteConfigService? configService, // Optional for testing
   }) {
-    // 条件1: 残り11手以下（終盤判定）
-    if (roundsRemaining > 11) {
+    final config = configService ?? RemoteConfigService();
+
+    // 条件1: 残りラウンド数が閾値以下（終盤判定）
+    // デフォルト: 11手以下 → Remote Config で調整可能
+    if (roundsRemaining > config.getWeakBonusRoundThreshold()) {
       return false;
     }
 
     // 条件2: 石差が下位20%以下（劣勢判定）
-    if (!_isInBottomPercentile(stoneCounts, playerIndex)) {
+    if (!_isInBottomPercentile(stoneCounts, playerIndex, config)) {
       return false;
     }
 
-    // 条件3: 発動回数上限
-    if (previousActivations >= 2) {
+    // 条件3: 発動回数上限（Remote Config で調整可能）
+    // デフォルト: 2回まで
+    if (previousActivations >= config.getWeakBonusMaxActivationsPerMatch()) {
       return false;
     }
 
@@ -35,7 +43,12 @@ class BonusCalculator {
   }
 
   /// プレイヤーが下位20%の劣勢にあるかチェック
-  static bool _isInBottomPercentile(List<int> stoneCounts, int playerIndex) {
+  /// Remote Config の stone_diff_threshold に基づいて判定
+  static bool _isInBottomPercentile(
+    List<int> stoneCounts,
+    int playerIndex,
+    RemoteConfigService config,
+  ) {
     final myStones = stoneCounts[playerIndex];
     final maxStones = stoneCounts.reduce((a, b) => max(a, b));
     final minStones = stoneCounts.reduce((a, b) => min(a, b));
@@ -44,8 +57,8 @@ class BonusCalculator {
     final diff = maxStones - myStones;
 
     // 下位20%の目安: 石数の差が一定以上 or 最下位
-    // 3人対戦の場合、最大差は約3-4石程度が目安
-    const thresholdDifference = 8; // 調整可能
+    // Remote Config で threshold を調整可能（デフォルト: 8石）
+    final thresholdDifference = config.getWeakBonusStoneDiffThreshold();
 
     return diff >= thresholdDifference || myStones == minStones;
   }
@@ -69,16 +82,22 @@ class BonusCalculator {
 /// 救済カード発動判定ロジック
 ///
 /// 発動条件:
-/// - 同一相手から2ラウンド連続で攻撃された
+/// - 同一相手から連続で攻撃された（回数は Remote Config で調整可能、デフォルト: 2ラウンド）
 /// - 自動的に2手連続実行権を付与
 class RescueCardCalculator {
   /// 救済カードを付与すべきかチェック
+  ///
+  /// Remote Config の rescue_card_consecutive_attacks に基づいて判定
   static bool shouldGrantRescueCard({
     required int consecutiveAttackCount, // 連続被弾数
     required bool cardAlreadyActive,     // カード既に有効か
+    RemoteConfigService? configService,  // Optional for testing
   }) {
-    // 2ラウンド連続で攻撃されたら付与
-    return consecutiveAttackCount >= 2 && !cardAlreadyActive;
+    final config = configService ?? RemoteConfigService();
+    final threshold = config.getRescueCardConsecutiveAttacksThreshold();
+
+    // 連続攻撃回数が閾値以上で、かつカードが未有効なら付与
+    return consecutiveAttackCount >= threshold && !cardAlreadyActive;
   }
 
   /// 救済カード効果を適用

@@ -5,13 +5,17 @@ import 'package:toriverse/features/match/domain/entities/board.dart';
 class BoardWidget extends StatelessWidget {
   final Board board;
   final List<List<int>> validMoves;
-  final Function(int row, int col) onMoveTapped;
+  final Function(int row, int col)? onMoveTapped;
+  final int? selectedRow;
+  final int? selectedCol;
 
   const BoardWidget({
     Key? key,
     required this.board,
     required this.validMoves,
-    required this.onMoveTapped,
+    this.onMoveTapped,
+    this.selectedRow,
+    this.selectedCol,
   }) : super(key: key);
 
   @override
@@ -35,16 +39,21 @@ class BoardWidget extends StatelessWidget {
             final col = index % 8;
             final stone = board.getStone(row, col);
             final isValidMove = validMoves.any((move) => move[0] == row && move[1] == col);
+            final isSelected = row == selectedRow && col == selectedCol;
 
             return GestureDetector(
-              onTap: isValidMove ? () => onMoveTapped(row, col) : null,
+              onTap: isValidMove && onMoveTapped != null ? () => onMoveTapped!(row, col) : null,
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Colors.black26,
-                    width: 0.5,
+                    color: isSelected ? Colors.blue : Colors.black26,
+                    width: isSelected ? 2 : 0.5,
                   ),
-                  color: isValidMove ? Colors.yellow.shade100 : null,
+                  color: isSelected
+                      ? Colors.blue.shade200
+                      : isValidMove
+                          ? Colors.yellow.shade100
+                          : null,
                 ),
                 child: Center(
                   child: _buildStone(stone),

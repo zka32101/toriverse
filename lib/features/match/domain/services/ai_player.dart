@@ -11,10 +11,21 @@ class AIPlayer {
   /// 探索の深さ（調整可能、深いほど強いが遅い）
   static const int defaultDepth = 3;
 
-  /// 最高スコアの手を検索
+  /// 最高スコアの手を検索（位置を整数で返す）
   static int? suggestMove(Board board, int aiPlayer, {int depth = defaultDepth}) {
+    final move = _selectBestMove(board, aiPlayer, depth);
+    return move != null ? move[0] * 8 + move[1] : null;
+  }
+
+  /// 最高スコアの手を検索（[row, col] リストで返す）
+  static List<int>? selectMove(Board board, int aiPlayer, {int depth = defaultDepth}) {
+    return _selectBestMove(board, aiPlayer, depth);
+  }
+
+  /// 最高スコアの手を検索（内部実装）
+  static List<int>? _selectBestMove(Board board, int aiPlayer, int depth) {
     int bestScore = -10000;
-    int? bestMove;
+    List<int>? bestMove;
 
     final validMoves = board.getValidMoves(aiPlayer);
     if (validMoves.isEmpty) {
@@ -34,7 +45,7 @@ class AIPlayer {
 
       if (score > bestScore) {
         bestScore = score;
-        bestMove = move[0] * 8 + move[1];
+        bestMove = move;
       }
     }
 
@@ -62,7 +73,6 @@ class AIPlayer {
     // 合法手がないターンをスキップ
     if (validMoves.isEmpty) {
       // 別のプレイヤーのターンへ（簡略化のため現在は敵プレイヤーのみ）
-      final nextPlayer = (currentPlayer + 1) % 3;
       return _minimax(board, depth, aiPlayer, !isMaximizing);
     }
 

@@ -1,0 +1,122 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    /// Helper functions
+
+    /// Check if request is from authenticated user
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    /// Check if request is from user whose ID matches path
+    function isUserOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    /// Check if document exists and user owns it
+    function docExists() {
+      return resource != null;
+    }
+
+    /// Cosmetics catalog — public read-only
+    /// Anyone can read (needed for shop display)
+    /// Only backend can write (seeding, updates)
+    match /cosmetics/{cosmeticId} {
+      allow read: if true;
+      allow create, update, delete: if false; // Server-side writes only
+    }
+
+    /// User data and cosmetics
+    match /users/{userId} {
+      /// User documents — owner only
+      allow read, update: if isUserOwner(userId);
+      allow create: if isUserOwner(userId);
+      allow delete: if false; // Prevent user self-deletion
+
+      /// User's owned cosmetics
+      match /cosmetics/{cosmeticId} {
+        allow read: if isUserOwner(userId);
+        allow write: if isUserOwner(userId) &&
+                     exists(/databases/$(database)/documents/cosmetics/$(cosmeticId));
+      }
+
+      /// User preferences (active cosmetics, settings)
+      match /preferences/{document=**} {
+        allow read, write: if isUserOwner(userId);
+      }
+
+      /// User statistics (matches played, streaks, etc.)
+      match /statistics/{statisticId} {
+        allow read: if isUserOwner(userId);
+        allow write: if isUserOwner(userId);
+      }
+
+      /// User's match history
+      match /matches/{matchId} {
+        allow read: if isUserOwner(userId);
+        allow write: if false; // Server-side writes only
+      }
+    }
+
+    /// Active matches
+    /// Cloud Functions orchestrate writes for fair play
+    match /matches/{matchId} {
+      allow read: if isAuthenticated() &&
+                     (request.auth.uid in resource.data.playerIds ||
+                      request.auth.uid in resource.data.observerIds);
+      allow create: if false; // Cloud Functions only
+      allow update: if false; // Cloud Functions only
+      allow delete: if false; // Cloud Functions only
+
+      /// Round results (child collection)
+      match /rounds/{roundId} {
+        allow read: if isAuthenticated() &&
+                       (request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.playerIds ||
+                        request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.observerIds);
+        allow write: if false; // Cloud Functions only
+      }
+    }
+
+    /// Replay clips (auto-generated match recordings)
+    match /clips/{clipId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Cloud Functions only
+    }
+
+    /// Notifications (push notification records)
+    match /notifications/{userId}/{notificationId} {
+      allow read, update: if isUserOwner(userId);
+      allow create: if false; // Cloud Functions + scheduled jobs only
+      allow delete: if isUserOwner(userId);
+    }
+
+    /// Sessions (for concurrent device tracking)
+    match /sessions/{userId}/{sessionId} {
+      allow read: if isUserOwner(userId);
+      allow create, update: if isUserOwner(userId) &&
+                             request.time.toMillis() < (
+                               get(/databases/$(database)/documents/sessions/$(userId)/$(sessionId)).data.expiresAt.toMillis() ??
+                               request.time.toMillis() + 86400000 // 24 hours
+                             );
+      allow delete: if isUserOwner(userId);
+    }
+
+    /// LiveOps campaigns and events
+    match /campaigns/{campaignId} {
+      allow read: if isAuthenticated();
+      allow write: if false; // Server only
+    }
+
+    /// Analytics and monitoring data
+    match /analytics/{collectionId}/{document=**} {
+      allow read: if false; // Not directly readable by clients
+      allow write: if false; // Cloud Functions + backend only
+    }
+
+    /// Deny all other access by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,63 +1,200 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper function to check if user is authenticated
+    // ========================================================================
+    // HELPER FUNCTIONS
+    // ========================================================================
+
     function isAuthenticated() {
-      return request.auth.uid != null;
+      return request.auth != null && request.auth.uid != null;
     }
 
-    // Helper function to check if user is the document owner
     function isOwner(uid) {
-      return request.auth.uid == uid;
+      return isAuthenticated() && request.auth.uid == uid;
     }
 
-    // Users collection: only read/write own document
+    function isMatchParticipant(matchId) {
+      return isAuthenticated() &&
+             request.auth.uid in get(/databases/$(database)/documents/matches/$(matchId)).data.players;
+    }
+
+    // ========================================================================
+    // USERS COLLECTION
+    // ========================================================================
     match /users/{uid} {
-      allow read: if isAuthenticated() && isOwner(uid);
-      allow write: if isAuthenticated() && isOwner(uid);
-      allow list: if false; // prevent listing all users
-    }
+      // Users can read their own profile (and any public profile in future)
+      allow read: if isAuthenticated();
 
-    // Matches collection: players can read their matches
-    match /matches/{matchId} {
-      allow read: if isAuthenticated() && 
-                      request.auth.uid in resource.data.players;
-      allow create: if isAuthenticated(); // created by cloud functions
-      allow update: if false; // only server can update
+      // Users can only write to their own profile
+      allow create, update: if isOwner(uid);
+
+      // Prevent user listing
+      allow list: if false;
+
+      // Delete only via Cloud Functions
       allow delete: if false;
+
+      // User preferences subcollection
+      match /preferences/{document=**} {
+        allow read, write: if isOwner(uid);
+      }
+
+      // User statistics subcollection
+      match /statistics/{document=**} {
+        allow read: if isAuthenticated();
+        allow write: if false; // Only Cloud Functions
+      }
     }
 
-    // Round results collection: write-restricted to backend
-    match /roundResults/{resultId} {
-      allow read: if isAuthenticated() &&
-                      (exists(/databases/{database}/documents/matches/$(resource.data.matchId)) &&
-                       request.auth.uid in get(/databases/{database}/documents/matches/$(resource.data.matchId)).data.players);
-      allow write: if false; // only cloud functions
+    // ========================================================================
+    // MATCHES COLLECTION
+    // ========================================================================
+    match /matches/{matchId} {
+      // Participants can read the match
+      allow read: if isMatchParticipant(matchId);
+
+      // Authenticated users can create (Cloud Functions validate)
+      allow create: if isAuthenticated();
+
+      // Only Cloud Functions update during play
+      allow update: if false;
+
+      // Prevent deletion
+      allow delete: if false;
+
+      // Move submissions subcollection
+      match /submissions/{submissionId} {
+        // Players can submit their own moves
+        allow create: if isMatchParticipant(matchId) &&
+                         request.resource.data.playerId == request.auth.uid;
+
+        // Only Cloud Functions read/process
+        allow read: if false;
+        allow update, delete: if false;
+      }
+
+      // Round results subcollection
+      match /roundResults/{roundId} {
+        // Participants can read results
+        allow read: if isMatchParticipant(matchId);
+
+        // Only Cloud Functions write
+        allow write, delete: if false;
+      }
+
+      // Rescue cards subcollection
+      match /rescueCards/{cardId} {
+        // Participants can read rescue cards
+        allow read: if isMatchParticipant(matchId);
+
+        // Only Cloud Functions write
+        allow write, delete: if false;
+      }
+
+      // Weak bonus state subcollection
+      match /weakBonuses/{bonusId} {
+        // Participants can read bonus state
+        allow read: if isMatchParticipant(matchId);
+
+        // Only Cloud Functions write
+        allow write, delete: if false;
+      }
+
+      // Match clips subcollection
+      match /clips/{clipId} {
+        // Participants can read and share clips
+        allow read: if isMatchParticipant(matchId);
+
+        // Participants can create and update (for sharing)
+        allow create: if isMatchParticipant(matchId);
+        allow update: if isMatchParticipant(matchId);
+        allow delete: if false;
+      }
     }
 
-    // Rescue cards collection
-    match /rescueCards/{cardId} {
-      allow read: if isAuthenticated() && isOwner(resource.data.playerId);
-      allow write: if false; // only cloud functions
-    }
-
-    // Weak bonus collection
-    match /weakBonuses/{bonusId} {
-      allow read: if isAuthenticated() &&
-                      (exists(/databases/{database}/documents/matches/$(resource.data.matchId)) &&
-                       request.auth.uid in get(/databases/{database}/documents/matches/$(resource.data.matchId)).data.players);
-      allow write: if false; // only cloud functions
-    }
-
-    // Cosmetics collection: readable by all, managed by admin
+    // ========================================================================
+    // COSMETICS COLLECTION
+    // ========================================================================
     match /cosmetics/{cosmeticId} {
+      // Public read access to cosmetics catalog
       allow read: if true;
-      allow write: if false;
+
+      // Only admin/Cloud Functions write
+      allow write, delete: if false;
     }
 
-    // Deny all other access
+    match /userCosmetics/{userId} {
+      // Users can read their cosmetics
+      allow read: if isOwner(userId);
+
+      // Only Cloud Functions create/manage
+      allow create, update, delete: if false;
+
+      // Owned cosmetics subcollection
+      match /owned/{cosmeticId} {
+        allow read: if isOwner(userId);
+        allow write, delete: if false;
+      }
+
+      // Active cosmetics subcollection
+      match /active/{cosmeticId} {
+        allow read: if isOwner(userId);
+        allow write: if isOwner(userId);
+        allow delete: if false;
+      }
+    }
+
+    // ========================================================================
+    // TRANSACTIONS COLLECTION (for payment tracking)
+    // ========================================================================
+    match /transactions/{transactionId} {
+      // Users can read their own transactions
+      allow read: if isAuthenticated() &&
+                     resource.data.userId == request.auth.uid;
+
+      // Only Cloud Functions write
+      allow write, delete: if false;
+    }
+
+    // ========================================================================
+    // LEADERBOARDS COLLECTION (Phase 2)
+    // ========================================================================
+    match /leaderboards/{leaderboardId} {
+      // Public read access
+      allow read: if true;
+
+      // Only Cloud Functions write
+      allow write, delete: if false;
+
+      match /entries/{userId} {
+        allow read: if true;
+        allow write, delete: if false;
+      }
+    }
+
+    // ========================================================================
+    // FRIENDSHIPS COLLECTION (Phase 2)
+    // ========================================================================
+    match /friendships/{userId} {
+      // Users can read their own friendships
+      allow read: if isOwner(userId);
+
+      match /friends/{friendId} {
+        allow read: if isOwner(userId);
+        allow write, delete: if isOwner(userId);
+      }
+
+      match /requests/{requestId} {
+        allow read: if isOwner(userId);
+        allow create, update, delete: if isOwner(userId);
+      }
+    }
+
+    // ========================================================================
+    // DEFAULT: DENY ALL
+    // ========================================================================
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write, delete: if false;
     }
   }
 }

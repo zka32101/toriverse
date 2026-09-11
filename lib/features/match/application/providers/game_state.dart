@@ -189,6 +189,25 @@ class GameStateNotifier extends StateNotifier<GameState?> {
       state = currentState.copyWith(status: GameStatus.playing);
     }
   }
+
+  /// ゲーム状態を更新（同時提出フロー用）
+  void updateGameState({
+    Board? board,
+    int? roundIndex,
+    GameStatus? status,
+    Map<String, int>? stoneCounts,
+  }) {
+    final currentState = state;
+    if (currentState == null) return;
+
+    state = currentState.copyWith(
+      board: board ?? currentState.board,
+      roundIndex: roundIndex ?? currentState.roundIndex,
+      status: status ?? currentState.status,
+      stoneCounts: stoneCounts ?? currentState.stoneCounts,
+      lastMoveAt: DateTime.now(),
+    );
+  }
 }
 
 /// GameState Provider
