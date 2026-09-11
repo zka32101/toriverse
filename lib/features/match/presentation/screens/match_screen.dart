@@ -23,6 +23,7 @@ import 'package:toriverse/features/match/domain/services/bonus_calculator.dart';
 import 'package:toriverse/features/match/domain/services/rivalry_tracker.dart';
 import 'package:toriverse/features/match/presentation/widgets/ai_takeover_indicator_widget.dart';
 import 'package:toriverse/features/match/presentation/widgets/animations/animations_barrel.dart';
+import 'package:toriverse/features/match/presentation/widgets/animations/animation_overlay.dart';
 import 'package:toriverse/features/match/presentation/widgets/board_widget.dart';
 import 'package:toriverse/features/match/presentation/widgets/move_submission_panel.dart';
 import 'package:toriverse/features/match/presentation/widgets/rivalry_indicator_widget.dart';

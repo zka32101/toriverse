@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../config/theme.dart';
 import '../../application/providers/animation_orchestrator_provider.dart';
-import 'animations_barrel.dart';
+import 'weak_bonus_animation_widget.dart';
+import 'rescue_card_animation_widget.dart';
+import 'collision_resolution_animation_widget.dart';
+import 'lottery_animation_widget.dart';
 
 /// Animation Overlay Widget
 ///
