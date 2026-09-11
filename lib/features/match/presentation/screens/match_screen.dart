@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,10 +22,13 @@ import 'package:toriverse/features/match/domain/services/ai_player.dart';
 import 'package:toriverse/features/match/domain/services/bonus_calculator.dart';
 import 'package:toriverse/features/match/domain/services/rivalry_tracker.dart';
 import 'package:toriverse/features/match/presentation/widgets/ai_takeover_indicator_widget.dart';
+import 'package:toriverse/features/match/presentation/widgets/animations/animations_barrel.dart';
 import 'package:toriverse/features/match/presentation/widgets/board_widget.dart';
 import 'package:toriverse/features/match/presentation/widgets/move_submission_panel.dart';
 import 'package:toriverse/features/match/presentation/widgets/rivalry_indicator_widget.dart';
 import 'package:toriverse/features/match/presentation/widgets/simultaneous_reveal_widget.dart';
+import 'package:toriverse/features/match/application/providers/animation_orchestrator_provider.dart';
+import 'package:toriverse/features/match/application/services/animation_sequence_builder.dart';
 
 /// Match/Board screen: displays the 3-color Othello board and handles simultaneous moves
 class MatchScreen extends ConsumerStatefulWidget {
@@ -311,6 +316,11 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
   }
 
   void _applyRoundMoves() {
+    // Launch async work without awaiting to maintain VoidCallback signature
+    unawaited(_applyRoundMovesAsync());
+  }
+
+  Future<void> _applyRoundMovesAsync() async {
     final gameState = ref.read(gameStateProvider);
     final roundSubmission = ref.read(roundSubmissionProvider);
     final currentResolution = _currentResolution;
@@ -320,6 +330,28 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     }
 
     try {
+      // Build and queue post-game animations (weak bonus, rescue card, collision)
+      final animationSequence =
+          AnimationSequenceBuilder.buildRoundSequence(
+        result: currentResolution.result,
+        playerNames: gameState.playerIds
+            .map((id) => id == 'AI' || id.startsWith('AI_')
+                ? 'AI'
+                : id)
+            .toList(),
+        playerIndices: [0, 1, 2], // Standard 3-player indices
+      );
+
+      // Queue animations if any exist
+      if (animationSequence.isNotEmpty) {
+        ref
+            .read(animationOrchestratorProvider(widget.matchId).notifier)
+            .queueAnimations(animationSequence);
+
+        // Wait for animations to complete
+        await _waitForAnimationsComplete();
+      }
+
       // Get the resolved board state
       final newBoard = currentResolution.boardAfter;
 
@@ -391,6 +423,35 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
       debugPrint('Error applying round moves: $e');
       _handleGameError(e);
     }
+  }
+
+  /// Wait for animation orchestrator to complete all queued animations
+  ///
+  /// Polls the orchestrator state until isPlaying becomes false.
+  /// Returns immediately if no animations are queued.
+  Future<void> _waitForAnimationsComplete() async {
+    const maxWaitMs = 30000; // 30 second timeout
+    const pollIntervalMs = 100; // Check every 100ms
+    int elapsedMs = 0;
+
+    while (elapsedMs < maxWaitMs) {
+      final orchestratorState =
+          ref.read(animationOrchestratorProvider(widget.matchId));
+
+      // Done when not playing and queue is empty
+      if (!orchestratorState.isPlaying &&
+          orchestratorState.queue.isEmpty &&
+          orchestratorState.currentAnimation == null) {
+        return;
+      }
+
+      // Poll again after interval
+      await Future.delayed(const Duration(milliseconds: pollIntervalMs));
+      elapsedMs += pollIntervalMs;
+    }
+
+    // Timeout - log warning and continue
+    debugPrint('Animation orchestrator timeout after ${maxWaitMs}ms');
   }
 
   void _handleGameError(Object error) {
@@ -552,6 +613,15 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
                 events: roundResult.replayEvents,
                 onComplete: _applyRoundMoves,
               ),
+
+            // Post-game animation overlay (weak bonus, rescue card, collision, etc.)
+            AnimationOverlay(
+              matchId: widget.matchId,
+              playerNames: gameState.playerIds
+                  .map((id) => id == 'AI' || id.startsWith('AI_') ? 'AI' : id)
+                  .toList(),
+              playerIndices: [0, 1, 2],
+            ),
           ],
         ),
       ),
