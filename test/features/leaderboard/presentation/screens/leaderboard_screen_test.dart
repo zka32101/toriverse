@@ -3,23 +3,11 @@
 /// Tests leaderboard display, tab switching, and player entry rendering.
 
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-import 'package:toriverse/features/leaderboard/application/providers/leaderboard_provider.dart';
-import 'package:toriverse/features/leaderboard/domain/models/leaderboard_models.dart';
 import 'package:toriverse/features/leaderboard/presentation/screens/leaderboard_screen.dart';
-
-// Mock classes
-class MockLeaderboardService extends Mock {}
 
 void main() {
   group('LeaderboardScreen', () {
-    late ProviderContainer providerContainer;
-
-    setUp(() {
-      providerContainer = ProviderContainer();
-    });
 
     testWidgets('displays loading state initially', (WidgetTester tester) async {
       await tester.pumpWidget(
