@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import '../../../../../config/theme.dart';
 
 /// Rescue Card Animation Widget
@@ -211,6 +210,8 @@ class _RescueCardAnimationWidgetState extends State<RescueCardAnimationWidget>
   Widget _buildLottieAnimation() {
     // TODO: Replace with actual Lottie animation file
     // Path should be: assets/animations/rescue_card.json
+    // import 'package:lottie/lottie.dart';
+    // return Lottie.asset('assets/animations/rescue_card.json', ...);
     // For now, show a placeholder with icon animation
     return ScaleTransition(
       scale: Tween<double>(begin: 0.8, end: 1.2).animate(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import '../../../../../config/theme.dart';
 
 /// Weak Bonus Animation Widget
@@ -171,6 +170,8 @@ class _WeakBonusAnimationWidgetState extends State<WeakBonusAnimationWidget>
   Widget _buildLottieAnimation() {
     // TODO: Replace with actual Lottie animation file
     // Path should be: assets/animations/weak_bonus.json
+    // import 'package:lottie/lottie.dart';
+    // return Lottie.asset('assets/animations/weak_bonus.json', ...);
     // For now, show a placeholder with icon animation
     return ScaleTransition(
       scale: Tween<double>(begin: 0.8, end: 1.2).animate(

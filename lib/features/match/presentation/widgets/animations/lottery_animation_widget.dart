@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import '../../../../../config/theme.dart';
 
 /// Lottery/Process Order Animation Widget
@@ -274,6 +273,8 @@ class _LotteryAnimationWidgetState extends State<LotteryAnimationWidget>
   Widget _buildLottieAnimation() {
     // TODO: Replace with actual Lottie animation file
     // Path should be: assets/animations/lottery.json
+    // import 'package:lottie/lottie.dart';
+    // return Lottie.asset('assets/animations/lottery.json', ...);
     // For now, show a placeholder with rotating icon animation
     return RotationTransition(
       turns: _mainController,
