@@ -8,12 +8,21 @@ import 'package:toriverse/features/match/data/models/round_result_model.dart';
 class MockFirestoreMatchRepository extends Mock
     implements FirestoreMatchRepository {}
 
-class MockFirebaseException extends Mock implements FirebaseException {
-  final String errorCode;
-  MockFirebaseException(this.errorCode);
+/// Test exception that mimics FirebaseException behavior
+class TestFirebaseException implements FirebaseException {
+  @override
+  final String code;
+
+  TestFirebaseException(this.code);
 
   @override
-  String get code => errorCode;
+  String get message => 'Firebase error: $code';
+
+  @override
+  StackTrace? get stackTrace => null;
+
+  @override
+  String toString() => 'TestFirebaseException($code)';
 }
 
 void main() {
@@ -37,7 +46,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('unavailable'))
+            .thenThrow(TestFirebaseException('unavailable'))
             .thenAnswer((_) async => null);
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -53,7 +62,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('deadline-exceeded'))
+            .thenThrow(TestFirebaseException('deadline-exceeded'))
             .thenAnswer((_) async => null);
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -69,7 +78,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('aborted'))
+            .thenThrow(TestFirebaseException('aborted'))
             .thenAnswer((_) async => null);
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -85,7 +94,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('internal'))
+            .thenThrow(TestFirebaseException('internal'))
             .thenAnswer((_) async => null);
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -101,7 +110,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('permission-denied'));
+            .thenThrow(TestFirebaseException('permission-denied'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
         expect(result, false);
@@ -117,7 +126,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('invalid-argument'));
+            .thenThrow(TestFirebaseException('invalid-argument'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
         expect(result, false);
@@ -133,7 +142,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('not-found'));
+            .thenThrow(TestFirebaseException('not-found'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
         expect(result, false);
@@ -166,7 +175,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('unavailable'))
+            .thenThrow(TestFirebaseException('unavailable'))
             .thenAnswer((_) async => null);
 
         await service.saveRoundResultWithRetry(testResult);
@@ -182,8 +191,8 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('unavailable'))
-            .thenThrow(MockFirebaseException('unavailable'))
+            .thenThrow(TestFirebaseException('unavailable'))
+            .thenThrow(TestFirebaseException('unavailable'))
             .thenAnswer((_) async => null);
 
         await service.saveRoundResultWithRetry(testResult);
@@ -199,7 +208,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('unavailable'));
+            .thenThrow(TestFirebaseException('unavailable'));
 
         await service.saveRoundResultWithRetry(testResult);
         verify(mockRepository.saveRoundResult(any)).called(4); // 1 + 3 retries
@@ -216,7 +225,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('unauthenticated'));
+            .thenThrow(TestFirebaseException('unauthenticated'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
         expect(result, false);
@@ -274,7 +283,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('unavailable'));
+            .thenThrow(TestFirebaseException('unavailable'));
 
         final stopwatch = Stopwatch()..start();
         await service.saveRoundResultWithRetry(testResult);

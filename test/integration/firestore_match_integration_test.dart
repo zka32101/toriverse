@@ -8,12 +8,21 @@ import 'package:toriverse/features/match/data/models/round_result_model.dart';
 class MockFirestoreMatchRepository extends Mock
     implements FirestoreMatchRepository {}
 
-class MockFirebaseException extends Mock implements FirebaseException {
-  final String errorCode;
-  MockFirebaseException(this.errorCode);
+/// Test exception that mimics FirebaseException behavior
+class TestFirebaseException implements FirebaseException {
+  @override
+  final String code;
+
+  TestFirebaseException(this.code);
 
   @override
-  String get code => errorCode;
+  String get message => 'Firebase error: $code';
+
+  @override
+  StackTrace? get stackTrace => null;
+
+  @override
+  String toString() => 'TestFirebaseException($code)';
 }
 
 void main() {
@@ -70,7 +79,7 @@ void main() {
 
         // First call fails, but game should continue
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('unavailable'));
+            .thenThrow(TestFirebaseException('unavailable'));
 
         final roundSaved =
             await service.saveRoundResultWithRetry(roundResult);
@@ -128,7 +137,7 @@ void main() {
         when(mockRepository.saveRoundResult(any)).thenAnswer((_) async {
           attemptCount++;
           if (attemptCount == 1) {
-            throw MockFirebaseException('deadline-exceeded');
+            throw TestFirebaseException('deadline-exceeded');
           }
         });
 
@@ -149,7 +158,7 @@ void main() {
         int attemptCount = 0;
         when(mockRepository.saveRoundResult(any)).thenAnswer((_) async {
           attemptCount++;
-          throw MockFirebaseException('permission-denied');
+          throw TestFirebaseException('permission-denied');
         });
 
         final result = await service.saveRoundResultWithRetry(roundResult);
@@ -169,7 +178,7 @@ void main() {
         int attemptCount = 0;
         when(mockRepository.saveRoundResult(any)).thenAnswer((_) async {
           attemptCount++;
-          throw MockFirebaseException('unavailable');
+          throw TestFirebaseException('unavailable');
         });
 
         final result = await service.saveRoundResultWithRetry(roundResult);
@@ -250,9 +259,9 @@ void main() {
 
         // Simulate complete Firestore outage
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('unavailable'));
+            .thenThrow(TestFirebaseException('unavailable'));
         when(mockRepository.updateMatchState(any, any))
-            .thenThrow(MockFirebaseException('unavailable'));
+            .thenThrow(TestFirebaseException('unavailable'));
 
         // Both operations should return false but not throw
         final roundSaved =

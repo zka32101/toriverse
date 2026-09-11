@@ -9,13 +9,21 @@ import 'package:toriverse/features/match/data/models/round_result_model.dart';
 class MockFirestoreMatchRepository extends Mock
     implements FirestoreMatchRepository {}
 
-class MockFirebaseException extends Mock implements FirebaseException {
-  final String errorCode;
+/// Test exception that mimics FirebaseException behavior
+class TestFirebaseException implements FirebaseException {
+  @override
+  final String code;
 
-  MockFirebaseException(this.errorCode);
+  TestFirebaseException(this.code);
 
   @override
-  String get code => errorCode;
+  String get message => 'Firebase error: $code';
+
+  @override
+  StackTrace? get stackTrace => null;
+
+  @override
+  String toString() => 'TestFirebaseException($code)';
 }
 
 void main() {
@@ -53,7 +61,7 @@ void main() {
 
       test('retries on retryable error', () async {
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('unavailable'))
+            .thenThrow(TestFirebaseException('unavailable'))
             .thenAnswer((_) async => null);
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -64,7 +72,7 @@ void main() {
 
       test('returns false after max retries exceeded', () async {
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('unavailable'));
+            .thenThrow(TestFirebaseException('unavailable'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
 
@@ -74,7 +82,7 @@ void main() {
 
       test('does not retry on non-retryable error', () async {
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('permission-denied'));
+            .thenThrow(TestFirebaseException('permission-denied'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
 
@@ -84,7 +92,7 @@ void main() {
 
       test('handles deadline-exceeded as retryable', () async {
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('deadline-exceeded'))
+            .thenThrow(TestFirebaseException('deadline-exceeded'))
             .thenAnswer((_) async => null);
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -95,7 +103,7 @@ void main() {
 
       test('handles aborted as retryable', () async {
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('aborted'))
+            .thenThrow(TestFirebaseException('aborted'))
             .thenAnswer((_) async => null);
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -106,7 +114,7 @@ void main() {
 
       test('handles internal as retryable', () async {
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('internal'))
+            .thenThrow(TestFirebaseException('internal'))
             .thenAnswer((_) async => null);
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -117,7 +125,7 @@ void main() {
 
       test('does not retry on invalid-argument error', () async {
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('invalid-argument'));
+            .thenThrow(TestFirebaseException('invalid-argument'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
 
@@ -127,7 +135,7 @@ void main() {
 
       test('does not retry on not-found error', () async {
         when(mockRepository.saveRoundResult(any))
-            .thenThrow(MockFirebaseException('not-found'));
+            .thenThrow(TestFirebaseException('not-found'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
 
@@ -165,7 +173,7 @@ void main() {
 
       test('retries on retryable error', () async {
         when(mockRepository.updateMatchState(any, any))
-            .thenThrow(MockFirebaseException('deadline-exceeded'))
+            .thenThrow(TestFirebaseException('deadline-exceeded'))
             .thenAnswer((_) async => null);
 
         final result = await service.updateMatchStateAfterRound(
@@ -182,7 +190,7 @@ void main() {
 
       test('returns false after max retries', () async {
         when(mockRepository.updateMatchState(any, any))
-            .thenThrow(MockFirebaseException('unavailable'));
+            .thenThrow(TestFirebaseException('unavailable'));
 
         final result = await service.updateMatchStateAfterRound(
           matchId: 'match_001',
