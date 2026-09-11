@@ -167,4 +167,25 @@ class FirestoreRoundResultService {
       return false;
     }
   }
+
+  /// Fetch all round results for a match in order
+  ///
+  /// Returns empty list if no rounds found or on error
+  Future<List<RoundResultModel>> fetchMatchRoundResults(String matchId) async {
+    try {
+      final firestore = FirebaseFirestore.instance;
+      final snapshot = await firestore
+          .collection('roundResults')
+          .where('matchId', isEqualTo: matchId)
+          .orderBy('roundIndex', descending: false)
+          .get();
+
+      return snapshot.docs
+          .map((doc) => RoundResultModel.fromJson(doc.data()))
+          .toList();
+    } catch (e) {
+      debugPrint('Error fetching round results ($matchId): $e');
+      return [];
+    }
+  }
 }
