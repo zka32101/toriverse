@@ -357,27 +357,6 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
       // Get the resolved board state
       final newBoard = currentResolution.boardAfter;
 
-      // Compute attack breakdown for rivalry tracking from the resolution
-      final roundBreakdown = <int, Map<int, int>>{};
-
-      // Use the processor from the resolution to get attack breakdown
-      final roundResult = currentResolution.result;
-      if (roundResult.boardAfter != null) {
-        for (final playerId in currentResolution.result.processOrder) {
-          final move = roundSubmission.submittedPositions[playerId];
-          if (move != null) {
-            final playerIndex = gameState.playerIds.indexOf(playerId);
-            // Attack breakdown is already computed in the result
-            // Just record it for rivalry tracking
-          }
-        }
-      }
-
-      // Record any rivalry information
-      if (roundBreakdown.isNotEmpty) {
-        ref.read(rivalryProvider.notifier).recordRound(roundBreakdown);
-      }
-
       // Update game state with new board
       final newCounts = newBoard.countStones();
       final newStoneCounts = {
