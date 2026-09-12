@@ -150,6 +150,9 @@ flutter run
 | **[RELEASE_NOTES.md](./RELEASE_NOTES.md)** | TestFlight v0.1.0+2 リリースノート・機能一覧・既知の制限 |
 | **[TESTING_GUIDELINES.md](./TESTING_GUIDELINES.md)** | ベータテスター向けテスト手順・テストシナリオ・フィードバック方法 |
 | **[TESTFLIGHT_CHECKLIST.md](./TESTFLIGHT_CHECKLIST.md)** | 本番ローンチ前チェックリスト・成功メトリクス・ゲート条件 |
+| **[MONITORING_DASHBOARDS.md](./MONITORING_DASHBOARDS.md)** | リアルタイム監視ダッシュボード・KPI追跡・成功ゲート評価 |
+| **[HOT_PATCH_PLAYBOOKS.md](./HOT_PATCH_PLAYBOOKS.md)** | Remote Config ホットパッチ戦略・ゲーム調整・問題対応 |
+| **[BUG_TRIAGE_PROCEDURES.md](./BUG_TRIAGE_PROCEDURES.md)** | バグ分類・対応手順・エスカレーション・品質管理 |
 | **[企画・設計書](./docs/toriverse_kikaku_sekkei_v1_0.md)** | 企画フェーズ・設計フェーズの完全ドキュメント |
 
 ---
