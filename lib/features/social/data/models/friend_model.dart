@@ -1,11 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'friend_model.freezed.dart';
 
 
 /// Friend relationship stored in users/{uid}/friends/{friendUid}
-@freezed
-class Friend with _$Friend {
+class Friend {
   const factory Friend({
     required String uid, // Friend's UID
     required DateTime addedAt,
@@ -19,8 +17,7 @@ class Friend with _$Friend {
 }
 
 /// Friend request stored in friendRequests/{requestId}
-@freezed
-class FriendRequest with _$FriendRequest {
+class FriendRequest {
   const factory FriendRequest({
     required String id,
     required String fromUid, // Requester

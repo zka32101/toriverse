@@ -2,8 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 
 /// Live match viewing session
-@freezed
-class LiveMatchSession with _$LiveMatchSession {
+class LiveMatchSession {
   const factory LiveMatchSession({
     required String id,
     required String matchId,
@@ -25,8 +24,7 @@ class LiveMatchSession with _$LiveMatchSession {
 }
 
 /// Real-time board state for spectators
-@freezed
-class LiveBoardState with _$LiveBoardState {
+class LiveBoardState {
   const factory LiveBoardState({
     required String matchId,
     required List<int> boardState, // 8x8 = 64 cells (0=empty, 1=black, 2=white, 3=red)
@@ -46,8 +44,7 @@ class LiveBoardState with _$LiveBoardState {
 }
 
 /// Spectator action/interaction
-@freezed
-class SpectatorAction with _$SpectatorAction {
+class SpectatorAction {
   const factory SpectatorAction({
     required String id,
     required String viewerId,
@@ -63,8 +60,7 @@ class SpectatorAction with _$SpectatorAction {
 }
 
 /// Live viewer participation record
-@freezed
-class LiveViewer with _$LiveViewer {
+class LiveViewer {
   const factory LiveViewer({
     required String id,
     required String matchId,
@@ -84,8 +80,7 @@ class LiveViewer with _$LiveViewer {
 }
 
 /// Live match interaction (chat, reactions, predictions)
-@freezed
-class MatchInteraction with _$MatchInteraction {
+class MatchInteraction {
   const factory MatchInteraction({
     required String id,
     required String matchId,
@@ -105,8 +100,7 @@ class MatchInteraction with _$MatchInteraction {
 }
 
 /// Live prediction during match
-@freezed
-class LivePrediction with _$LivePrediction {
+class LivePrediction {
   const factory LivePrediction({
     required String id,
     required String matchId,
@@ -125,8 +119,7 @@ class LivePrediction with _$LivePrediction {
 }
 
 /// Live spectator reward for watching
-@freezed
-class LiveSpectatorReward with _$LiveSpectatorReward {
+class LiveSpectatorReward {
   const factory LiveSpectatorReward({
     required String id,
     required String matchId,
@@ -144,8 +137,7 @@ class LiveSpectatorReward with _$LiveSpectatorReward {
 }
 
 /// Spectator leaderboard entry (during live match)
-@freezed
-class LiveLeaderboardEntry with _$LiveLeaderboardEntry {
+class LiveLeaderboardEntry {
   const factory LiveLeaderboardEntry({
     required String rank,
     required String viewerId,
@@ -161,8 +153,7 @@ class LiveLeaderboardEntry with _$LiveLeaderboardEntry {
 }
 
 /// Highlight moment during live match
-@freezed
-class MatchHighlightMoment with _$MatchHighlightMoment {
+class MatchHighlightMoment {
   const factory MatchHighlightMoment({
     required String id,
     required String matchId,
@@ -179,8 +170,7 @@ class MatchHighlightMoment with _$MatchHighlightMoment {
 }
 
 /// Live chat message (for match discussion)
-@freezed
-class LiveChatMessage with _$LiveChatMessage {
+class LiveChatMessage {
   const factory LiveChatMessage({
     required String id,
     required String matchId,
@@ -199,8 +189,7 @@ class LiveChatMessage with _$LiveChatMessage {
 }
 
 /// Stream info for live spectating
-@freezed
-class MatchStreamInfo with _$MatchStreamInfo {
+class MatchStreamInfo {
   const factory MatchStreamInfo({
     required String matchId,
     required String streamUrl, // HLS/DASH stream
@@ -218,8 +207,7 @@ class MatchStreamInfo with _$MatchStreamInfo {
 }
 
 /// Live match viewer statistics
-@freezed
-class LiveMatchStats with _$LiveMatchStats {
+class LiveMatchStats {
   const factory LiveMatchStats({
     required String matchId,
     @Default(0) int currentViewerCount,
@@ -238,8 +226,7 @@ class LiveMatchStats with _$LiveMatchStats {
 }
 
 /// Spectator engagement metrics
-@freezed
-class SpectatorEngagement with _$SpectatorEngagement {
+class SpectatorEngagement {
   const factory SpectatorEngagement({
     required String viewerId,
     required String matchId,

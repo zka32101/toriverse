@@ -1,11 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'match_room_model.freezed.dart';
 
 
 /// Match room for private friend matches stored in matchRooms/{roomId}
-@freezed
-class MatchRoom with _$MatchRoom {
+class MatchRoom {
   const factory MatchRoom({
     required String id, // Room identifier
     required String creatorUid, // Who created room
@@ -23,8 +21,7 @@ class MatchRoom with _$MatchRoom {
 }
 
 /// Match invitation stored in invitations/{invitationId}
-@freezed
-class Invitation with _$Invitation {
+class Invitation {
   const factory Invitation({
     required String id,
     required String roomId,

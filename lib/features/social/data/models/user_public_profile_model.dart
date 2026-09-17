@@ -1,11 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'user_public_profile_model.freezed.dart';
 
 
 /// User public profile stored in users/{uid}/profiles/public
-@freezed
-class UserPublicProfile with _$UserPublicProfile {
+class UserPublicProfile {
   const factory UserPublicProfile({
     required String uid,
     required String displayName,

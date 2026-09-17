@@ -2,8 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 
 /// Creator earnings aggregated by time period
-@freezed
-class CreatorEarnings with _$CreatorEarnings {
+class CreatorEarnings {
   const factory CreatorEarnings({
     required String id,
     required String creatorId,
@@ -26,8 +25,7 @@ class CreatorEarnings with _$CreatorEarnings {
 }
 
 /// Subscription tier configuration
-@freezed
-class SubscriptionTier with _$SubscriptionTier {
+class SubscriptionTier {
   const factory SubscriptionTier({
     required String id,
     required String creatorId,
@@ -52,8 +50,7 @@ class SubscriptionTier with _$SubscriptionTier {
 }
 
 /// User's active subscription to a creator
-@freezed
-class UserSubscription with _$UserSubscription {
+class UserSubscription {
   const factory UserSubscription({
     required String id,
     required String userId,
@@ -75,8 +72,7 @@ class UserSubscription with _$UserSubscription {
 }
 
 /// Virtual gift item definition
-@freezed
-class VirtualGift with _$VirtualGift {
+class VirtualGift {
   const factory VirtualGift({
     required String id,
     required String name,
@@ -95,8 +91,7 @@ class VirtualGift with _$VirtualGift {
 }
 
 /// Record of virtual gift purchase and sending
-@freezed
-class GiftTransaction with _$GiftTransaction {
+class GiftTransaction {
   const factory GiftTransaction({
     required String id,
     required String giftId,
@@ -116,8 +111,7 @@ class GiftTransaction with _$GiftTransaction {
 }
 
 /// Subscription payment record
-@freezed
-class SubscriptionTransaction with _$SubscriptionTransaction {
+class SubscriptionTransaction {
   const factory SubscriptionTransaction({
     required String id,
     required String subscriptionId,
@@ -139,8 +133,7 @@ class SubscriptionTransaction with _$SubscriptionTransaction {
 }
 
 /// Payout request and status
-@freezed
-class CreatorPayout with _$CreatorPayout {
+class CreatorPayout {
   const factory CreatorPayout({
     required String id,
     required String creatorId,
@@ -160,8 +153,7 @@ class CreatorPayout with _$CreatorPayout {
 }
 
 /// Creator's payment method for payouts
-@freezed
-class PaymentMethod with _$PaymentMethod {
+class PaymentMethod {
   const factory PaymentMethod({
     required String id,
     required String creatorId,
@@ -183,8 +175,7 @@ class PaymentMethod with _$PaymentMethod {
 }
 
 /// Creator's payout frequency settings
-@freezed
-class PayoutSchedule with _$PayoutSchedule {
+class PayoutSchedule {
   const factory PayoutSchedule({
     required String id,
     required String creatorId,
@@ -201,8 +192,7 @@ class PayoutSchedule with _$PayoutSchedule {
 }
 
 /// Revenue split configuration
-@freezed
-class RevenueAllocation with _$RevenueAllocation {
+class RevenueAllocation {
   const factory RevenueAllocation({
     required String id,
     required String creatorId,
@@ -221,8 +211,7 @@ class RevenueAllocation with _$RevenueAllocation {
 }
 
 /// Detailed analytics for creator earnings
-@freezed
-class CreatorAnalytics with _$CreatorAnalytics {
+class CreatorAnalytics {
   const factory CreatorAnalytics({
     required String id,
     required String creatorId,
@@ -248,8 +237,7 @@ class CreatorAnalytics with _$CreatorAnalytics {
 }
 
 /// Monetization milestones and achievements
-@freezed
-class MonetizationAchievement with _$MonetizationAchievement {
+class MonetizationAchievement {
   const factory MonetizationAchievement({
     required String id,
     required String creatorId,
@@ -266,8 +254,7 @@ class MonetizationAchievement with _$MonetizationAchievement {
 }
 
 /// Multi-currency exchange rates
-@freezed
-class CurrencyExchange with _$CurrencyExchange {
+class CurrencyExchange {
   const factory CurrencyExchange({
     required String id,
     required String fromCurrency,
@@ -282,8 +269,7 @@ class CurrencyExchange with _$CurrencyExchange {
 }
 
 /// Tax information for creators
-@freezed
-class TaxInfo with _$TaxInfo {
+class TaxInfo {
   const factory TaxInfo({
     required String id,
     required String creatorId,
@@ -303,8 +289,7 @@ class TaxInfo with _$TaxInfo {
 }
 
 /// Referral bonus tracking
-@freezed
-class ReferralBonus with _$ReferralBonus {
+class ReferralBonus {
   const factory ReferralBonus({
     required String id,
     required String referrerCreatorId,
@@ -322,8 +307,7 @@ class ReferralBonus with _$ReferralBonus {
 }
 
 /// Creator earnings configuration
-@freezed
-class MonetizationSettings with _$MonetizationSettings {
+class MonetizationSettings {
   const factory MonetizationSettings({
     required String id,
     required String creatorId,

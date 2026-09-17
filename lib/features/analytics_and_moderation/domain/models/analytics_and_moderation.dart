@@ -17,8 +17,7 @@ enum ReportStatus { open, investigating, resolved, dismissed, appealed }
 // Creator Analytics Models
 
 /// Creator dashboard with aggregated metrics
-@freezed
-class CreatorAnalyticsDashboard with _$CreatorAnalyticsDashboard {
+class CreatorAnalyticsDashboard {
   const factory CreatorAnalyticsDashboard({
     required String creatorId,
     @Default(0) int totalViews,
@@ -36,8 +35,7 @@ class CreatorAnalyticsDashboard with _$CreatorAnalyticsDashboard {
 }
 
 /// Individual content performance metrics
-@freezed
-class ContentPerformance with _$ContentPerformance {
+class ContentPerformance {
   const factory ContentPerformance({
     required String contentId,
     required String contentType,
@@ -55,8 +53,7 @@ class ContentPerformance with _$ContentPerformance {
 }
 
 /// Aggregated viewer demographics
-@freezed
-class AudienceDemographics with _$AudienceDemographics {
+class AudienceDemographics {
   const factory AudienceDemographics({
     required String creatorId,
     @Default({}) Map<String, int> ageGroups,
@@ -74,8 +71,7 @@ class AudienceDemographics with _$AudienceDemographics {
 }
 
 /// Revenue breakdown by source and period
-@freezed
-class RevenueAnalytics with _$RevenueAnalytics {
+class RevenueAnalytics {
   const factory RevenueAnalytics({
     required String creatorId,
     required String period,
@@ -98,8 +94,7 @@ class RevenueAnalytics with _$RevenueAnalytics {
 // Community Safety Models
 
 /// User report for abuse/spam/harassment
-@freezed
-class UserReport with _$UserReport {
+class UserReport {
   const factory UserReport({
     required String reportId,
     required String reporterId,
@@ -117,8 +112,7 @@ class UserReport with _$UserReport {
 }
 
 /// Content flagged for moderation
-@freezed
-class ContentModeration with _$ContentModeration {
+class ContentModeration {
   const factory ContentModeration({
     required String contentId,
     required String contentType,
@@ -135,8 +129,7 @@ class ContentModeration with _$ContentModeration {
 }
 
 /// Moderation action taken on user
-@freezed
-class CommunityModeration with _$CommunityModeration {
+class CommunityModeration {
   const factory CommunityModeration({
     required String moderationId,
     required ModerationAction action,
@@ -157,8 +150,7 @@ class CommunityModeration with _$CommunityModeration {
 // Notification & Engagement Models
 
 /// Push notification
-@freezed
-class PushNotification with _$PushNotification {
+class PushNotification {
   const factory PushNotification({
     required String notificationId,
     required String userId,
@@ -179,8 +171,7 @@ class PushNotification with _$PushNotification {
 }
 
 /// User engagement metrics
-@freezed
-class UserEngagementMetrics with _$UserEngagementMetrics {
+class UserEngagementMetrics {
   const factory UserEngagementMetrics({
     required String userId,
     @Default(0) int dailyActiveUsers,
@@ -198,8 +189,7 @@ class UserEngagementMetrics with _$UserEngagementMetrics {
 }
 
 /// Achievement badge
-@freezed
-class AchievementBadge with _$AchievementBadge {
+class AchievementBadge {
   const factory AchievementBadge({
     required String badgeId,
     required String name,
@@ -219,8 +209,7 @@ class AchievementBadge with _$AchievementBadge {
 // Platform Monitoring
 
 /// Platform-wide metrics
-@freezed
-class PlatformMetrics with _$PlatformMetrics {
+class PlatformMetrics {
   const factory PlatformMetrics({
     required String metricsId,
     required String period,

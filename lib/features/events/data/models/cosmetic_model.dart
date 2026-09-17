@@ -1,11 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'cosmetic_model.freezed.dart';
 
 
 /// Limited edition cosmetic stored in cosmetics/limited/{eventId}
-@freezed
-class LimitedCosmetic with _$LimitedCosmetic {
+class LimitedCosmetic {
   const factory LimitedCosmetic({
     required String id,
     required String eventId,
@@ -26,8 +24,7 @@ class LimitedCosmetic with _$LimitedCosmetic {
 }
 
 /// User's event cosmetic stored in users/{uid}/eventCosmetics/{cosmeticId}
-@freezed
-class UserEventCosmetic with _$UserEventCosmetic {
+class UserEventCosmetic {
   const factory UserEventCosmetic({
     required String cosmeticId,
     required String eventId,

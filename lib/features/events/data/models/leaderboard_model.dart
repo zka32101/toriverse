@@ -1,11 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'leaderboard_model.freezed.dart';
 
 
 /// Leaderboard entry stored in events/{eventId}/leaderboard/{entryId}
-@freezed
-class LeaderboardEntry with _$LeaderboardEntry {
+class LeaderboardEntry {
   const factory LeaderboardEntry({
     required String id,
     required String eventId,

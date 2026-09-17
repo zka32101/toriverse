@@ -5,8 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 ///
 /// Represents a single message sent in spectator chat during a match.
 /// Supports moderation, emoji reactions, and message pinning.
-@freezed
-class SpectatorMessage with _$SpectatorMessage {
+class SpectatorMessage {
   const factory SpectatorMessage({
     required String id,                  // Unique message ID
     required String matchId,             // Match being watched

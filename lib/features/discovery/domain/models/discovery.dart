@@ -20,8 +20,7 @@ enum ContentTypeEnum { creator, clip, match, clan }
 // Models
 
 /// Represents a search query performed by a user
-@freezed
-class SearchQuery with _$SearchQuery {
+class SearchQuery {
   const factory SearchQuery({
     required String queryId,
     required String userId,
@@ -38,8 +37,7 @@ class SearchQuery with _$SearchQuery {
 }
 
 /// Real-time personalized recommendation feed
-@freezed
-class RecommendationFeed with _$RecommendationFeed {
+class RecommendationFeed {
   const factory RecommendationFeed({
     required String feedId,
     required String userId,
@@ -55,8 +53,7 @@ class RecommendationFeed with _$RecommendationFeed {
 }
 
 /// Trending content rankings
-@freezed
-class TrendingContent with _$TrendingContent {
+class TrendingContent {
   const factory TrendingContent({
     required String trendingId,
     required ContentTypeEnum contentType,
@@ -73,8 +70,7 @@ class TrendingContent with _$TrendingContent {
 }
 
 /// Discovery analytics for tracking user behavior
-@freezed
-class DiscoveryAnalytics with _$DiscoveryAnalytics {
+class DiscoveryAnalytics {
   const factory DiscoveryAnalytics({
     required String analyticsId,
     required String userId,
@@ -92,8 +88,7 @@ class DiscoveryAnalytics with _$DiscoveryAnalytics {
 }
 
 /// Cached search result
-@freezed
-class SearchResult with _$SearchResult {
+class SearchResult {
   const factory SearchResult({
     required String resultId,
     required String queryId,
@@ -109,8 +104,7 @@ class SearchResult with _$SearchResult {
 }
 
 /// Optimized creator search display
-@freezed
-class CreatorSearchCard with _$CreatorSearchCard {
+class CreatorSearchCard {
   const factory CreatorSearchCard({
     required String creatorId,
     required String displayName,
@@ -130,8 +124,7 @@ class CreatorSearchCard with _$CreatorSearchCard {
 }
 
 /// Saved search for quick re-execution
-@freezed
-class SavedSearch with _$SavedSearch {
+class SavedSearch {
   const factory SavedSearch({
     required String savedSearchId,
     required String userId,
@@ -147,8 +140,7 @@ class SavedSearch with _$SavedSearch {
 }
 
 /// Platform-wide discovery metrics
-@freezed
-class DiscoveryMetrics with _$DiscoveryMetrics {
+class DiscoveryMetrics {
   const factory DiscoveryMetrics({
     required String metricsId,
     required String period,
@@ -167,8 +159,7 @@ class DiscoveryMetrics with _$DiscoveryMetrics {
 }
 
 /// User preferences for personalization
-@freezed
-class UserPreferences with _$UserPreferences {
+class UserPreferences {
   const factory UserPreferences({
     required String userId,
     @Default([]) List<String> preferredSkillLevels,

@@ -2,8 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 
 /// User's organizer profile and capabilities
-@freezed
-class OrganizerProfile with _$OrganizerProfile {
+class OrganizerProfile {
   const factory OrganizerProfile({
     required String uid,
     required String displayName,
@@ -25,8 +24,7 @@ class OrganizerProfile with _$OrganizerProfile {
 }
 
 /// Tournament being created/drafted
-@freezed
-class TournamentDraft with _$TournamentDraft {
+class TournamentDraft {
   const factory TournamentDraft({
     required String organizerId,
     required String name,
@@ -51,8 +49,7 @@ class TournamentDraft with _$TournamentDraft {
 }
 
 /// Prize pool configuration for tournaments
-@freezed
-class PrizePoolConfig with _$PrizePoolConfig {
+class PrizePoolConfig {
   const factory PrizePoolConfig({
     required int totalAmount,
     required Map<int, int> distribution, // rank -> amount (JPY)
@@ -67,8 +64,7 @@ class PrizePoolConfig with _$PrizePoolConfig {
 }
 
 /// Tournament configuration details
-@freezed
-class TournamentConfig with _$TournamentConfig {
+class TournamentConfig {
   const factory TournamentConfig({
     required String tournamentId,
     required String organizerId,
@@ -93,8 +89,7 @@ class TournamentConfig with _$TournamentConfig {
 }
 
 /// Organizer tournament statistics
-@freezed
-class OrganizerStats with _$OrganizerStats {
+class OrganizerStats {
   const factory OrganizerStats({
     required String organizerId,
     @Default(0) int totalTournaments,
@@ -114,8 +109,7 @@ class OrganizerStats with _$OrganizerStats {
 }
 
 /// Review/rating for tournament organizer
-@freezed
-class TournamentReview with _$TournamentReview {
+class TournamentReview {
   const factory TournamentReview({
     required String id,
     required String tournamentId,
@@ -132,8 +126,7 @@ class TournamentReview with _$TournamentReview {
 }
 
 /// Tournament participation request from player
-@freezed
-class TournamentRegistration with _$TournamentRegistration {
+class TournamentRegistration {
   const factory TournamentRegistration({
     required String id,
     required String tournamentId,
@@ -150,8 +143,7 @@ class TournamentRegistration with _$TournamentRegistration {
 }
 
 /// Payout request for tournament prizes
-@freezed
-class PayoutRequest with _$PayoutRequest {
+class PayoutRequest {
   const factory PayoutRequest({
     required String id,
     required String tournamentId,
@@ -170,8 +162,7 @@ class PayoutRequest with _$PayoutRequest {
 }
 
 /// Template for organizing recurring tournament series
-@freezed
-class TournamentTemplate with _$TournamentTemplate {
+class TournamentTemplate {
   const factory TournamentTemplate({
     required String id,
     required String organizerId,

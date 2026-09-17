@@ -1,11 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'event_model.freezed.dart';
 
 
 /// Event (campaign) stored in events/{eventId}
-@freezed
-class Event with _$Event {
+class Event {
   const factory Event({
     required String id,
     required String name,
@@ -28,8 +26,7 @@ class Event with _$Event {
 }
 
 /// Challenge within event stored in events/{eventId}/challenges/{challengeId}
-@freezed
-class Challenge with _$Challenge {
+class Challenge {
   const factory Challenge({
     required String id,
     required String eventId,
@@ -50,8 +47,7 @@ class Challenge with _$Challenge {
 }
 
 /// Challenge reward
-@freezed
-class ChallengeReward with _$ChallengeReward {
+class ChallengeReward {
   const factory ChallengeReward({
     @Default('bronze') String tier, // bronze, silver, gold
     required String cosmeticId,
@@ -64,8 +60,7 @@ class ChallengeReward with _$ChallengeReward {
 }
 
 /// Event progress for user stored in users/{uid}/eventProgress/{eventId}
-@freezed
-class EventProgress with _$EventProgress {
+class EventProgress {
   const factory EventProgress({
     required String eventId,
     required String uid,

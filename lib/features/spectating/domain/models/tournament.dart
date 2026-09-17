@@ -57,8 +57,7 @@ enum TournamentStatus {
 }
 
 /// Prize distribution model
-@freezed
-class PrizePool with _$PrizePool {
+class PrizePool {
   const factory PrizePool({
     required int totalAmount, // JPY
     required Map<int, int> distribution, // position -> amount (1 -> 100000, 2 -> 50000, etc)
@@ -70,8 +69,7 @@ class PrizePool with _$PrizePool {
 }
 
 /// Tournament with metadata
-@freezed
-class Tournament with _$Tournament {
+class Tournament {
   const factory Tournament({
     required String id,
     required String name,
@@ -104,8 +102,7 @@ class Tournament with _$Tournament {
 }
 
 /// Participant in tournament
-@freezed
-class TournamentParticipant with _$TournamentParticipant {
+class TournamentParticipant {
   const factory TournamentParticipant({
     required String id,
     required String tournamentId,
@@ -127,8 +124,7 @@ class TournamentParticipant with _$TournamentParticipant {
 }
 
 /// Match within tournament
-@freezed
-class TournamentMatch with _$TournamentMatch {
+class TournamentMatch {
   const factory TournamentMatch({
     required String id,
     required String tournamentId,
@@ -169,8 +165,7 @@ enum MatchStatus {
 }
 
 /// Tournament bracket/standings
-@freezed
-class TournamentBracket with _$TournamentBracket {
+class TournamentBracket {
   const factory TournamentBracket({
     required String id,
     required String tournamentId,
@@ -184,8 +179,7 @@ class TournamentBracket with _$TournamentBracket {
 }
 
 /// Viewer prediction/wagering
-@freezed
-class MatchPrediction with _$MatchPrediction {
+class MatchPrediction {
   const factory MatchPrediction({
     required String id,
     required String matchId,
@@ -201,8 +195,7 @@ class MatchPrediction with _$MatchPrediction {
 }
 
 /// Viewer reward for watching
-@freezed
-class ViewerReward with _$ViewerReward {
+class ViewerReward {
   const factory ViewerReward({
     required String id,
     required String tournamentId,
@@ -218,8 +211,7 @@ class ViewerReward with _$ViewerReward {
 }
 
 /// Featured match display info
-@freezed
-class FeaturedMatch with _$FeaturedMatch {
+class FeaturedMatch {
   const factory FeaturedMatch({
     required String id,
     required String matchId,
@@ -241,8 +233,7 @@ class FeaturedMatch with _$FeaturedMatch {
 }
 
 /// Tournament standings snapshot
-@freezed
-class TournamentStandings with _$TournamentStandings {
+class TournamentStandings {
   const factory TournamentStandings({
     required String id,
     required String tournamentId,
@@ -254,8 +245,7 @@ class TournamentStandings with _$TournamentStandings {
 }
 
 /// Individual standing entry
-@freezed
-class StandingEntry with _$StandingEntry {
+class StandingEntry {
   const factory StandingEntry({
     required int rank,
     required String playerId,
@@ -275,8 +265,7 @@ class StandingEntry with _$StandingEntry {
 }
 
 /// Tournament achievement/badge
-@freezed
-class TournamentBadge with _$TournamentBadge {
+class TournamentBadge {
   const factory TournamentBadge({
     required String id,
     required String tournamentId,
@@ -291,8 +280,7 @@ class TournamentBadge with _$TournamentBadge {
 }
 
 /// Highlight moment in tournament
-@freezed
-class TournamentHighlight with _$TournamentHighlight {
+class TournamentHighlight {
   const factory TournamentHighlight({
     required String id,
     required String tournamentId,
@@ -310,8 +298,7 @@ class TournamentHighlight with _$TournamentHighlight {
 }
 
 /// Tournament invitation to player
-@freezed
-class TournamentInvitation with _$TournamentInvitation {
+class TournamentInvitation {
   const factory TournamentInvitation({
     required String id,
     required String tournamentId,

@@ -1,11 +1,9 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'replay_model.freezed.dart';
 
 
 /// Replay asset stored in replays/{replayId}
-@freezed
-class Replay with _$Replay {
+class Replay {
   const factory Replay({
     required String id, // Replay identifier
     required String matchId, // Source match
@@ -28,8 +26,7 @@ class Replay with _$Replay {
 }
 
 /// Replay view log stored in replays/{replayId}/views/{viewId}
-@freezed
-class ReplayView with _$ReplayView {
+class ReplayView {
   const factory ReplayView({
     required String replayId,
     required String viewedByUid,

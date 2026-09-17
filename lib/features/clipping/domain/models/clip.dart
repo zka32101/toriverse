@@ -4,8 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 /// Generated clip from match highlight moment
 ///
 /// Represents a video clip extracted from a match, ready for social sharing
-@freezed
-class MatchClip with _$MatchClip {
+class MatchClip {
   const factory MatchClip({
     required String id,
     required String matchId,
@@ -35,8 +34,7 @@ class MatchClip with _$MatchClip {
 /// Different format versions of a clip
 ///
 /// Clips are generated in multiple aspect ratios for different platforms
-@freezed
-class ClipFormat with _$ClipFormat {
+class ClipFormat {
   const factory ClipFormat({
     required String id,
     required String clipId,
@@ -62,8 +60,7 @@ class ClipFormat with _$ClipFormat {
 /// Clip upload status to social platform
 ///
 /// Tracks clip distribution across social media platforms
-@freezed
-class ClipUploadStatus with _$ClipUploadStatus {
+class ClipUploadStatus {
   const factory ClipUploadStatus({
     required String id,
     required String clipId,
@@ -85,8 +82,7 @@ class ClipUploadStatus with _$ClipUploadStatus {
 /// Social sharing record
 ///
 /// Tracks when and where clips are shared
-@freezed
-class ClipShare with _$ClipShare {
+class ClipShare {
   const factory ClipShare({
     required String id,
     required String clipId,
@@ -107,8 +103,7 @@ class ClipShare with _$ClipShare {
 /// Clip engagement metrics
 ///
 /// Aggregated view/like/share counts across all platforms
-@freezed
-class ClipMetrics with _$ClipMetrics {
+class ClipMetrics {
   const factory ClipMetrics({
     required String id,
     required String clipId,
@@ -134,8 +129,7 @@ class ClipMetrics with _$ClipMetrics {
 /// Clip generation configuration
 ///
 /// Settings for how clips should be generated
-@freezed
-class ClipGenerationConfig with _$ClipGenerationConfig {
+class ClipGenerationConfig {
   const factory ClipGenerationConfig({
     required String id,
     @Default('standard') String template, // standard, highlight_reel, dramatic, funny, etc
@@ -161,8 +155,7 @@ class ClipGenerationConfig with _$ClipGenerationConfig {
 /// Clip generation job
 ///
 /// Tracks the progress of clip generation from highlight to finished product
-@freezed
-class ClipGenerationJob with _$ClipGenerationJob {
+class ClipGenerationJob {
   const factory ClipGenerationJob({
     required String id,
     required String clipId,
@@ -183,8 +176,7 @@ class ClipGenerationJob with _$ClipGenerationJob {
 /// Clip recommendation
 ///
 /// Clips recommended to viewers based on viewing history
-@freezed
-class ClipRecommendation with _$ClipRecommendation {
+class ClipRecommendation {
   const factory ClipRecommendation({
     required String id,
     required String userId,
@@ -204,8 +196,7 @@ class ClipRecommendation with _$ClipRecommendation {
 /// Trending clip
 ///
 /// Clips currently trending on the platform
-@freezed
-class TrendingClip with _$TrendingClip {
+class TrendingClip {
   const factory TrendingClip({
     required String rank,
     required String clipId,
@@ -226,8 +217,7 @@ class TrendingClip with _$TrendingClip {
 /// Clip creator profile
 ///
 /// Statistics for clip creators
-@freezed
-class ClipCreatorProfile with _$ClipCreatorProfile {
+class ClipCreatorProfile {
   const factory ClipCreatorProfile({
     required String userId,
     @Default(0) int totalClipsCreated,
@@ -249,8 +239,7 @@ class ClipCreatorProfile with _$ClipCreatorProfile {
 /// Clip comment/reaction
 ///
 /// User reactions to clips on the platform
-@freezed
-class ClipComment with _$ClipComment {
+class ClipComment {
   const factory ClipComment({
     required String id,
     required String clipId,
@@ -271,8 +260,7 @@ class ClipComment with _$ClipComment {
 /// Viral tracking data
 ///
 /// Tracks how clips spread across the network
-@freezed
-class ViralTrackingData with _$ViralTrackingData {
+class ViralTrackingData {
   const factory ViralTrackingData({
     required String id,
     required String clipId,

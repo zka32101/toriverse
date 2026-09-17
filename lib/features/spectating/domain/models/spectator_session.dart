@@ -2,8 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 
 /// Represents a spectator's view of an active match
-@freezed
-class SpectatorSession with _$SpectatorSession {
+class SpectatorSession {
   const factory SpectatorSession({
     required String id,
     required String matchId,
@@ -28,8 +27,7 @@ enum SpectatorRole {
 }
 
 /// Device information for spectator
-@freezed
-class DeviceInfo with _$DeviceInfo {
+class DeviceInfo {
   const factory DeviceInfo({
     required String os,           // "iOS", "Android", "Web"
     required String osVersion,

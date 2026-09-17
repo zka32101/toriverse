@@ -5,8 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 ///
 /// Represents a user's active streaming session across multiple platforms.
 /// Tracks streaming status, viewer count, earnings, and platform metadata.
-@freezed
-class StreamingSession with _$StreamingSession {
+class StreamingSession {
   const factory StreamingSession({
     required String id,                    // Unique session ID
     required String matchId,               // Match being streamed
@@ -99,8 +98,7 @@ extension StreamingPlatformExt on StreamingPlatform {
 }
 
 /// Platform-specific streaming metadata
-@freezed
-class StreamingMetadata with _$StreamingMetadata {
+class StreamingMetadata {
   const factory StreamingMetadata({
     required String platform,              // 'twitch', 'youtube', 'obs'
     String? platformUserId,                // User ID on platform
@@ -117,8 +115,7 @@ class StreamingMetadata with _$StreamingMetadata {
 }
 
 /// Auto-generated highlight clip from stream
-@freezed
-class HighlightClip with _$HighlightClip {
+class HighlightClip {
   const factory HighlightClip({
     required String id,                    // Unique clip ID
     required String streamingSessionId,    // Parent session
@@ -255,8 +252,7 @@ class StreamingAnalyticsEvent {
 }
 
 /// Streamer earnings tracking
-@freezed
-class StreamerEarnings with _$StreamerEarnings {
+class StreamerEarnings {
   const factory StreamerEarnings({
     required String userId,                // Streamer ID
     required DateTime periodStart,         // Earnings period start

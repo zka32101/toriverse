@@ -4,8 +4,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 /// Streamer verification status and tier information
 ///
 /// Tracks verification level, monetization tier, and program eligibility.
-@freezed
-class StreamerVerification with _$StreamerVerification {
+class StreamerVerification {
   const factory StreamerVerification({
     required String userId,                    // Streamer's user ID
     required StreamerTier tier,                // Current monetization tier
@@ -106,8 +105,7 @@ extension StreamerTierExt on StreamerTier {
 }
 
 /// Verification requirements for tier eligibility
-@freezed
-class VerificationRequirements with _$VerificationRequirements {
+class VerificationRequirements {
   const factory VerificationRequirements({
     required StreamerTier tier,
     required int minFollowers,                 // Minimum follower count
@@ -126,8 +124,7 @@ class VerificationRequirements with _$VerificationRequirements {
 /// Referral tracking for viral growth
 ///
 /// Tracks user-to-user referrals with revenue sharing.
-@freezed
-class ReferralRecord with _$ReferralRecord {
+class ReferralRecord {
   const factory ReferralRecord({
     required String id,                        // Unique referral ID
     required String referrerId,                // Who referred
@@ -181,8 +178,7 @@ extension ReferralStatusExt on ReferralStatus {
 /// Streamer analytics and performance metrics
 ///
 /// Aggregated statistics for streamer dashboard and program eligibility.
-@freezed
-class StreamerAnalytics with _$StreamerAnalytics {
+class StreamerAnalytics {
   const factory StreamerAnalytics({
     required String userId,                    // Streamer ID
     required DateTime periodStart,             // Analytics period start
@@ -211,8 +207,7 @@ class StreamerAnalytics with _$StreamerAnalytics {
 }
 
 /// Achievement badges for streamer profile
-@freezed
-class StreamerBadge with _$StreamerBadge {
+class StreamerBadge {
   const factory StreamerBadge({
     required String id,                        // Badge ID
     required String name,                      // Display name
@@ -254,8 +249,7 @@ extension StreamerBadgeTypeExt on StreamerBadgeType {
 }
 
 /// Streamer leaderboard entry
-@freezed
-class StreamerLeaderboardEntry with _$StreamerLeaderboardEntry {
+class StreamerLeaderboardEntry {
   const factory StreamerLeaderboardEntry({
     required String userId,                    // Streamer ID
     required String displayName,               // Display name
@@ -272,8 +266,7 @@ class StreamerLeaderboardEntry with _$StreamerLeaderboardEntry {
 }
 
 /// Tier upgrade eligibility check result
-@freezed
-class TierUpgradeEligibility with _$TierUpgradeEligibility {
+class TierUpgradeEligibility {
   const factory TierUpgradeEligibility({
     required StreamerTier nextTier,             // Next tier to qualify for
     @Default(true) bool isEligible,            // Meets all requirements
@@ -286,8 +279,7 @@ class TierUpgradeEligibility with _$TierUpgradeEligibility {
 }
 
 /// Individual tier requirement check
-@freezed
-class TierRequirementCheck with _$TierRequirementCheck {
+class TierRequirementCheck {
   const factory TierRequirementCheck({
     required String requirement,               // Requirement name
     required int required,                     // Required value
