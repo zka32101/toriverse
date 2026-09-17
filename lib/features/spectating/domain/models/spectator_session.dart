@@ -1,9 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 /// Represents a spectator's view of an active match
 class SpectatorSession {
-  const factory SpectatorSession({
+  const SpectatorSession({
     required String id,
     required String matchId,
     required String userId,
@@ -13,10 +12,7 @@ class SpectatorSession {
     required DeviceInfo deviceInfo,
     required bool isActive,
     required DateTime lastActivityAt,
-  }) = _SpectatorSession;
-
-  factory SpectatorSession.fromJson(Map<String, dynamic> json) =>
-      _$SpectatorSessionFromJson(json);
+  });
 }
 
 /// Role of spectator in the match
@@ -28,13 +24,10 @@ enum SpectatorRole {
 
 /// Device information for spectator
 class DeviceInfo {
-  const factory DeviceInfo({
+  const DeviceInfo({
     required String os,           // "iOS", "Android", "Web"
     required String osVersion,
     required String appVersion,
     required String platform,
-  }) = _DeviceInfo;
-
-  factory DeviceInfo.fromJson(Map<String, dynamic> json) =>
-      _$DeviceInfoFromJson(json);
+  });
 }

@@ -1,9 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 /// Creator earnings aggregated by time period
 class CreatorEarnings {
-  const factory CreatorEarnings({
+  const CreatorEarnings({
     required String id,
     required String creatorId,
     required double totalEarnings,
@@ -18,15 +17,12 @@ class CreatorEarnings {
     required int totalClipsMonetized,
     required DateTime period,
     required DateTime updatedAt,
-  }) = _CreatorEarnings;
-
-  factory CreatorEarnings.fromJson(Map<String, dynamic> json) =>
-      _$CreatorEarningsFromJson(json);
+  });
 }
 
 /// Subscription tier configuration
 class SubscriptionTier {
-  const factory SubscriptionTier({
+  const SubscriptionTier({
     required String id,
     required String creatorId,
     required String name,
@@ -40,18 +36,15 @@ class SubscriptionTier {
     required bool includeCreatorBadge,
     required bool includeEarlyAccess,
     required int maxSubscriberLimit,
-    @Default(0) int currentSubscribers,
+    int currentSubscribers,
     required DateTime createdAt,
     required DateTime updatedAt,
-  }) = _SubscriptionTier;
-
-  factory SubscriptionTier.fromJson(Map<String, dynamic> json) =>
-      _$SubscriptionTierFromJson(json);
+  });
 }
 
 /// User's active subscription to a creator
 class UserSubscription {
-  const factory UserSubscription({
+  const UserSubscription({
     required String id,
     required String userId,
     required String creatorId,
@@ -62,18 +55,15 @@ class UserSubscription {
     required DateTime? nextBillingDate,
     required int priceJpy,
     required String billingCycle, // monthly, annual
-    @Default(false) bool autoRenew,
+    bool autoRenew,
     required DateTime createdAt,
     required DateTime updatedAt,
-  }) = _UserSubscription;
-
-  factory UserSubscription.fromJson(Map<String, dynamic> json) =>
-      _$UserSubscriptionFromJson(json);
+  });
 }
 
 /// Virtual gift item definition
 class VirtualGift {
-  const factory VirtualGift({
+  const VirtualGift({
     required String id,
     required String name,
     required String description,
@@ -81,18 +71,15 @@ class VirtualGift {
     required int priceJpy,
     required int creatorRevenueJpy,
     required String rarity, // common, rare, legendary
-    @Default(true) bool isAvailable,
+    bool isAvailable,
     required int totalGiftsSent,
     required DateTime createdAt,
-  }) = _VirtualGift;
-
-  factory VirtualGift.fromJson(Map<String, dynamic> json) =>
-      _$VirtualGiftFromJson(json);
+  });
 }
 
 /// Record of virtual gift purchase and sending
 class GiftTransaction {
-  const factory GiftTransaction({
+  const GiftTransaction({
     required String id,
     required String giftId,
     required String senderId,
@@ -104,15 +91,12 @@ class GiftTransaction {
     required DateTime sentAt,
     required DateTime? deliveredAt,
     required DateTime createdAt,
-  }) = _GiftTransaction;
-
-  factory GiftTransaction.fromJson(Map<String, dynamic> json) =>
-      _$GiftTransactionFromJson(json);
+  });
 }
 
 /// Subscription payment record
 class SubscriptionTransaction {
-  const factory SubscriptionTransaction({
+  const SubscriptionTransaction({
     required String id,
     required String subscriptionId,
     required String userId,
@@ -126,15 +110,12 @@ class SubscriptionTransaction {
     required String? failureReason,
     required int? retryCount,
     required DateTime createdAt,
-  }) = _SubscriptionTransaction;
-
-  factory SubscriptionTransaction.fromJson(Map<String, dynamic> json) =>
-      _$SubscriptionTransactionFromJson(json);
+  });
 }
 
 /// Payout request and status
 class CreatorPayout {
-  const factory CreatorPayout({
+  const CreatorPayout({
     required String id,
     required String creatorId,
     required double amountJpy,
@@ -146,15 +127,12 @@ class CreatorPayout {
     required String? failureReason,
     required String? transactionReference,
     required DateTime createdAt,
-  }) = _CreatorPayout;
-
-  factory CreatorPayout.fromJson(Map<String, dynamic> json) =>
-      _$CreatorPayoutFromJson(json);
+  });
 }
 
 /// Creator's payment method for payouts
 class PaymentMethod {
-  const factory PaymentMethod({
+  const PaymentMethod({
     required String id,
     required String creatorId,
     required String type, // bank_transfer, paypal, stripe
@@ -164,19 +142,16 @@ class PaymentMethod {
     required String? paypalEmail,
     required String? stripeAccountId,
     required String currency, // JPY, USD, EUR
-    @Default(false) bool isDefault,
-    @Default(true) bool isVerified,
+    bool isDefault,
+    bool isVerified,
     required DateTime createdAt,
     required DateTime updatedAt,
-  }) = _PaymentMethod;
-
-  factory PaymentMethod.fromJson(Map<String, dynamic> json) =>
-      _$PaymentMethodFromJson(json);
+  });
 }
 
 /// Creator's payout frequency settings
 class PayoutSchedule {
-  const factory PayoutSchedule({
+  const PayoutSchedule({
     required String id,
     required String creatorId,
     required String frequency, // weekly, biweekly, monthly
@@ -185,15 +160,12 @@ class PayoutSchedule {
     required DateTime nextPayoutDate,
     required DateTime createdAt,
     required DateTime updatedAt,
-  }) = _PayoutSchedule;
-
-  factory PayoutSchedule.fromJson(Map<String, dynamic> json) =>
-      _$PayoutScheduleFromJson(json);
+  });
 }
 
 /// Revenue split configuration
 class RevenueAllocation {
-  const factory RevenueAllocation({
+  const RevenueAllocation({
     required String id,
     required String creatorId,
     required double subscriptionPlatformFeePercent,
@@ -204,15 +176,12 @@ class RevenueAllocation {
     required double creatorClipPercent,
     required DateTime effectiveDate,
     required DateTime createdAt,
-  }) = _RevenueAllocation;
-
-  factory RevenueAllocation.fromJson(Map<String, dynamic> json) =>
-      _$RevenueAllocationFromJson(json);
+  });
 }
 
 /// Detailed analytics for creator earnings
 class CreatorAnalytics {
-  const factory CreatorAnalytics({
+  const CreatorAnalytics({
     required String id,
     required String creatorId,
     required int totalSubscribers,
@@ -230,15 +199,12 @@ class CreatorAnalytics {
     required DateTime periodStart,
     required DateTime periodEnd,
     required DateTime createdAt,
-  }) = _CreatorAnalytics;
-
-  factory CreatorAnalytics.fromJson(Map<String, dynamic> json) =>
-      _$CreatorAnalyticsFromJson(json);
+  });
 }
 
 /// Monetization milestones and achievements
 class MonetizationAchievement {
-  const factory MonetizationAchievement({
+  const MonetizationAchievement({
     required String id,
     required String creatorId,
     required String achievementType, // first_sub, 100_subs, 1000_subs, 10k_earnings
@@ -247,30 +213,24 @@ class MonetizationAchievement {
     required String badgeAssetUrl,
     required DateTime unlockedAt,
     required DateTime createdAt,
-  }) = _MonetizationAchievement;
-
-  factory MonetizationAchievement.fromJson(Map<String, dynamic> json) =>
-      _$MonetizationAchievementFromJson(json);
+  });
 }
 
 /// Multi-currency exchange rates
 class CurrencyExchange {
-  const factory CurrencyExchange({
+  const CurrencyExchange({
     required String id,
     required String fromCurrency,
     required String toCurrency,
     required double rate,
     required DateTime rateDate,
     required DateTime lastUpdatedAt,
-  }) = _CurrencyExchange;
-
-  factory CurrencyExchange.fromJson(Map<String, dynamic> json) =>
-      _$CurrencyExchangeFromJson(json);
+  });
 }
 
 /// Tax information for creators
 class TaxInfo {
-  const factory TaxInfo({
+  const TaxInfo({
     required String id,
     required String creatorId,
     required String taxId, // encrypted
@@ -282,15 +242,12 @@ class TaxInfo {
     required String taxDocumentUrl, // encrypted
     required DateTime createdAt,
     required DateTime updatedAt,
-  }) = _TaxInfo;
-
-  factory TaxInfo.fromJson(Map<String, dynamic> json) =>
-      _$TaxInfoFromJson(json);
+  });
 }
 
 /// Referral bonus tracking
 class ReferralBonus {
-  const factory ReferralBonus({
+  const ReferralBonus({
     required String id,
     required String referrerCreatorId,
     required String referredUserId,
@@ -300,29 +257,23 @@ class ReferralBonus {
     required DateTime referralDate,
     required DateTime? completionDate,
     required DateTime createdAt,
-  }) = _ReferralBonus;
-
-  factory ReferralBonus.fromJson(Map<String, dynamic> json) =>
-      _$ReferralBonusFromJson(json);
+  });
 }
 
 /// Creator earnings configuration
 class MonetizationSettings {
-  const factory MonetizationSettings({
+  const MonetizationSettings({
     required String id,
     required String creatorId,
-    @Default(true) bool subscriptionsEnabled,
-    @Default(true) bool giftsEnabled,
-    @Default(true) bool clipsMonetizationEnabled,
-    @Default(true) bool referralsEnabled,
+    bool subscriptionsEnabled,
+    bool giftsEnabled,
+    bool clipsMonetizationEnabled,
+    bool referralsEnabled,
     required String preferredPayoutCurrency,
     required String minimumPayoutCurrencyType,
-    @Default(false) bool taxInfoVerified,
-    @Default(false) bool paymentMethodVerified,
+    bool taxInfoVerified,
+    bool paymentMethodVerified,
     required DateTime createdAt,
     required DateTime updatedAt,
-  }) = _MonetizationSettings;
-
-  factory MonetizationSettings.fromJson(Map<String, dynamic> json) =>
-      _$MonetizationSettingsFromJson(json);
+  });
 }

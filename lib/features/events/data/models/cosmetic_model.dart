@@ -1,38 +1,30 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
-
 /// Limited edition cosmetic stored in cosmetics/limited/{eventId}
 class LimitedCosmetic {
-  const factory LimitedCosmetic({
+  const LimitedCosmetic({
     required String id,
     required String eventId,
     required String name,
-    @Default('stone') String type, // stone, board, theme
+    String type, // stone, board, theme
     String? description,
     String? imageUrl,
-    @Default([]) List<String> colors,
-    @Default('common') String rarity, // common, uncommon, rare, legendary
+    List<String> colors,
+    String rarity, // common, uncommon, rare, legendary
     String? requiresChallenge,
-    @Default(0) int basePrice,
-    @Default(false) bool eventExclusive,
+    int basePrice,
+    bool eventExclusive,
     required DateTime createdAt,
-  }) = _LimitedCosmetic;
-
-  factory LimitedCosmetic.fromJson(Map<String, dynamic> json) =>
-      _$LimitedCosmeticFromJson(json);
+  });
 }
 
 /// User's event cosmetic stored in users/{uid}/eventCosmetics/{cosmeticId}
 class UserEventCosmetic {
-  const factory UserEventCosmetic({
+  const UserEventCosmetic({
     required String cosmeticId,
     required String eventId,
     required DateTime unlockedAt,
-    @Default('challenge') String method, // challenge, purchase, gift
-    @Default(false) bool equipped,
-  }) = _UserEventCosmetic;
-
-  factory UserEventCosmetic.fromJson(Map<String, dynamic> json) =>
-      _$UserEventCosmeticFromJson(json);
+    String method, // challenge, purchase, gift
+    bool equipped,
+  });
 }
