@@ -1,6 +1,6 @@
 targets:
   $default:
     builders:
-      freezed: {}
+      # All code generation disabled - see commit message
+      # freezed: {}
       # json_serializable disabled due to performance issues (takes 40+ additional minutes)
-      # @JsonSerializable annotations will be ignored by code generation
