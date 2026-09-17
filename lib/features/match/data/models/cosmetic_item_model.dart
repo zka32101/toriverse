@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'cosmetic_item_model.freezed.dart';
-part 'cosmetic_item_model.g.dart';
 
 /// Cosmetic Item model for Firestore
 /// Maps to 'cosmetics' collection (global catalog)

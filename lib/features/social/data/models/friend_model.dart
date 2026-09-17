@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'friend_model.freezed.dart';
-part 'friend_model.g.dart';
 
 /// Friend relationship stored in users/{uid}/friends/{friendUid}
 @freezed

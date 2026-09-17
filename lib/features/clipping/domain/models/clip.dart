@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'clip.freezed.dart';
-part 'clip.g.dart';
 
 /// Generated clip from match highlight moment
 ///

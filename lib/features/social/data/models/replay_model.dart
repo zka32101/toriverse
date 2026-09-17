@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'replay_model.freezed.dart';
-part 'replay_model.g.dart';
 
 /// Replay asset stored in replays/{replayId}
 @freezed

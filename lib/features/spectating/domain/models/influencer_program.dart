@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'influencer_program.freezed.dart';
-part 'influencer_program.g.dart';
 
 /// Streamer verification status and tier information
 ///

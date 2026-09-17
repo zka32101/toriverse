@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'spectator_session.freezed.dart';
-part 'spectator_session.g.dart';
 
 /// Represents a spectator's view of an active match
 @freezed

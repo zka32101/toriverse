@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'cosmetic_model.freezed.dart';
-part 'cosmetic_model.g.dart';
 
 /// Limited edition cosmetic stored in cosmetics/limited/{eventId}
 @freezed

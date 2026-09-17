@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'round_result_model.freezed.dart';
-part 'round_result_model.g.dart';
 
 /// Move submission within a round
 @freezed

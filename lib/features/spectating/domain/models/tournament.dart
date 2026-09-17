@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'tournament.freezed.dart';
-part 'tournament.g.dart';
 
 /// Tournament format and rules
 enum TournamentFormat {

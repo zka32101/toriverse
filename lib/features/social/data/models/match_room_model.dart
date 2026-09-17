@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'match_room_model.freezed.dart';
-part 'match_room_model.g.dart';
 
 /// Match room for private friend matches stored in matchRooms/{roomId}
 @freezed

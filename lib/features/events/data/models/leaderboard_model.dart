@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'leaderboard_model.freezed.dart';
-part 'leaderboard_model.g.dart';
 
 /// Leaderboard entry stored in events/{eventId}/leaderboard/{entryId}
 @freezed
