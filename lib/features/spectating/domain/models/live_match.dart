@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 /// Live match viewing session
 class LiveMatchSession {

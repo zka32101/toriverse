@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 /// Match room for private friend matches stored in matchRooms/{roomId}
 class MatchRoom {

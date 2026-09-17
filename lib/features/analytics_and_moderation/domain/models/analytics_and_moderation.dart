@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 // Enums
 enum ReportReason { harassment, spam, abuse, misinformation, copyright, other }

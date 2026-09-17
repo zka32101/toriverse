@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 /// Represents a spectator's view of an active match
 class SpectatorSession {

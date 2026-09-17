@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 /// Limited edition cosmetic stored in cosmetics/limited/{eventId}
 class LimitedCosmetic {

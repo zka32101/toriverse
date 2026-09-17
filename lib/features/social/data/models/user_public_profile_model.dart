@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 /// User public profile stored in users/{uid}/profiles/public
 class UserPublicProfile {

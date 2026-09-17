@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 /// Creator earnings aggregated by time period
 class CreatorEarnings {

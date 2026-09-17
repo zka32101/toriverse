@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 /// Replay asset stored in replays/{replayId}
 class Replay {

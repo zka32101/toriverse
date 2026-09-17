@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 /// Event (campaign) stored in events/{eventId}
 class Event {

@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 // Enums
 enum SearchType { creator, clip, match, clan }

@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 /// Friend relationship stored in users/{uid}/friends/{friendUid}
 class Friend {

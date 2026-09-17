@@ -1,4 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 
 /// Leaderboard entry stored in events/{eventId}/leaderboard/{entryId}
 class LeaderboardEntry {
