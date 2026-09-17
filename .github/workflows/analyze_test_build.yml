@@ -30,11 +30,9 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      # Code generation disabled - using manual model implementations
-      # See: lib/features/*/data/models/ for generated file stubs
-      # - name: Run code generation
-      #   timeout-minutes: 100
-      #   run: flutter pub run build_runner build --delete-conflicting-outputs
+      - name: Run code generation
+        timeout-minutes: 30
+        run: flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: Analyze code
         run: flutter analyze --no-fatal-infos
