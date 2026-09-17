@@ -2,4 +2,5 @@ targets:
   $default:
     builders:
       freezed: {}
-      json_serializable: {}
+      # json_serializable disabled due to performance issues (takes 40+ additional minutes)
+      # @JsonSerializable annotations will be ignored by code generation
