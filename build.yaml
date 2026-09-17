@@ -1,26 +1,5 @@
-# riverpod_generator is currently disabled due to a known timeout issue
-# (hangs after ~14 minutes) when processing provider files.
-#
-# Root cause: Likely related to https://github.com/rrousselGit/riverpod/issues/2766
-#
-# Impact: @riverpod annotations will NOT generate code, but @freezed annotations
-# will still be processed by freezed_generator (which works fine).
-#
-# Providers in leaderboards_and_social and other features that use @riverpod
-# have been temporarily disabled (converted to documentation/TODOs) until
-# this generator issue is resolved.
-#
-# TODO: Re-enable riverpod_generator once upstream issue is fixed
-# (by updating dependencies or riverpod repository fix).
-#
-# Do NOT include riverpod_generator in targets below.
 targets:
   $default:
     builders:
-      # All code generators temporarily disabled to isolate build_runner issue
-      # Both freezed and json_serializable cause timeout or failure
-      # freezed: {}
-      # json_serializable: {}
-
-      # Testing with NO generators to identify root cause of build_runner hang
-      # riverpod_generator is NOT listed here - it's disabled due to issue #2766
+      freezed: {}
+      json_serializable: {}
