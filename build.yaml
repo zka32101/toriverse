@@ -1,18 +1,3 @@
 targets:
   $default:
-    builders:
-      freezed: {}
-    sources:
-      - lib/features/match/data/models/**
-    exclude:
-      - lib/features/social/**
-      - lib/features/spectating/**
-      - lib/features/events/**
-      - lib/features/leaderboard/**
-      - lib/features/profile/**
-      - lib/features/discovering/**
-      - lib/features/monetization/**
-      - lib/features/analytics_and_moderation/**
-      - lib/features/organizing/**
-      - lib/features/clipping/**
-      - test/**
+    builders: {}

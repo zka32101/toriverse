@@ -30,10 +30,6 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Run code generation
-        timeout-minutes: 30
-        run: flutter pub run build_runner build --delete-conflicting-outputs
-
       - name: Analyze code
         run: flutter analyze --no-fatal-infos
 
@@ -57,10 +53,6 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
-
-      - name: Run code generation
-        timeout-minutes: 50
-        run: flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: Run unit tests
         run: flutter test --coverage
@@ -106,10 +98,6 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Run code generation
-        timeout-minutes: 50
-        run: flutter pub run build_runner build --delete-conflicting-outputs
-
       - name: Build APK
         env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
@@ -143,10 +131,6 @@ jobs:
 
       - name: Get dependencies
         run: flutter pub get
-
-      - name: Run code generation
-        timeout-minutes: 50
-        run: flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: Install CocoaPods
         run: cd ios && pod install --repo-update && cd ..
