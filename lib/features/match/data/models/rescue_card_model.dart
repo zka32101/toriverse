@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'rescue_card_model.freezed.dart';
 
+
 /// Rescue card state per player per match
 /// 2 consecutive attacks -> grants next-round double-move
 @freezed

@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'discovery.freezed.dart';
 
 // Enums
 enum SearchType { creator, clip, match, clan }

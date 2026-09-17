@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'match_room_model.freezed.dart';
 
+
 /// Match room for private friend matches stored in matchRooms/{roomId}
 @freezed
 class MatchRoom with _$MatchRoom {

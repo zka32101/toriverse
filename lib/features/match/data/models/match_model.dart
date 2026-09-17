@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'match_model.freezed.dart';
 
+
 /// Match (対局) document model for Firestore
 /// Maps to 'matches' collection with auto-generated document ID
 /// 

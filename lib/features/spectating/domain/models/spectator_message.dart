@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'spectator_message.freezed.dart';
 
 /// Spectator chat message model
 ///

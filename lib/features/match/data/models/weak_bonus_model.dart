@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'weak_bonus_model.freezed.dart';
 
+
 /// Weak player bonus state per match
 /// Conditions: endgame (≤11 hands), stone deficit ≥threshold, max 2 activations
 @freezed

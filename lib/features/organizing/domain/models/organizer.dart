@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'organizer.freezed.dart';
 
 /// User's organizer profile and capabilities
 @freezed

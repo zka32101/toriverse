@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'event_model.freezed.dart';
 
+
 /// Event (campaign) stored in events/{eventId}
 @freezed
 class Event with _$Event {

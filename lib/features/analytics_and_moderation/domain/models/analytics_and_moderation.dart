@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'analytics_and_moderation.freezed.dart';
 
 // Enums
 enum ReportReason { harassment, spam, abuse, misinformation, copyright, other }

@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'live_match.freezed.dart';
 
 /// Live match viewing session
 @freezed

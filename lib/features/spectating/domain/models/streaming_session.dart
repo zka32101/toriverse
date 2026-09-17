@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'streaming_session.freezed.dart';
 
 /// Streaming session model for streamer sessions
 ///

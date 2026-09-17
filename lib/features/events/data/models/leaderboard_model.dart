@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'leaderboard_model.freezed.dart';
 
+
 /// Leaderboard entry stored in events/{eventId}/leaderboard/{entryId}
 @freezed
 class LeaderboardEntry with _$LeaderboardEntry {

@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'user_model.freezed.dart';
 
+
 /// User document model for Firestore
 /// Maps to 'users' collection with document ID = uid
 @freezed

@@ -2,6 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'replay_model.freezed.dart';
 
+
 /// Replay asset stored in replays/{replayId}
 @freezed
 class Replay with _$Replay {

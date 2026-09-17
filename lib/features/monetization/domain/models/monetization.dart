@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'monetization.freezed.dart';
 
 /// Creator earnings aggregated by time period
 @freezed
