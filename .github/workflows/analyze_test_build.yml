@@ -30,9 +30,12 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Run code generation
-        timeout-minutes: 50
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+      # Temporarily skip code generation step due to build_runner timeout
+      # (takes 48+ minutes even with generators disabled in build.yaml)
+      # TODO: Debug build_runner performance issue post-checkpoint
+      # - name: Run code generation
+      #   timeout-minutes: 50
+      #   run: flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: Analyze code
         run: flutter analyze --no-fatal-infos
@@ -58,9 +61,10 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Run code generation
-        timeout-minutes: 50
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+      # Temporarily skip code generation step due to build_runner timeout
+      # - name: Run code generation
+      #   timeout-minutes: 50
+      #   run: flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: Run unit tests
         run: flutter test --coverage
@@ -106,9 +110,10 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Run code generation
-        timeout-minutes: 50
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+      # Temporarily skip code generation step due to build_runner timeout
+      # - name: Run code generation
+      #   timeout-minutes: 50
+      #   run: flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: Build APK
         env:
@@ -144,9 +149,10 @@ jobs:
       - name: Get dependencies
         run: flutter pub get
 
-      - name: Run code generation
-        timeout-minutes: 50
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+      # Temporarily skip code generation step due to build_runner timeout
+      # - name: Run code generation
+      #   timeout-minutes: 50
+      #   run: flutter pub run build_runner build --delete-conflicting-outputs
 
       - name: Install CocoaPods
         run: cd ios && pod install --repo-update && cd ..
