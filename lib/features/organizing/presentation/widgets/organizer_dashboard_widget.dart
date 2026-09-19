@@ -18,7 +18,7 @@ class OrganizerDashboardWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(
-      organizerStatsProvider(_GetStatsParams(organizerId)),
+      organizerStatsProvider(GetStatsParams(organizerId)),
     );
 
     return statsAsync.when(
@@ -211,7 +211,7 @@ class OrganizerDashboardWidget extends ConsumerWidget {
 
   Widget _buildTournamentsList(WidgetRef ref) {
     final tournamentsAsync = ref.watch(
-      organizerTournamentsStreamProvider(_GetTournamentsParams(organizerId)),
+      organizerTournamentsStreamProvider(GetTournamentsParams(organizerId)),
     );
 
     return tournamentsAsync.when(

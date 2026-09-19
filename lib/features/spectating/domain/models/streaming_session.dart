@@ -1,31 +1,133 @@
 
+DateTime _parseDateTime(dynamic value) {
+  if (value is DateTime) return value;
+  if (value is String) return DateTime.parse(value);
+  if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+  try {
+    return (value as dynamic).toDate() as DateTime;
+  } catch (_) {
+    return DateTime.now();
+  }
+}
+
+DateTime? _parseDateTimeOrNull(dynamic value) {
+  if (value == null) return null;
+  return _parseDateTime(value);
+}
+
+Duration _parseDuration(dynamic value) {
+  if (value is Duration) return value;
+  if (value is int) return Duration(seconds: value);
+  final match = RegExp(r'^(-?)(\d+):(\d{2}):(\d{2})\.(\d{6})$')
+      .firstMatch(value as String);
+  if (match == null) return Duration.zero;
+  final sign = match.group(1) == '-' ? -1 : 1;
+  final hours = int.parse(match.group(2)!);
+  final minutes = int.parse(match.group(3)!);
+  final seconds = int.parse(match.group(4)!);
+  final micros = int.parse(match.group(5)!);
+  return Duration(
+    hours: sign * hours,
+    minutes: sign * minutes,
+    seconds: sign * seconds,
+    microseconds: sign * micros,
+  );
+}
+
 /// Streaming session model for streamer sessions
 ///
 /// Represents a user's active streaming session across multiple platforms.
 /// Tracks streaming status, viewer count, earnings, and platform metadata.
 class StreamingSession {
+  final String id;                    // Unique session ID
+  final String matchId;               // Match being streamed
+  final String userId;                // Streamer's user ID
+  final String displayName;           // Streamer's name
+  final DateTime startedAt;           // When stream started
+  final DateTime? endedAt;            // When stream ended (null if active)
+  final StreamingStatus status;       // Current streaming status
+  final int viewerCount;              // Current concurrent viewers
+  final int totalViews;               // Total cumulative views
+  final List<String> connectedPlatforms;  // ['twitch', 'youtube', 'obs']
+  final String? twitchChannelUrl;     // Twitch channel URL
+  final String? youtubeStreamUrl;     // YouTube Live stream URL
+  final String? obsSourceUrl;         // OBS browser source URL
+  final double revenueEarned;         // Revenue from this stream (JPY)
+  final StreamingMetadata? metadata;  // Platform-specific metadata
+  final bool isHighlighted;           // Featured/highlighted stream
+  final List<HighlightClip> generatedHighlights;  // Auto-generated highlight clips
+
   const StreamingSession({
-    required String id,                    // Unique session ID
-    required String matchId,               // Match being streamed
-    required String userId,                // Streamer's user ID
-    required String displayName,           // Streamer's name
-    required DateTime startedAt,           // When stream started
-    DateTime? endedAt,                     // When stream ended (null if active)
-    
-      StreamingStatus status,              // Current streaming status
-    int viewerCount,           // Current concurrent viewers
-    int totalViews,            // Total cumulative views
-    List<String>
-      connectedPlatforms,                  // ['twitch', 'youtube', 'obs']
-    String? twitchChannelUrl,              // Twitch channel URL
-    String? youtubeStreamUrl,              // YouTube Live stream URL
-    String? obsSourceUrl,                  // OBS browser source URL
-    double revenueEarned,    // Revenue from this stream (JPY)
-    StreamingMetadata? metadata,           // Platform-specific metadata
-    bool isHighlighted,    // Featured/highlighted stream
-    List<HighlightClip>
-      generatedHighlights,                 // Auto-generated highlight clips
+    required this.id,
+    required this.matchId,
+    required this.userId,
+    required this.displayName,
+    required this.startedAt,
+    this.endedAt,
+    this.status = StreamingStatus.offline,
+    this.viewerCount = 0,
+    this.totalViews = 0,
+    this.connectedPlatforms = const [],
+    this.twitchChannelUrl,
+    this.youtubeStreamUrl,
+    this.obsSourceUrl,
+    this.revenueEarned = 0.0,
+    this.metadata,
+    this.isHighlighted = false,
+    this.generatedHighlights = const [],
   });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'matchId': matchId,
+    'userId': userId,
+    'displayName': displayName,
+    'startedAt': startedAt.toIso8601String(),
+    'endedAt': endedAt?.toIso8601String(),
+    'status': status.name,
+    'viewerCount': viewerCount,
+    'totalViews': totalViews,
+    'connectedPlatforms': connectedPlatforms,
+    'twitchChannelUrl': twitchChannelUrl,
+    'youtubeStreamUrl': youtubeStreamUrl,
+    'obsSourceUrl': obsSourceUrl,
+    'revenueEarned': revenueEarned,
+    'metadata': metadata?.toJson(),
+    'isHighlighted': isHighlighted,
+    'generatedHighlights': generatedHighlights.map((c) => c.toJson()).toList(),
+  };
+
+  factory StreamingSession.fromJson(Map<String, dynamic> json) {
+    return StreamingSession(
+      id: json['id'] as String,
+      matchId: json['matchId'] as String,
+      userId: json['userId'] as String,
+      displayName: json['displayName'] as String,
+      startedAt: _parseDateTime(json['startedAt']),
+      endedAt: _parseDateTimeOrNull(json['endedAt']),
+      status: StreamingStatus.values.byName(
+        json['status'] as String? ?? 'offline',
+      ),
+      viewerCount: json['viewerCount'] as int? ?? 0,
+      totalViews: json['totalViews'] as int? ?? 0,
+      connectedPlatforms: (json['connectedPlatforms'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      twitchChannelUrl: json['twitchChannelUrl'] as String?,
+      youtubeStreamUrl: json['youtubeStreamUrl'] as String?,
+      obsSourceUrl: json['obsSourceUrl'] as String?,
+      revenueEarned: (json['revenueEarned'] as num?)?.toDouble() ?? 0.0,
+      metadata: json['metadata'] != null
+          ? StreamingMetadata.fromJson(json['metadata'] as Map<String, dynamic>)
+          : null,
+      isHighlighted: json['isHighlighted'] as bool? ?? false,
+      generatedHighlights: (json['generatedHighlights'] as List<dynamic>?)
+              ?.map((e) => HighlightClip.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
+    );
+  }
 }
 
 /// Streaming status enumeration
@@ -94,37 +196,128 @@ extension StreamingPlatformExt on StreamingPlatform {
 
 /// Platform-specific streaming metadata
 class StreamingMetadata {
+  final String platform;                 // 'twitch', 'youtube', 'obs'
+  final String? platformUserId;          // User ID on platform
+  final String? streamTitle;             // Stream title
+  final String? streamDescription;       // Stream description
+  final List<String> tags;               // Stream tags/categories
+  final String? gameTitleOverride;       // Custom game title for platform
+  final bool autoArchive;                // Auto-save VOD after stream
+  final DateTime? scheduleTime;          // Pre-scheduled stream time
+
   const StreamingMetadata({
-    required String platform,              // 'twitch', 'youtube', 'obs'
-    String? platformUserId,                // User ID on platform
-    String? streamTitle,                   // Stream title
-    String? streamDescription,             // Stream description
-    List<String> tags,        // Stream tags/categories
-    String? gameTitleOverride,             // Custom game title for platform
-    bool autoArchive,      // Auto-save VOD after stream
-    DateTime? scheduleTime,                // Pre-scheduled stream time
+    required this.platform,
+    this.platformUserId,
+    this.streamTitle,
+    this.streamDescription,
+    this.tags = const [],
+    this.gameTitleOverride,
+    this.autoArchive = false,
+    this.scheduleTime,
   });
+
+  Map<String, dynamic> toJson() => {
+    'platform': platform,
+    'platformUserId': platformUserId,
+    'streamTitle': streamTitle,
+    'streamDescription': streamDescription,
+    'tags': tags,
+    'gameTitleOverride': gameTitleOverride,
+    'autoArchive': autoArchive,
+    'scheduleTime': scheduleTime?.toIso8601String(),
+  };
+
+  factory StreamingMetadata.fromJson(Map<String, dynamic> json) {
+    return StreamingMetadata(
+      platform: json['platform'] as String,
+      platformUserId: json['platformUserId'] as String?,
+      streamTitle: json['streamTitle'] as String?,
+      streamDescription: json['streamDescription'] as String?,
+      tags: (json['tags'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+      gameTitleOverride: json['gameTitleOverride'] as String?,
+      autoArchive: json['autoArchive'] as bool? ?? false,
+      scheduleTime: _parseDateTimeOrNull(json['scheduleTime']),
+    );
+  }
 }
 
 /// Auto-generated highlight clip from stream
 class HighlightClip {
+  final String id;                    // Unique clip ID
+  final String streamingSessionId;    // Parent session
+  final String matchId;               // Associated match
+  final String title;                 // Clip title
+  final String description;           // What happened
+  final Duration startTime;           // Time in stream
+  final Duration endTime;             // Clip duration
+  final HighlightType type;           // milestone, epic, turnover, etc.
+  final int viewCount;                // Total clip views
+  final int shareCount;               // Times shared
+  final String? videoUrl;             // Processed video URL
+  final bool isApproved;              // Streamer approved
+  final DateTime? createdAt;          // When clip was generated
+  final List<String> tags;            // Searchable tags
+
   const HighlightClip({
-    required String id,                    // Unique clip ID
-    required String streamingSessionId,    // Parent session
-    required String matchId,               // Associated match
-    required String title,                 // Clip title
-    required String description,           // What happened
-    required Duration startTime,           // Time in stream
-    required Duration endTime,             // Clip duration
-    
-      HighlightType type,                  // milestone, epic, turnover, etc.
-    int viewCount,             // Total clip views
-    int shareCount,            // Times shared
-    String? videoUrl,                      // Processed video URL
-    bool isApproved,       // Streamer approved
-    DateTime? createdAt,                   // When clip was generated
-    List<String> tags,        // Searchable tags
+    required this.id,
+    required this.streamingSessionId,
+    required this.matchId,
+    required this.title,
+    required this.description,
+    required this.startTime,
+    required this.endTime,
+    this.type = HighlightType.milestone,
+    this.viewCount = 0,
+    this.shareCount = 0,
+    this.videoUrl,
+    this.isApproved = false,
+    this.createdAt,
+    this.tags = const [],
   });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'streamingSessionId': streamingSessionId,
+    'matchId': matchId,
+    'title': title,
+    'description': description,
+    'startTime': startTime.toString(),
+    'endTime': endTime.toString(),
+    'type': type.name,
+    'viewCount': viewCount,
+    'shareCount': shareCount,
+    'videoUrl': videoUrl,
+    'isApproved': isApproved,
+    'createdAt': createdAt?.toIso8601String(),
+    'tags': tags,
+  };
+
+  factory HighlightClip.fromJson(Map<String, dynamic> json) {
+    return HighlightClip(
+      id: json['id'] as String,
+      streamingSessionId: json['streamingSessionId'] as String,
+      matchId: json['matchId'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      startTime: _parseDuration(json['startTime']),
+      endTime: _parseDuration(json['endTime']),
+      type: HighlightType.values.byName(
+        json['type'] as String? ?? 'milestone',
+      ),
+      viewCount: json['viewCount'] as int? ?? 0,
+      shareCount: json['shareCount'] as int? ?? 0,
+      videoUrl: json['videoUrl'] as String?,
+      isApproved: json['isApproved'] as bool? ?? false,
+      createdAt: _parseDateTimeOrNull(json['createdAt']),
+      tags: (json['tags'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          const [],
+    );
+  }
 }
 
 /// Types of highlight clips
@@ -242,16 +435,55 @@ class StreamingAnalyticsEvent {
 
 /// Streamer earnings tracking
 class StreamerEarnings {
+  final String userId;                // Streamer ID
+  final DateTime periodStart;         // Earnings period start
+  final DateTime periodEnd;           // Earnings period end
+  final int totalStreamMinutes;       // Total minutes streamed
+  final int totalViewerMinutes;       // Total viewer-minutes
+  final int totalClipViews;           // Total highlight clip views
+  final double streamingRevenue;      // From stream subscriptions (JPY)
+  final double clipRevenue;           // From clip views (JPY)
+  final double referralRevenue;       // From referrals (JPY)
+  final double totalEarnings;         // Total earnings this period (JPY)
+
   const StreamerEarnings({
-    required String userId,                // Streamer ID
-    required DateTime periodStart,         // Earnings period start
-    required DateTime periodEnd,           // Earnings period end
-    int totalStreamMinutes,    // Total minutes streamed
-    int totalViewerMinutes,    // Total viewer-minutes
-    int totalClipViews,        // Total highlight clip views
-    double streamingRevenue, // From stream subscriptions (JPY)
-    double clipRevenue,      // From clip views (JPY)
-    double referralRevenue,  // From referrals (JPY)
-    double totalEarnings,    // Total earnings this period (JPY)
+    required this.userId,
+    required this.periodStart,
+    required this.periodEnd,
+    this.totalStreamMinutes = 0,
+    this.totalViewerMinutes = 0,
+    this.totalClipViews = 0,
+    this.streamingRevenue = 0.0,
+    this.clipRevenue = 0.0,
+    this.referralRevenue = 0.0,
+    this.totalEarnings = 0.0,
   });
+
+  Map<String, dynamic> toJson() => {
+    'userId': userId,
+    'periodStart': periodStart.toIso8601String(),
+    'periodEnd': periodEnd.toIso8601String(),
+    'totalStreamMinutes': totalStreamMinutes,
+    'totalViewerMinutes': totalViewerMinutes,
+    'totalClipViews': totalClipViews,
+    'streamingRevenue': streamingRevenue,
+    'clipRevenue': clipRevenue,
+    'referralRevenue': referralRevenue,
+    'totalEarnings': totalEarnings,
+  };
+
+  factory StreamerEarnings.fromJson(Map<String, dynamic> json) {
+    return StreamerEarnings(
+      userId: json['userId'] as String,
+      periodStart: _parseDateTime(json['periodStart']),
+      periodEnd: _parseDateTime(json['periodEnd']),
+      totalStreamMinutes: json['totalStreamMinutes'] as int? ?? 0,
+      totalViewerMinutes: json['totalViewerMinutes'] as int? ?? 0,
+      totalClipViews: json['totalClipViews'] as int? ?? 0,
+      streamingRevenue: (json['streamingRevenue'] as num?)?.toDouble() ?? 0.0,
+      clipRevenue: (json['clipRevenue'] as num?)?.toDouble() ?? 0.0,
+      referralRevenue: (json['referralRevenue'] as num?)?.toDouble() ?? 0.0,
+      totalEarnings: (json['totalEarnings'] as num?)?.toDouble() ?? 0.0,
+    );
+  }
 }

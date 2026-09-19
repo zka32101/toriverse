@@ -4,20 +4,65 @@
 /// Represents a single message sent in spectator chat during a match.
 /// Supports moderation, emoji reactions, and message pinning.
 class SpectatorMessage {
+  final String id;                  // Unique message ID
+  final String matchId;             // Match being watched
+  final String userId;              // Who sent the message
+  final String displayName;         // Sender's display name
+  final String text;                // Message content (max 500 chars)
+  final DateTime createdAt;         // When message was sent
+  final bool isModerated;    // Content flagged by moderation
+  final String? moderationReason;            // Why message was moderated
+  final String? emoji;                       // Optional reaction emoji
+  final bool isPinned;       // Moderator pinned this message
+  final SpectatorChatRole role;            // Sender's role (viewer/commentator/streamer)
+
   const SpectatorMessage({
-    required String id,                  // Unique message ID
-    required String matchId,             // Match being watched
-    required String userId,              // Who sent the message
-    required String displayName,         // Sender's display name
-    required String text,                // Message content (max 500 chars)
-    required DateTime createdAt,         // When message was sent
-    bool isModerated,    // Content flagged by moderation
-    String? moderationReason,            // Why message was moderated
-    String? emoji,                       // Optional reaction emoji
-    bool isPinned,       // Moderator pinned this message
-    
-      SpectatorChatRole role,            // Sender's role (viewer/commentator/streamer)
+    required this.id,
+    required this.matchId,
+    required this.userId,
+    required this.displayName,
+    required this.text,
+    required this.createdAt,
+    this.isModerated = false,
+    this.moderationReason,
+    this.emoji,
+    this.isPinned = false,
+    this.role = SpectatorChatRole.viewer,
   });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'matchId': matchId,
+    'userId': userId,
+    'displayName': displayName,
+    'text': text,
+    'createdAt': createdAt.toIso8601String(),
+    'isModerated': isModerated,
+    'moderationReason': moderationReason,
+    'emoji': emoji,
+    'isPinned': isPinned,
+    'role': role.name,
+  };
+
+  factory SpectatorMessage.fromJson(Map<String, dynamic> json) {
+    final rawCreatedAt = json['createdAt'];
+    final createdAt = rawCreatedAt is DateTime
+        ? rawCreatedAt
+        : DateTime.parse(rawCreatedAt as String);
+    return SpectatorMessage(
+      id: json['id'] as String,
+      matchId: json['matchId'] as String,
+      userId: json['userId'] as String,
+      displayName: json['displayName'] as String,
+      text: json['text'] as String,
+      createdAt: createdAt,
+      isModerated: json['isModerated'] as bool? ?? false,
+      moderationReason: json['moderationReason'] as String?,
+      emoji: json['emoji'] as String?,
+      isPinned: json['isPinned'] as bool? ?? false,
+      role: SpectatorChatRole.values.byName(json['role'] as String? ?? 'viewer'),
+    );
+  }
 }
 
 /// Spectator chat user role with special permissions

@@ -15,21 +15,21 @@ final organizerRepositoryProvider = Provider<OrganizerRepository>((ref) {
 // PARAMETER CLASSES
 // ============================================================================
 
-class _GetOrganizerProfileParams {
+class GetOrganizerProfileParams {
   final String uid;
 
-  const _GetOrganizerProfileParams(this.uid);
+  const GetOrganizerProfileParams(this.uid);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _GetOrganizerProfileParams && runtimeType == other.runtimeType && uid == other.uid;
+      other is GetOrganizerProfileParams && runtimeType == other.runtimeType && uid == other.uid;
 
   @override
   int get hashCode => uid.hashCode;
 }
 
-class _CreateTournamentParams {
+class CreateTournamentParams {
   final String organizerId;
   final String name;
   final String description;
@@ -37,7 +37,7 @@ class _CreateTournamentParams {
   final int maxParticipants;
   final PrizePoolConfig prizePool;
 
-  const _CreateTournamentParams({
+  const CreateTournamentParams({
     required this.organizerId,
     required this.name,
     required this.description,
@@ -49,7 +49,7 @@ class _CreateTournamentParams {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _CreateTournamentParams &&
+      other is CreateTournamentParams &&
           runtimeType == other.runtimeType &&
           organizerId == other.organizerId &&
           name == other.name &&
@@ -59,15 +59,15 @@ class _CreateTournamentParams {
   int get hashCode => Object.hash(organizerId, name, format);
 }
 
-class _GetRegistrationsParams {
+class GetRegistrationsParams {
   final String tournamentId;
 
-  const _GetRegistrationsParams(this.tournamentId);
+  const GetRegistrationsParams(this.tournamentId);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _GetRegistrationsParams &&
+      other is GetRegistrationsParams &&
           runtimeType == other.runtimeType &&
           tournamentId == other.tournamentId;
 
@@ -75,15 +75,15 @@ class _GetRegistrationsParams {
   int get hashCode => tournamentId.hashCode;
 }
 
-class _GetPayoutsParams {
+class GetPayoutsParams {
   final String organizerId;
 
-  const _GetPayoutsParams(this.organizerId);
+  const GetPayoutsParams(this.organizerId);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _GetPayoutsParams &&
+      other is GetPayoutsParams &&
           runtimeType == other.runtimeType &&
           organizerId == other.organizerId;
 
@@ -91,15 +91,15 @@ class _GetPayoutsParams {
   int get hashCode => organizerId.hashCode;
 }
 
-class _GetTournamentsParams {
+class GetTournamentsParams {
   final String organizerId;
 
-  const _GetTournamentsParams(this.organizerId);
+  const GetTournamentsParams(this.organizerId);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _GetTournamentsParams &&
+      other is GetTournamentsParams &&
           runtimeType == other.runtimeType &&
           organizerId == other.organizerId;
 
@@ -107,15 +107,15 @@ class _GetTournamentsParams {
   int get hashCode => organizerId.hashCode;
 }
 
-class _GetStatsParams {
+class GetStatsParams {
   final String organizerId;
 
-  const _GetStatsParams(this.organizerId);
+  const GetStatsParams(this.organizerId);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _GetStatsParams &&
+      other is GetStatsParams &&
           runtimeType == other.runtimeType &&
           organizerId == other.organizerId;
 
@@ -129,7 +129,7 @@ class _GetStatsParams {
 
 /// Watch organizer profile (real-time)
 final organizerProfileProvider =
-    FutureProvider.autoDispose.family<OrganizerProfile?, _GetOrganizerProfileParams>(
+    FutureProvider.autoDispose.family<OrganizerProfile?, GetOrganizerProfileParams>(
   (ref, params) async {
     final repo = ref.watch(organizerRepositoryProvider);
     return repo.getOrganizerProfile(params.uid);
@@ -138,7 +138,7 @@ final organizerProfileProvider =
 
 /// Watch organizer statistics (real-time)
 final organizerStatsProvider =
-    FutureProvider.autoDispose.family<OrganizerStats?, _GetStatsParams>(
+    FutureProvider.autoDispose.family<OrganizerStats?, GetStatsParams>(
   (ref, params) async {
     final repo = ref.watch(organizerRepositoryProvider);
     return repo.getOrganizerStats(params.organizerId);
@@ -151,7 +151,7 @@ final organizerStatsProvider =
 
 /// Create tournament draft
 final createTournamentProvider =
-    FutureProvider.autoDispose.family<TournamentDraft, _CreateTournamentParams>(
+    FutureProvider.autoDispose.family<TournamentDraft, CreateTournamentParams>(
   (ref, params) async {
     final repo = ref.watch(organizerRepositoryProvider);
     return repo.createTournamentDraft(
@@ -167,7 +167,7 @@ final createTournamentProvider =
 
 /// Get organizer's tournaments (one-time fetch)
 final organizerTournamentsProvider =
-    FutureProvider.autoDispose.family<List<TournamentDraft>, _GetTournamentsParams>(
+    FutureProvider.autoDispose.family<List<TournamentDraft>, GetTournamentsParams>(
   (ref, params) async {
     final repo = ref.watch(organizerRepositoryProvider);
     return repo.getOrganizerTournaments(params.organizerId);
@@ -176,7 +176,7 @@ final organizerTournamentsProvider =
 
 /// Watch organizer's tournaments (real-time)
 final organizerTournamentsStreamProvider =
-    StreamProvider.autoDispose.family<List<TournamentDraft>, _GetTournamentsParams>(
+    StreamProvider.autoDispose.family<List<TournamentDraft>, GetTournamentsParams>(
   (ref, params) {
     final repo = ref.watch(organizerRepositoryProvider);
     return repo.watchOrganizerTournaments(params.organizerId);
@@ -185,7 +185,7 @@ final organizerTournamentsStreamProvider =
 
 /// Watch draft tournaments only
 final draftTournamentsProvider =
-    StreamProvider.autoDispose.family<List<TournamentDraft>, _GetTournamentsParams>(
+    StreamProvider.autoDispose.family<List<TournamentDraft>, GetTournamentsParams>(
   (ref, params) {
     final repo = ref.watch(organizerRepositoryProvider);
     return repo.watchDraftTournaments(params.organizerId);
@@ -198,7 +198,7 @@ final draftTournamentsProvider =
 
 /// Get tournament registrations (one-time fetch)
 final registrationsProvider = FutureProvider.autoDispose
-    .family<List<TournamentRegistration>, _GetRegistrationsParams>(
+    .family<List<TournamentRegistration>, GetRegistrationsParams>(
   (ref, params) async {
     final repo = ref.watch(organizerRepositoryProvider);
     return repo.getTournamentRegistrations(params.tournamentId);
@@ -207,7 +207,7 @@ final registrationsProvider = FutureProvider.autoDispose
 
 /// Watch tournament participants (real-time)
 final participantsStreamProvider =
-    StreamProvider.autoDispose.family<List<TournamentRegistration>, _GetRegistrationsParams>(
+    StreamProvider.autoDispose.family<List<TournamentRegistration>, GetRegistrationsParams>(
   (ref, params) {
     final repo = ref.watch(organizerRepositoryProvider);
     return repo.watchTournamentParticipants(params.tournamentId);
@@ -220,7 +220,7 @@ final participantsStreamProvider =
 
 /// Get organizer's payout requests
 final payoutRequestsProvider =
-    FutureProvider.autoDispose.family<List<PayoutRequest>, _GetPayoutsParams>(
+    FutureProvider.autoDispose.family<List<PayoutRequest>, GetPayoutsParams>(
   (ref, params) async {
     final repo = ref.watch(organizerRepositoryProvider);
     return repo.getPayoutRequests(params.organizerId);
@@ -233,7 +233,7 @@ final payoutRequestsProvider =
 
 /// Get organizer's tournament templates
 final organizerTemplatesProvider =
-    FutureProvider.autoDispose.family<List<TournamentTemplate>, _GetTournamentsParams>(
+    FutureProvider.autoDispose.family<List<TournamentTemplate>, GetTournamentsParams>(
   (ref, params) async {
     final repo = ref.watch(organizerRepositoryProvider);
     return repo.getTournamentTemplates(params.organizerId);

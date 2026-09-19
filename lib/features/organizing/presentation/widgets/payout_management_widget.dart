@@ -17,7 +17,7 @@ class PayoutManagementWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final payoutsAsync = ref.watch(
-      payoutRequestsProvider(_GetPayoutsParams(organizerId)),
+      payoutRequestsProvider(GetPayoutsParams(organizerId)),
     );
 
     return payoutsAsync.when(
