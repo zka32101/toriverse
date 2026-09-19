@@ -1,31 +1,23 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'spectator_message.freezed.dart';
-part 'spectator_message.g.dart';
 
 /// Spectator chat message model
 ///
 /// Represents a single message sent in spectator chat during a match.
 /// Supports moderation, emoji reactions, and message pinning.
-@freezed
-class SpectatorMessage with _$SpectatorMessage {
-  const factory SpectatorMessage({
+class SpectatorMessage {
+  const SpectatorMessage({
     required String id,                  // Unique message ID
     required String matchId,             // Match being watched
     required String userId,              // Who sent the message
     required String displayName,         // Sender's display name
     required String text,                // Message content (max 500 chars)
     required DateTime createdAt,         // When message was sent
-    @Default(false) bool isModerated,    // Content flagged by moderation
+    bool isModerated,    // Content flagged by moderation
     String? moderationReason,            // Why message was moderated
     String? emoji,                       // Optional reaction emoji
-    @Default(false) bool isPinned,       // Moderator pinned this message
-    @Default(SpectatorChatRole.viewer)
+    bool isPinned,       // Moderator pinned this message
+    
       SpectatorChatRole role,            // Sender's role (viewer/commentator/streamer)
-  }) = _SpectatorMessage;
-
-  factory SpectatorMessage.fromJson(Map<String, dynamic> json) =>
-      _$SpectatorMessageFromJson(json);
+  });
 }
 
 /// Spectator chat user role with special permissions

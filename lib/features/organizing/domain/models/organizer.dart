@@ -1,12 +1,7 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'organizer.freezed.dart';
-part 'organizer.g.dart';
 
 /// User's organizer profile and capabilities
-@freezed
-class OrganizerProfile with _$OrganizerProfile {
-  const factory OrganizerProfile({
+class OrganizerProfile {
+  const OrganizerProfile({
     required String uid,
     required String displayName,
     required String email,
@@ -15,176 +10,141 @@ class OrganizerProfile with _$OrganizerProfile {
     required double avgRating,
     required DateTime createdAt,
     required DateTime updatedAt,
-    @Default(false) bool isVerified,
-    @Default(false) bool canHostPremium,
-    @Default([]) List<String> tournamentIds,
-    @Default('') String bio,
-    @Default('') String avatarUrl,
-  }) = _OrganizerProfile;
-
-  factory OrganizerProfile.fromJson(Map<String, dynamic> json) =>
-      _$OrganizerProfileFromJson(json);
+    bool isVerified,
+    bool canHostPremium,
+    List<String> tournamentIds,
+    String bio,
+    String avatarUrl,
+  });
 }
 
 /// Tournament being created/drafted
-@freezed
-class TournamentDraft with _$TournamentDraft {
-  const factory TournamentDraft({
+class TournamentDraft {
+  const TournamentDraft({
     required String organizerId,
     required String name,
     required String description,
     required String format,
-    @Default(null) DateTime? startDate,
-    @Default(null) DateTime? registrationDeadline,
-    @Default(64) int maxParticipants,
-    @Default(0) int currentParticipants,
+    DateTime? startDate,
+    DateTime? registrationDeadline,
+    int maxParticipants,
+    int currentParticipants,
     required PrizePoolConfig prizePool,
-    @Default([]) List<String> rules,
-    @Default('draft') String status, // draft, published, active, finished
-    @Default(false) bool isFeatured,
-    @Default(false) bool isPremium,
-    @Default('') String bannerUrl,
-    @Default('') String rulesetId,
-    @Default({}) Map<String, dynamic> bracketSettings,
-  }) = _TournamentDraft;
-
-  factory TournamentDraft.fromJson(Map<String, dynamic> json) =>
-      _$TournamentDraftFromJson(json);
+    List<String> rules,
+    String status, // draft, published, active, finished
+    bool isFeatured,
+    bool isPremium,
+    String bannerUrl,
+    String rulesetId,
+    Map<String, dynamic> bracketSettings,
+  });
 }
 
 /// Prize pool configuration for tournaments
-@freezed
-class PrizePoolConfig with _$PrizePoolConfig {
-  const factory PrizePoolConfig({
+class PrizePoolConfig {
+  const PrizePoolConfig({
     required int totalAmount,
     required Map<int, int> distribution, // rank -> amount (JPY)
-    @Default('JPY') String currency,
-    @Default('') String sponsorName,
-    @Default(false) bool isPaidOut,
-    @Default(null) DateTime? paidOutAt,
-  }) = _PrizePoolConfig;
-
-  factory PrizePoolConfig.fromJson(Map<String, dynamic> json) =>
-      _$PrizePoolConfigFromJson(json);
+    String currency,
+    String sponsorName,
+    bool isPaidOut,
+    DateTime? paidOutAt,
+  });
 }
 
 /// Tournament configuration details
-@freezed
-class TournamentConfig with _$TournamentConfig {
-  const factory TournamentConfig({
+class TournamentConfig {
+  const TournamentConfig({
     required String tournamentId,
     required String organizerId,
     required String format,
-    @Default(false) bool allowLateRegistration,
-    @Default(30) int submissionTimeSeconds,
-    @Default(false) bool requirePlayerConfirmation,
-    @Default(false) bool autoStartMatches,
-    @Default('') String timezone,
-    @Default([]) List<String> allowedCountries,
-    @Default(18) int minAge,
-    @Default(0) int spectatorLimit,
-    @Default(false) bool allowStreamers,
-    @Default(false) bool recordMatches,
-    @Default(false) bool autoGenerateClips,
-    @Default(null) DateTime? createdAt,
-    @Default(null) DateTime? updatedAt,
-  }) = _TournamentConfig;
-
-  factory TournamentConfig.fromJson(Map<String, dynamic> json) =>
-      _$TournamentConfigFromJson(json);
+    bool allowLateRegistration,
+    int submissionTimeSeconds,
+    bool requirePlayerConfirmation,
+    bool autoStartMatches,
+    String timezone,
+    List<String> allowedCountries,
+    int minAge,
+    int spectatorLimit,
+    bool allowStreamers,
+    bool recordMatches,
+    bool autoGenerateClips,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  });
 }
 
 /// Organizer tournament statistics
-@freezed
-class OrganizerStats with _$OrganizerStats {
-  const factory OrganizerStats({
+class OrganizerStats {
+  const OrganizerStats({
     required String organizerId,
-    @Default(0) int totalTournaments,
-    @Default(0) int completedTournaments,
-    @Default(0) int totalParticipants,
-    @Default(0) int totalViewers,
-    @Default(0) int totalPrizePoolAwarded,
-    @Default(0.0) double avgPlayerRating,
-    @Default(0.0) double organizerRating,
-    @Default([]) List<TournamentReview> reviews,
-    @Default(null) DateTime? createdAt,
-    @Default(null) DateTime? updatedAt,
-  }) = _OrganizerStats;
-
-  factory OrganizerStats.fromJson(Map<String, dynamic> json) =>
-      _$OrganizerStatsFromJson(json);
+    int totalTournaments,
+    int completedTournaments,
+    int totalParticipants,
+    int totalViewers,
+    int totalPrizePoolAwarded,
+    double avgPlayerRating,
+    double organizerRating,
+    List<TournamentReview> reviews,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  });
 }
 
 /// Review/rating for tournament organizer
-@freezed
-class TournamentReview with _$TournamentReview {
-  const factory TournamentReview({
+class TournamentReview {
+  const TournamentReview({
     required String id,
     required String tournamentId,
     required String reviewerId,
     required String reviewerName,
     required double rating, // 1-5 stars
     required String comment,
-    @Default([]) List<String> categories, // 'fair-play', 'communication', 'fairness', etc
-    @Default(null) DateTime? createdAt,
-  }) = _TournamentReview;
-
-  factory TournamentReview.fromJson(Map<String, dynamic> json) =>
-      _$TournamentReviewFromJson(json);
+    List<String> categories, // 'fair-play', 'communication', 'fairness', etc
+    DateTime? createdAt,
+  });
 }
 
 /// Tournament participation request from player
-@freezed
-class TournamentRegistration with _$TournamentRegistration {
-  const factory TournamentRegistration({
+class TournamentRegistration {
+  const TournamentRegistration({
     required String id,
     required String tournamentId,
     required String userId,
     required String displayName,
-    @Default(null) DateTime? registeredAt,
-    @Default('pending') String status, // pending, approved, rejected, withdrawn
-    @Default(null) DateTime? approvedAt,
-    @Default('') String notes, // organizer notes about player
-  }) = _TournamentRegistration;
-
-  factory TournamentRegistration.fromJson(Map<String, dynamic> json) =>
-      _$TournamentRegistrationFromJson(json);
+    DateTime? registeredAt,
+    String status, // pending, approved, rejected, withdrawn
+    DateTime? approvedAt,
+    String notes, // organizer notes about player
+  });
 }
 
 /// Payout request for tournament prizes
-@freezed
-class PayoutRequest with _$PayoutRequest {
-  const factory PayoutRequest({
+class PayoutRequest {
+  const PayoutRequest({
     required String id,
     required String tournamentId,
     required String organizerId,
     required int totalAmount,
     required Map<String, int> payouts, // userId -> amount (JPY)
-    @Default('pending') String status, // pending, approved, processing, completed, failed
-    @Default('') String bankAccount,
-    @Default(null) DateTime? requestedAt,
-    @Default(null) DateTime? processedAt,
-    @Default('') String notes,
-  }) = _PayoutRequest;
-
-  factory PayoutRequest.fromJson(Map<String, dynamic> json) =>
-      _$PayoutRequestFromJson(json);
+    String status, // pending, approved, processing, completed, failed
+    String bankAccount,
+    DateTime? requestedAt,
+    DateTime? processedAt,
+    String notes,
+  });
 }
 
 /// Template for organizing recurring tournament series
-@freezed
-class TournamentTemplate with _$TournamentTemplate {
-  const factory TournamentTemplate({
+class TournamentTemplate {
+  const TournamentTemplate({
     required String id,
     required String organizerId,
     required String name,
     required String format,
     required PrizePoolConfig prizePoolTemplate,
-    @Default([]) List<String> rules,
-    @Default(null) DateTime? createdAt,
-    @Default(null) DateTime? updatedAt,
-  }) = _TournamentTemplate;
-
-  factory TournamentTemplate.fromJson(Map<String, dynamic> json) =>
-      _$TournamentTemplateFromJson(json);
+    List<String> rules,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  });
 }

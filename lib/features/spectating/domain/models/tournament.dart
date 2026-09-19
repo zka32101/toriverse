@@ -1,7 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'tournament.freezed.dart';
-part 'tournament.g.dart';
 
 /// Tournament format and rules
 enum TournamentFormat {
@@ -59,22 +55,18 @@ enum TournamentStatus {
 }
 
 /// Prize distribution model
-@freezed
-class PrizePool with _$PrizePool {
-  const factory PrizePool({
+class PrizePool {
+  const PrizePool({
     required int totalAmount, // JPY
     required Map<int, int> distribution, // position -> amount (1 -> 100000, 2 -> 50000, etc)
     required String currency, // JPY
     String? sponsorName,
-  }) = _PrizePool;
-
-  factory PrizePool.fromJson(Map<String, dynamic> json) => _$PrizePoolFromJson(json);
+  });
 }
 
 /// Tournament with metadata
-@freezed
-class Tournament with _$Tournament {
-  const factory Tournament({
+class Tournament {
+  const Tournament({
     required String id,
     required String name,
     required String description,
@@ -95,20 +87,17 @@ class Tournament with _$Tournament {
     required int completedMatches,
     required DateTime createdAt,
     required DateTime updatedAt,
-    @Default([]) List<String> tags, // competitive, beginner, regional, etc
-    @Default(0.0) double avgMatchDuration, // minutes
+    List<String> tags, // competitive, beginner, regional, etc
+    double avgMatchDuration, // minutes
     String? bannerUrl,
     String? logoUrl,
     Map<String, dynamic>? metadata,
-  }) = _Tournament;
-
-  factory Tournament.fromJson(Map<String, dynamic> json) => _$TournamentFromJson(json);
+  });
 }
 
 /// Participant in tournament
-@freezed
-class TournamentParticipant with _$TournamentParticipant {
-  const factory TournamentParticipant({
+class TournamentParticipant {
+  const TournamentParticipant({
     required String id,
     required String tournamentId,
     required String userId,
@@ -121,17 +110,14 @@ class TournamentParticipant with _$TournamentParticipant {
     required bool isActive,
     required DateTime joinedAt,
     DateTime? eliminatedAt,
-    @Default(0) int trophies,
-    @Default(0) int consecutiveWins,
-  }) = _TournamentParticipant;
-
-  factory TournamentParticipant.fromJson(Map<String, dynamic> json) => _$TournamentParticipantFromJson(json);
+    int trophies,
+    int consecutiveWins,
+  });
 }
 
 /// Match within tournament
-@freezed
-class TournamentMatch with _$TournamentMatch {
-  const factory TournamentMatch({
+class TournamentMatch {
+  const TournamentMatch({
     required String id,
     required String tournamentId,
     required int round,
@@ -145,12 +131,10 @@ class TournamentMatch with _$TournamentMatch {
     DateTime? completedTime,
     required bool isFeatured, // Highlighted match
     required int viewerCount,
-    @Default(0) int predictions,
+    int predictions,
     String? matchRecordId, // Link to actual game
     Map<String, int>? finalScores, // userId -> score
-  }) = _TournamentMatch;
-
-  factory TournamentMatch.fromJson(Map<String, dynamic> json) => _$TournamentMatchFromJson(json);
+  });
 }
 
 /// Match status
@@ -171,24 +155,20 @@ enum MatchStatus {
 }
 
 /// Tournament bracket/standings
-@freezed
-class TournamentBracket with _$TournamentBracket {
-  const factory TournamentBracket({
+class TournamentBracket {
+  const TournamentBracket({
     required String id,
     required String tournamentId,
     required Map<int, List<TournamentMatch>> roundMatches, // round -> matches
     required List<TournamentParticipant> standings,
     required int currentRound,
     required DateTime? nextRoundTime,
-  }) = _TournamentBracket;
-
-  factory TournamentBracket.fromJson(Map<String, dynamic> json) => _$TournamentBracketFromJson(json);
+  });
 }
 
 /// Viewer prediction/wagering
-@freezed
-class MatchPrediction with _$MatchPrediction {
-  const factory MatchPrediction({
+class MatchPrediction {
+  const MatchPrediction({
     required String id,
     required String matchId,
     required String viewerId,
@@ -197,32 +177,26 @@ class MatchPrediction with _$MatchPrediction {
     required bool isCorrect,
     required int pointsWon,
     required DateTime createdAt,
-  }) = _MatchPrediction;
-
-  factory MatchPrediction.fromJson(Map<String, dynamic> json) => _$MatchPredictionFromJson(json);
+  });
 }
 
 /// Viewer reward for watching
-@freezed
-class ViewerReward with _$ViewerReward {
-  const factory ViewerReward({
+class ViewerReward {
+  const ViewerReward({
     required String id,
     required String tournamentId,
     required String viewerId,
     required int watchMinutes,
     required int pointsEarned,
     required int tokensEarned, // Premium currency (¥)
-    @Default(false) bool isPremiumBonus, // Extra for subscribed viewers
+    bool isPremiumBonus, // Extra for subscribed viewers
     required DateTime earnedAt,
-  }) = _ViewerReward;
-
-  factory ViewerReward.fromJson(Map<String, dynamic> json) => _$ViewerRewardFromJson(json);
+  });
 }
 
 /// Featured match display info
-@freezed
-class FeaturedMatch with _$FeaturedMatch {
-  const factory FeaturedMatch({
+class FeaturedMatch {
+  const FeaturedMatch({
     required String id,
     required String matchId,
     required String tournamentId,
@@ -232,33 +206,27 @@ class FeaturedMatch with _$FeaturedMatch {
     required int expectedViewers,
     required int currentViewers,
     required double importance, // 0.0-1.0, used for ranking
-    @Default(false) bool isLive,
+    bool isLive,
     required DateTime featuredStartTime,
     required DateTime featuredEndTime,
     String? bannerUrl,
-    @Default([]) List<String> relatedTags,
-  }) = _FeaturedMatch;
-
-  factory FeaturedMatch.fromJson(Map<String, dynamic> json) => _$FeaturedMatchFromJson(json);
+    List<String> relatedTags,
+  });
 }
 
 /// Tournament standings snapshot
-@freezed
-class TournamentStandings with _$TournamentStandings {
-  const factory TournamentStandings({
+class TournamentStandings {
+  const TournamentStandings({
     required String id,
     required String tournamentId,
     required List<StandingEntry> entries,
     required DateTime generatedAt,
-  }) = _TournamentStandings;
-
-  factory TournamentStandings.fromJson(Map<String, dynamic> json) => _$TournamentStandingsFromJson(json);
+  });
 }
 
 /// Individual standing entry
-@freezed
-class StandingEntry with _$StandingEntry {
-  const factory StandingEntry({
+class StandingEntry {
+  const StandingEntry({
     required int rank,
     required String playerId,
     required String playerName,
@@ -271,15 +239,12 @@ class StandingEntry with _$StandingEntry {
     required int pointDiff,
     required int trophies,
     required String? tier, // S/A/B/C etc
-  }) = _StandingEntry;
-
-  factory StandingEntry.fromJson(Map<String, dynamic> json) => _$StandingEntryFromJson(json);
+  });
 }
 
 /// Tournament achievement/badge
-@freezed
-class TournamentBadge with _$TournamentBadge {
-  const factory TournamentBadge({
+class TournamentBadge {
+  const TournamentBadge({
     required String id,
     required String tournamentId,
     required String name, // "Champion", "Finalist", "Undefeated"
@@ -287,15 +252,12 @@ class TournamentBadge with _$TournamentBadge {
     required String description,
     required List<String> unlockedBy, // userIds who earned it
     required int rarity, // 1-5, higher = rarer
-  }) = _TournamentBadge;
-
-  factory TournamentBadge.fromJson(Map<String, dynamic> json) => _$TournamentBadgeFromJson(json);
+  });
 }
 
 /// Highlight moment in tournament
-@freezed
-class TournamentHighlight with _$TournamentHighlight {
-  const factory TournamentHighlight({
+class TournamentHighlight {
+  const TournamentHighlight({
     required String id,
     required String tournamentId,
     required String matchId,
@@ -305,16 +267,13 @@ class TournamentHighlight with _$TournamentHighlight {
     required String videoUrl,
     required int views,
     required List<String> playerIds,
-    @Default('epic') String type, // epic, upset, comeback, etc
-  }) = _TournamentHighlight;
-
-  factory TournamentHighlight.fromJson(Map<String, dynamic> json) => _$TournamentHighlightFromJson(json);
+    String type, // epic, upset, comeback, etc
+  });
 }
 
 /// Tournament invitation to player
-@freezed
-class TournamentInvitation with _$TournamentInvitation {
-  const factory TournamentInvitation({
+class TournamentInvitation {
+  const TournamentInvitation({
     required String id,
     required String tournamentId,
     required String invitedUserId,
@@ -322,8 +281,6 @@ class TournamentInvitation with _$TournamentInvitation {
     required String tournamentName,
     required DateTime invitedAt,
     DateTime? respondedAt,
-    @Default('pending') String status, // pending, accepted, declined
-  }) = _TournamentInvitation;
-
-  factory TournamentInvitation.fromJson(Map<String, dynamic> json) => _$TournamentInvitationFromJson(json);
+    String status, // pending, accepted, declined
+  });
 }

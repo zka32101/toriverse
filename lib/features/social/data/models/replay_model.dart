@@ -1,12 +1,7 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'replay_model.freezed.dart';
-part 'replay_model.g.dart';
 
 /// Replay asset stored in replays/{replayId}
-@freezed
-class Replay with _$Replay {
-  const factory Replay({
+class Replay {
+  const Replay({
     required String id, // Replay identifier
     required String matchId, // Source match
     required String creatorUid, // Player who shared
@@ -14,29 +9,22 @@ class Replay with _$Replay {
     String? thumbnail, // Preview image
     String? title, // Player's title
     String? description,
-    @Default(true) bool isPublic, // Visibility
-    @Default([]) List<String> tags, // #highlights, #clutch, etc.
+    bool isPublic, // Visibility
+    List<String> tags, // #highlights, #clutch, etc.
     int? duration, // Video length in seconds
     required DateTime createdAt,
-    @Default(0) int viewCount,
-    @Default(0) int shareCount,
-    @Default(0) int favoriteCount,
-  }) = _Replay;
-
-  factory Replay.fromJson(Map<String, dynamic> json) =>
-      _$ReplayFromJson(json);
+    int viewCount,
+    int shareCount,
+    int favoriteCount,
+  });
 }
 
 /// Replay view log stored in replays/{replayId}/views/{viewId}
-@freezed
-class ReplayView with _$ReplayView {
-  const factory ReplayView({
+class ReplayView {
+  const ReplayView({
     required String replayId,
     required String viewedByUid,
     required DateTime viewedAt,
     int? duration, // How long they watched
-  }) = _ReplayView;
-
-  factory ReplayView.fromJson(Map<String, dynamic> json) =>
-      _$ReplayViewFromJson(json);
+  });
 }

@@ -1,7 +1,3 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'discovery.freezed.dart';
-part 'discovery.g.dart';
 
 // Enums
 enum SearchType { creator, clip, match, clan }
@@ -22,62 +18,49 @@ enum ContentTypeEnum { creator, clip, match, clan }
 // Models
 
 /// Represents a search query performed by a user
-@freezed
-class SearchQuery with _$SearchQuery {
-  const factory SearchQuery({
+class SearchQuery {
+  const SearchQuery({
     required String queryId,
     required String userId,
     required String searchText,
     required SearchType searchType,
-    @Default({}) Map<String, dynamic> filters,
-    @Default(0) int resultsCount,
+    Map<String, dynamic> filters,
+    int resultsCount,
     required DateTime performedAt,
-    @Default(false) bool isPopular,
-  }) = _SearchQuery;
-
-  factory SearchQuery.fromJson(Map<String, dynamic> json) =>
-      _$SearchQueryFromJson(json);
+    bool isPopular,
+  });
 }
 
 /// Real-time personalized recommendation feed
-@freezed
-class RecommendationFeed with _$RecommendationFeed {
-  const factory RecommendationFeed({
+class RecommendationFeed {
+  const RecommendationFeed({
     required String feedId,
     required String userId,
     required RecommendationFeedType feedType,
-    @Default([]) List<Map<String, dynamic>> items,
+    List<Map<String, dynamic>> items,
     required DateTime generatedAt,
     required DateTime expiresAt,
-    @Default(0.85) double confidence,
-  }) = _RecommendationFeed;
-
-  factory RecommendationFeed.fromJson(Map<String, dynamic> json) =>
-      _$RecommendationFeedFromJson(json);
+    double confidence,
+  });
 }
 
 /// Trending content rankings
-@freezed
-class TrendingContent with _$TrendingContent {
-  const factory TrendingContent({
+class TrendingContent {
+  const TrendingContent({
     required String trendingId,
     required ContentTypeEnum contentType,
     required String contentId,
-    @Default(0) int rank,
-    @Default(0.0) double score,
+    int rank,
+    double score,
     required TrendingCategory trendingCategory,
     required DateTime generatedAt,
     required DateTime expiresAt,
-  }) = _TrendingContent;
-
-  factory TrendingContent.fromJson(Map<String, dynamic> json) =>
-      _$TrendingContentFromJson(json);
+  });
 }
 
 /// Discovery analytics for tracking user behavior
-@freezed
-class DiscoveryAnalytics with _$DiscoveryAnalytics {
-  const factory DiscoveryAnalytics({
+class DiscoveryAnalytics {
+  const DiscoveryAnalytics({
     required String analyticsId,
     required String userId,
     required DiscoveryActionType action,
@@ -85,102 +68,79 @@ class DiscoveryAnalytics with _$DiscoveryAnalytics {
     required String contentId,
     String? creatorId,
     required DateTime actionAt,
-    @Default(0) int durationViewed,
-    @Default(false) bool conversionAction,
-  }) = _DiscoveryAnalytics;
-
-  factory DiscoveryAnalytics.fromJson(Map<String, dynamic> json) =>
-      _$DiscoveryAnalyticsFromJson(json);
+    int durationViewed,
+    bool conversionAction,
+  });
 }
 
 /// Cached search result
-@freezed
-class SearchResult with _$SearchResult {
-  const factory SearchResult({
+class SearchResult {
+  const SearchResult({
     required String resultId,
     required String queryId,
     required ContentTypeEnum contentType,
     required String contentId,
-    @Default(0.0) double matchScore,
-    @Default(0) int rank,
-    @Default({}) Map<String, dynamic> displayData,
-  }) = _SearchResult;
-
-  factory SearchResult.fromJson(Map<String, dynamic> json) =>
-      _$SearchResultFromJson(json);
+    double matchScore,
+    int rank,
+    Map<String, dynamic> displayData,
+  });
 }
 
 /// Optimized creator search display
-@freezed
-class CreatorSearchCard with _$CreatorSearchCard {
-  const factory CreatorSearchCard({
+class CreatorSearchCard {
+  const CreatorSearchCard({
     required String creatorId,
     required String displayName,
     String? bio,
     String? avatarUrl,
-    @Default(0) int followerCount,
+    int followerCount,
     String? creatorTier,
-    @Default(false) bool verificationBadge,
+    bool verificationBadge,
     String? topClipThisMonth,
-    @Default(0.0) double avgViewsPerClip,
+    double avgViewsPerClip,
     DateTime? lastStreamedAt,
     DateTime? lastClipUploadedAt,
-  }) = _CreatorSearchCard;
-
-  factory CreatorSearchCard.fromJson(Map<String, dynamic> json) =>
-      _$CreatorSearchCardFromJson(json);
+  });
 }
 
 /// Saved search for quick re-execution
-@freezed
-class SavedSearch with _$SavedSearch {
-  const factory SavedSearch({
+class SavedSearch {
+  const SavedSearch({
     required String savedSearchId,
     required String userId,
     required String searchText,
-    @Default({}) Map<String, dynamic> searchFilters,
+    Map<String, dynamic> searchFilters,
     required DateTime savedAt,
     DateTime? lastExecutedAt,
-    @Default(0) int resultCount,
-  }) = _SavedSearch;
-
-  factory SavedSearch.fromJson(Map<String, dynamic> json) =>
-      _$SavedSearchFromJson(json);
+    int resultCount,
+  });
 }
 
 /// Platform-wide discovery metrics
-@freezed
-class DiscoveryMetrics with _$DiscoveryMetrics {
-  const factory DiscoveryMetrics({
+class DiscoveryMetrics {
+  const DiscoveryMetrics({
     required String metricsId,
     required String period,
-    @Default(0) int totalSearches,
-    @Default(0) int uniqueSearchers,
-    @Default(0.0) double avgResultsPerQuery,
-    @Default([]) List<String> topSearchTerms,
-    @Default([]) List<String> topTrendingCreators,
-    @Default([]) List<String> topTrendingClips,
-    @Default(0.0) double discoveryRate,
+    int totalSearches,
+    int uniqueSearchers,
+    double avgResultsPerQuery,
+    List<String> topSearchTerms,
+    List<String> topTrendingCreators,
+    List<String> topTrendingClips,
+    double discoveryRate,
     required DateTime generatedAt,
-  }) = _DiscoveryMetrics;
-
-  factory DiscoveryMetrics.fromJson(Map<String, dynamic> json) =>
-      _$DiscoveryMetricsFromJson(json);
+  });
 }
 
 /// User preferences for personalization
-@freezed
-class UserPreferences with _$UserPreferences {
-  const factory UserPreferences({
+class UserPreferences {
+  const UserPreferences({
     required String userId,
-    @Default([]) List<String> preferredSkillLevels,
-    @Default([]) List<String> preferredCreatorTiers,
-    @Default([]) List<String> preferredContentTypes,
-    @Default('en') String languagePreference,
-    @Default(true) bool notificationsEnabled,
+    List<String> preferredSkillLevels,
+    List<String> preferredCreatorTiers,
+    List<String> preferredContentTypes,
+    String languagePreference,
+    bool notificationsEnabled,
     required DateTime updatedAt,
-  }) = _UserPreferences;
-
-  factory UserPreferences.fromJson(Map<String, dynamic> json) =>
-      _$UserPreferencesFromJson(json);
+  });
 }

@@ -1,12 +1,7 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'spectator_session.freezed.dart';
-part 'spectator_session.g.dart';
 
 /// Represents a spectator's view of an active match
-@freezed
-class SpectatorSession with _$SpectatorSession {
-  const factory SpectatorSession({
+class SpectatorSession {
+  const SpectatorSession({
     required String id,
     required String matchId,
     required String userId,
@@ -16,10 +11,7 @@ class SpectatorSession with _$SpectatorSession {
     required DeviceInfo deviceInfo,
     required bool isActive,
     required DateTime lastActivityAt,
-  }) = _SpectatorSession;
-
-  factory SpectatorSession.fromJson(Map<String, dynamic> json) =>
-      _$SpectatorSessionFromJson(json);
+  });
 }
 
 /// Role of spectator in the match
@@ -30,15 +22,11 @@ enum SpectatorRole {
 }
 
 /// Device information for spectator
-@freezed
-class DeviceInfo with _$DeviceInfo {
-  const factory DeviceInfo({
+class DeviceInfo {
+  const DeviceInfo({
     required String os,           // "iOS", "Android", "Web"
     required String osVersion,
     required String appVersion,
     required String platform,
-  }) = _DeviceInfo;
-
-  factory DeviceInfo.fromJson(Map<String, dynamic> json) =>
-      _$DeviceInfoFromJson(json);
+  });
 }

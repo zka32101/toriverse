@@ -1,39 +1,31 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-
-part 'streaming_session.freezed.dart';
-part 'streaming_session.g.dart';
 
 /// Streaming session model for streamer sessions
 ///
 /// Represents a user's active streaming session across multiple platforms.
 /// Tracks streaming status, viewer count, earnings, and platform metadata.
-@freezed
-class StreamingSession with _$StreamingSession {
-  const factory StreamingSession({
+class StreamingSession {
+  const StreamingSession({
     required String id,                    // Unique session ID
     required String matchId,               // Match being streamed
     required String userId,                // Streamer's user ID
     required String displayName,           // Streamer's name
     required DateTime startedAt,           // When stream started
     DateTime? endedAt,                     // When stream ended (null if active)
-    @Default(StreamingStatus.offline)
+    
       StreamingStatus status,              // Current streaming status
-    @Default(0) int viewerCount,           // Current concurrent viewers
-    @Default(0) int totalViews,            // Total cumulative views
-    @Default([]) List<String>
+    int viewerCount,           // Current concurrent viewers
+    int totalViews,            // Total cumulative views
+    List<String>
       connectedPlatforms,                  // ['twitch', 'youtube', 'obs']
     String? twitchChannelUrl,              // Twitch channel URL
     String? youtubeStreamUrl,              // YouTube Live stream URL
     String? obsSourceUrl,                  // OBS browser source URL
-    @Default(0.0) double revenueEarned,    // Revenue from this stream (JPY)
+    double revenueEarned,    // Revenue from this stream (JPY)
     StreamingMetadata? metadata,           // Platform-specific metadata
-    @Default(false) bool isHighlighted,    // Featured/highlighted stream
-    @Default([]) List<HighlightClip>
+    bool isHighlighted,    // Featured/highlighted stream
+    List<HighlightClip>
       generatedHighlights,                 // Auto-generated highlight clips
-  }) = _StreamingSession;
-
-  factory StreamingSession.fromJson(Map<String, dynamic> json) =>
-      _$StreamingSessionFromJson(json);
+  });
 }
 
 /// Streaming status enumeration
@@ -101,27 +93,22 @@ extension StreamingPlatformExt on StreamingPlatform {
 }
 
 /// Platform-specific streaming metadata
-@freezed
-class StreamingMetadata with _$StreamingMetadata {
-  const factory StreamingMetadata({
+class StreamingMetadata {
+  const StreamingMetadata({
     required String platform,              // 'twitch', 'youtube', 'obs'
     String? platformUserId,                // User ID on platform
     String? streamTitle,                   // Stream title
     String? streamDescription,             // Stream description
-    @Default([]) List<String> tags,        // Stream tags/categories
+    List<String> tags,        // Stream tags/categories
     String? gameTitleOverride,             // Custom game title for platform
-    @Default(false) bool autoArchive,      // Auto-save VOD after stream
+    bool autoArchive,      // Auto-save VOD after stream
     DateTime? scheduleTime,                // Pre-scheduled stream time
-  }) = _StreamingMetadata;
-
-  factory StreamingMetadata.fromJson(Map<String, dynamic> json) =>
-      _$StreamingMetadataFromJson(json);
+  });
 }
 
 /// Auto-generated highlight clip from stream
-@freezed
-class HighlightClip with _$HighlightClip {
-  const factory HighlightClip({
+class HighlightClip {
+  const HighlightClip({
     required String id,                    // Unique clip ID
     required String streamingSessionId,    // Parent session
     required String matchId,               // Associated match
@@ -129,18 +116,15 @@ class HighlightClip with _$HighlightClip {
     required String description,           // What happened
     required Duration startTime,           // Time in stream
     required Duration endTime,             // Clip duration
-    @Default(HighlightType.milestone)
+    
       HighlightType type,                  // milestone, epic, turnover, etc.
-    @Default(0) int viewCount,             // Total clip views
-    @Default(0) int shareCount,            // Times shared
+    int viewCount,             // Total clip views
+    int shareCount,            // Times shared
     String? videoUrl,                      // Processed video URL
-    @Default(false) bool isApproved,       // Streamer approved
+    bool isApproved,       // Streamer approved
     DateTime? createdAt,                   // When clip was generated
-    @Default([]) List<String> tags,        // Searchable tags
-  }) = _HighlightClip;
-
-  factory HighlightClip.fromJson(Map<String, dynamic> json) =>
-      _$HighlightClipFromJson(json);
+    List<String> tags,        // Searchable tags
+  });
 }
 
 /// Types of highlight clips
@@ -257,21 +241,17 @@ class StreamingAnalyticsEvent {
 }
 
 /// Streamer earnings tracking
-@freezed
-class StreamerEarnings with _$StreamerEarnings {
-  const factory StreamerEarnings({
+class StreamerEarnings {
+  const StreamerEarnings({
     required String userId,                // Streamer ID
     required DateTime periodStart,         // Earnings period start
     required DateTime periodEnd,           // Earnings period end
-    @Default(0) int totalStreamMinutes,    // Total minutes streamed
-    @Default(0) int totalViewerMinutes,    // Total viewer-minutes
-    @Default(0) int totalClipViews,        // Total highlight clip views
-    @Default(0.0) double streamingRevenue, // From stream subscriptions (JPY)
-    @Default(0.0) double clipRevenue,      // From clip views (JPY)
-    @Default(0.0) double referralRevenue,  // From referrals (JPY)
-    @Default(0.0) double totalEarnings,    // Total earnings this period (JPY)
-  }) = _StreamerEarnings;
-
-  factory StreamerEarnings.fromJson(Map<String, dynamic> json) =>
-      _$StreamerEarningsFromJson(json);
+    int totalStreamMinutes,    // Total minutes streamed
+    int totalViewerMinutes,    // Total viewer-minutes
+    int totalClipViews,        // Total highlight clip views
+    double streamingRevenue, // From stream subscriptions (JPY)
+    double clipRevenue,      // From clip views (JPY)
+    double referralRevenue,  // From referrals (JPY)
+    double totalEarnings,    // Total earnings this period (JPY)
+  });
 }
