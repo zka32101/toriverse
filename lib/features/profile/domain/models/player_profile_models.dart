@@ -217,7 +217,7 @@ enum AchievementType {
 
 /// Achievement definitions
 class AchievementDefinitions {
-  static const List<Achievement> ALL = [
+  static final List<Achievement> ALL = [
     Achievement(
       id: 'first_win',
       name: 'First Victory',

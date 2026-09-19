@@ -63,7 +63,7 @@ class MonetizationRepository {
 
   Future<List<CreatorEarnings>> getEarningsHistory(
     String creatorId,
-    {int limit = 12},
+    {int limit = 12}
   ) async {
     final docs = await _firestore
         .collection('creators')
@@ -78,7 +78,7 @@ class MonetizationRepository {
 
   Stream<List<CreatorEarnings>> watchEarningsHistory(
     String creatorId,
-    {int limit = 12},
+    {int limit = 12}
   ) {
     return _firestore
         .collection('creators')
@@ -443,7 +443,7 @@ class MonetizationRepository {
 
   Future<List<GiftTransaction>> getCreatorReceivedGifts(
     String creatorId,
-    {int limit = 20},
+    {int limit = 20}
   ) async {
     final docs = await _firestore
         .collection('creators')
@@ -458,7 +458,7 @@ class MonetizationRepository {
 
   Stream<List<GiftTransaction>> watchCreatorReceivedGifts(
     String creatorId,
-    {int limit = 20},
+    {int limit = 20}
   ) {
     return _firestore
         .collection('creators')
@@ -473,7 +473,7 @@ class MonetizationRepository {
 
   Future<List<GiftTransaction>> getUserSentGifts(
     String userId,
-    {int limit = 20},
+    {int limit = 20}
   ) async {
     final docs = await _firestore
         .collection('users')
@@ -539,7 +539,7 @@ class MonetizationRepository {
 
   Future<List<SubscriptionTransaction>> getCreatorSubscriptionTransactions(
     String creatorId,
-    {int limit = 50},
+    {int limit = 50}
   ) async {
     final docs = await _firestore
         .collection('creators')
@@ -554,7 +554,7 @@ class MonetizationRepository {
 
   Stream<List<SubscriptionTransaction>> watchCreatorSubscriptionTransactions(
     String creatorId,
-    {int limit = 50},
+    {int limit = 50}
   ) {
     return _firestore
         .collection('creators')
@@ -614,7 +614,7 @@ class MonetizationRepository {
 
   Future<List<CreatorPayout>> getCreatorPayouts(
     String creatorId,
-    {int limit = 20},
+    {int limit = 20}
   ) async {
     final docs = await _firestore
         .collection('creators')
@@ -629,7 +629,7 @@ class MonetizationRepository {
 
   Stream<List<CreatorPayout>> watchCreatorPayouts(
     String creatorId,
-    {int limit = 20},
+    {int limit = 20}
   ) {
     return _firestore
         .collection('creators')
@@ -851,7 +851,7 @@ class MonetizationRepository {
 
   Future<List<CreatorAnalytics>> getCreatorAnalyticsHistory(
     String creatorId,
-    {int limit = 12},
+    {int limit = 12}
   ) async {
     final docs = await _firestore
         .collection('creators')
@@ -866,7 +866,7 @@ class MonetizationRepository {
 
   Stream<List<CreatorAnalytics>> watchCreatorAnalyticsHistory(
     String creatorId,
-    {int limit = 12},
+    {int limit = 12}
   ) {
     return _firestore
         .collection('creators')
