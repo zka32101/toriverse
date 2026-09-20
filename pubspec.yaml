@@ -51,6 +51,9 @@ dependencies:
   # セキュア保存（トークン・認証情報）
   flutter_secure_storage: ^9.0.0
 
+  # SNSシェア
+  share_plus: ^7.2.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

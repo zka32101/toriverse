@@ -137,7 +137,7 @@ class OrganizerDashboardWidget extends ConsumerWidget {
             ),
             _ActionButton(
               label: 'Templates',
-              icon: Icons.template_outlined,
+              icon: Icons.dashboard_customize_outlined,
               onPressed: () {
                 // TODO: Navigate to templates
               },
@@ -182,7 +182,7 @@ class OrganizerDashboardWidget extends ConsumerWidget {
             _StatCard(
               label: 'Tournaments',
               value: stats.totalTournaments.toString(),
-              icon: Icons.tournament,
+              icon: Icons.emoji_events,
               color: Colors.purple,
             ),
             _StatCard(
@@ -245,7 +245,7 @@ class OrganizerDashboardWidget extends ConsumerWidget {
                 child: Column(
                   children: [
                     Icon(
-                      Icons.tournament,
+                      Icons.emoji_events,
                       size: 48,
                       color: Colors.grey[300],
                     ),

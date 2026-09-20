@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:toriverse/config/theme.dart';
 import 'package:toriverse/features/match/application/providers/game_state.dart';
 import 'package:toriverse/features/match/application/providers/user_state.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
@@ -23,7 +22,7 @@ class _ResultsScreenState extends ConsumerState<ResultsScreen> {
   bool _showingReplay = false;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final gameState = ref.watch(gameStateProvider);
     final streak = ref.watch(streakProvider);
 

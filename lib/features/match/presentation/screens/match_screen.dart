@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:toriverse/config/theme.dart';
 import 'package:toriverse/features/auth/application/providers/auth_provider.dart';
 import 'package:toriverse/features/match/application/providers/ai_difficulty_provider.dart';
 import 'package:toriverse/features/match/application/providers/ai_takeover_state.dart';
@@ -15,10 +14,8 @@ import 'package:toriverse/features/match/application/providers/rescue_card_state
 import 'package:toriverse/features/match/application/providers/rivalry_state.dart';
 import 'package:toriverse/features/match/application/providers/round_resolution_provider.dart';
 import 'package:toriverse/features/match/application/providers/round_submission_provider.dart';
-import 'package:toriverse/features/match/application/services/move_applicator.dart';
 import 'package:toriverse/features/match/application/providers/firestore_round_result_service_provider.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
-import 'package:toriverse/features/match/domain/services/ai_player.dart';
 import 'package:toriverse/features/match/presentation/widgets/ai_takeover_indicator_widget.dart';
 import 'package:toriverse/features/match/presentation/widgets/animations/animation_overlay.dart';
 import 'package:toriverse/features/match/presentation/widgets/board_widget.dart';
@@ -130,7 +127,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
   }
 
   void _scheduleAIMoves() {
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () async {
       if (!mounted) return;
 
       final gameState = ref.read(gameStateProvider);
@@ -148,7 +145,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
           // Auto-submit AI player moves
           if (playerId == 'AI' || playerId.startsWith('AI_')) {
             final difficulty = ref.read(aiDifficultyProvider);
-            final move = getAIMove(gameState.board, i, difficulty);
+            final move = await getAIMove(gameState.board, i, difficulty);
 
             if (move != null) {
               final position = move[0] * 8 + move[1];
@@ -251,7 +248,7 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
     final roundSubmission = ref.read(roundSubmissionProvider);
     final bonusState = ref.read(bonusActivationProvider(widget.matchId));
 
-    if (gameState == null || roundSubmission == null || bonusState == null) {
+    if (gameState == null || roundSubmission == null) {
       return;
     }
 
@@ -261,14 +258,14 @@ class _MatchScreenState extends ConsumerState<MatchScreen> {
 
       // Convert bonus state to list format
       final bonusActivations = [
-        bonusState.getActivationCount(gameState.playerIds[0]),
-        bonusState.getActivationCount(gameState.playerIds[1]),
-        bonusState.getActivationCount(gameState.playerIds[2]),
+        bonusState.getCount(gameState.playerIds[0]),
+        bonusState.getCount(gameState.playerIds[1]),
+        bonusState.getCount(gameState.playerIds[2]),
       ];
 
       // Filter submitted positions
       final validPositions = <String, int>{};
-      for (final (playerId, pos)
+      for (final MapEntry(key: playerId, value: pos)
           in roundSubmission.submittedPositions.entries) {
         if (pos != null) {
           validPositions[playerId] = pos;

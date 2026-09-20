@@ -5,8 +5,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import '../../../leaderboard/application/services/rank_calculation_service.dart';
-import '../../../leaderboard/domain/models/leaderboard_models.dart';
-import '../domain/models/friend_models.dart';
 
 enum MatchType {
   ranked,

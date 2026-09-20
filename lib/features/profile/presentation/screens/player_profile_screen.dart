@@ -4,7 +4,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../profile/domain/models/player_profile_models.dart';
 
 class PlayerProfileScreen extends ConsumerStatefulWidget {
   final String uid;

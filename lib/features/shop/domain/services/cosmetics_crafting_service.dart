@@ -8,7 +8,11 @@ class CosmeticsCraftingService {
   /// Crafting recipe: 3 commons + 1 rare = 1 rare cosmetic
   ///
   /// Maps rare cosmetic ID to required common cosmetic IDs.
-  static const Map<String, CraftingRecipe> craftingRecipes = {
+  ///
+  /// Not `const` because [CraftingRecipe]'s constructor validates
+  /// `requiredMaterials.length` in an assert, and `List.length` cannot be
+  /// evaluated in a constant expression.
+  static final Map<String, CraftingRecipe> craftingRecipes = {
     'board_sakura': CraftingRecipe(
       resultId: 'board_sakura',
       resultName: 'さくら盤',
@@ -142,7 +146,7 @@ class CraftingRecipe {
   /// Cost of recipe (if any)
   final int priceYen;
 
-  const CraftingRecipe({
+  CraftingRecipe({
     required this.resultId,
     required this.resultName,
     required this.resultType,

@@ -1,5 +1,5 @@
-import '../../../shared/services/firebase_messaging_service.dart';
-import '../../../shared/services/remote_config_service.dart';
+import '../../../../shared/services/firebase_messaging_service.dart';
+import '../../../../shared/services/remote_config_service.dart';
 import 'dart:async';
 
 /// Service for managing game-specific push notifications
@@ -22,21 +22,17 @@ class PushNotificationManager {
   /// Initialize push notification handling
   ///
   /// Must be called once on app startup.
+  ///
+  /// Note: notification routing callbacks (onMilestoneNotification, etc.)
+  /// are read-only on [FirebaseMessagingService] and must be supplied by
+  /// the caller when constructing the injected [messaging] instance —
+  /// they cannot be wired up after the fact.
   Future<void> initialize() async {
     try {
       await _messaging.initialize();
-      _setupNotificationCallbacks();
     } catch (e) {
       // Silent fail
     }
-  }
-
-  /// Setup callbacks for different notification types
-  void _setupNotificationCallbacks() {
-    _messaging.onMilestoneNotification = _handleMilestoneNotification;
-    _messaging.onStreakResetNotification = _handleStreakResetNotification;
-    _messaging.onCampaignNotification = _handleCampaignNotification;
-    _messaging.onMatchAvailableNotification = _handleMatchAvailableNotification;
   }
 
   /// Handle milestone achievement notification tap

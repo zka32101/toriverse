@@ -46,34 +46,34 @@ class FollowButton extends ConsumerWidget {
             isFollowing ? 'Following ($followerCount)' : 'Follow ($followerCount)',
           ),
         ),
-        loading: () => const OutlinedButton.icon(
+        loading: () => OutlinedButton.icon(
           onPressed: null,
-          icon: SizedBox(
+          icon: const SizedBox(
             height: 16,
             width: 16,
             child: CircularProgressIndicator(strokeWidth: 2),
           ),
-          label: Text('Follow'),
+          label: const Text('Follow'),
         ),
-        error: (err, stack) => const OutlinedButton.icon(
+        error: (err, stack) => OutlinedButton.icon(
           onPressed: null,
-          icon: Icon(Icons.favorite_border),
-          label: Text('Follow'),
+          icon: const Icon(Icons.favorite_border),
+          label: const Text('Follow'),
         ),
       ),
-      loading: () => const OutlinedButton.icon(
+      loading: () => OutlinedButton.icon(
         onPressed: null,
-        icon: SizedBox(
+        icon: const SizedBox(
           height: 16,
           width: 16,
           child: CircularProgressIndicator(strokeWidth: 2),
         ),
-        label: Text('Follow'),
+        label: const Text('Follow'),
       ),
-      error: (err, stack) => const OutlinedButton.icon(
+      error: (err, stack) => OutlinedButton.icon(
         onPressed: null,
-        icon: Icon(Icons.favorite_border),
-        label: Text('Follow'),
+        icon: const Icon(Icons.favorite_border),
+        label: const Text('Follow'),
       ),
     );
   }

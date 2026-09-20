@@ -100,7 +100,6 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
                     ),
                     const SizedBox(height: 12),
                     ...matchedPlayers.asMap().entries.map((entry) {
-                      final index = entry.key;
                       final playerId = entry.value;
                       final isAI = playerId.startsWith('AI');
 

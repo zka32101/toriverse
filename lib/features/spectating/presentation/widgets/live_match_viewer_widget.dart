@@ -238,10 +238,10 @@ class _LiveMatchViewerWidgetState extends ConsumerState<LiveMatchViewerWidget> {
                                     : state == 2
                                         ? Colors.white
                                         : Colors.red,
-                              ),
-                              border: Border.all(
-                                color: Colors.grey[400]!,
-                                width: 0.5,
+                                border: Border.all(
+                                  color: Colors.grey[400]!,
+                                  width: 0.5,
+                                ),
                               ),
                             ),
                           )
@@ -711,6 +711,7 @@ class _LiveMatchViewerWidgetState extends ConsumerState<LiveMatchViewerWidget> {
                 : Column(
                     children: entries
                         .take(10)
+                        .toList()
                         .asMap()
                         .entries
                         .map((entry) =>

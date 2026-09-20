@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/cosmetic_state.dart';
-import '../../application/providers/streak_state.dart';
 import 'streak_display_widget.dart';
 
 /// Home screen panel showing cosmetic collection and streak progress
@@ -27,12 +26,10 @@ class HomeCosmeticsPanel extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cosmeticState = ref.watch(cosmeticProvider);
-    final currentStreak = ref.watch(currentStreakProvider);
-    final nextMilestone = ref.watch(nextMilestoneProvider);
 
     // Get recently acquired cosmetics (last 3)
-    final recentCosmetics = cosmeticState.ownedCosmetics
-        .sorted((a, b) => b.acquiredAt.compareTo(a.acquiredAt))
+    final recentCosmetics = (List<OwnedCosmetic>.from(cosmeticState.ownedCosmetics)
+          ..sort((a, b) => b.acquiredAt.compareTo(a.acquiredAt)))
         .take(3)
         .toList();
 

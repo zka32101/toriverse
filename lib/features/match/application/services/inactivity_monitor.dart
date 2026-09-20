@@ -1,5 +1,3 @@
-import 'package:flutter/foundation.dart';
-
 /// Monitors player inactivity and detects disconnections
 ///
 /// Tracks the last activity (move submission) for each player.

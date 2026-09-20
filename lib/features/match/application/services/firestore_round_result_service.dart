@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../data/models/round_result_model.dart';
+import '../providers/firestore_match_provider.dart';
 import 'offline_queue_service.dart';
 
 /// Firestore Round Result Service
@@ -215,7 +216,7 @@ class FirestoreRoundResultService {
     try {
       if (_offlineQueue == null) return;
 
-      await _offlineQueue!.queueRoundSave(
+      await _offlineQueue.queueRoundSave(
         matchId: result.matchId,
         roundResult: result,
       );
@@ -236,7 +237,7 @@ class FirestoreRoundResultService {
     try {
       if (_offlineQueue == null) return;
 
-      await _offlineQueue!.queueMatchStateUpdate(
+      await _offlineQueue.queueMatchStateUpdate(
         matchId: matchId,
         roundIndex: roundIndex,
         status: status,

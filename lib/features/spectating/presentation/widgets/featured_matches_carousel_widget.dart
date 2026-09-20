@@ -31,7 +31,7 @@ class FeaturedMatchesCarouselWidget extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: Row(
             children: [
-              Icon(Icons.fire, color: Colors.red[500], size: 20),
+              Icon(Icons.local_fire_department, color: Colors.red[500], size: 20),
               const SizedBox(width: 8),
               const Text(
                 'Featured Matches',

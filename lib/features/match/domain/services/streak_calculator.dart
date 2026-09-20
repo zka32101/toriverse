@@ -1,5 +1,4 @@
 import 'package:toriverse/features/match/application/providers/ai_takeover_state.dart';
-import 'package:toriverse/features/match/application/providers/streak_state.dart';
 
 /// Determines streak progression and reset logic
 class StreakCalculator {

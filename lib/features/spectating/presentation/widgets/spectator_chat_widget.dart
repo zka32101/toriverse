@@ -45,7 +45,7 @@ class _SpectatorChatWidgetState extends ConsumerState<SpectatorChatWidget> {
       // Check if user is muted
       final isMuted = await ref.read(
         isUserMutedProvider(
-          _CheckMuteParams(
+          CheckMuteParams(
             matchId: widget.matchId,
             userId: widget.userId,
           ),
@@ -68,7 +68,7 @@ class _SpectatorChatWidgetState extends ConsumerState<SpectatorChatWidget> {
       // Send message
       await ref.read(
         sendChatMessageProvider(
-          _SendMessageParams(
+          SendMessageParams(
             matchId: widget.matchId,
             userId: widget.userId,
             displayName: widget.displayName,
@@ -229,7 +229,7 @@ class _MessageTile extends ConsumerWidget {
                   if (message.isPinned) {
                     ref.read(
                       unpinChatMessageProvider(
-                        _PinMessageParams(
+                        PinMessageParams(
                           matchId: matchId,
                           messageId: message.id,
                           userRole: currentUserRole,
@@ -239,7 +239,7 @@ class _MessageTile extends ConsumerWidget {
                   } else {
                     ref.read(
                       pinChatMessageProvider(
-                        _PinMessageParams(
+                        PinMessageParams(
                           matchId: matchId,
                           messageId: message.id,
                           userRole: currentUserRole,
@@ -267,7 +267,7 @@ class _MessageTile extends ConsumerWidget {
                 onTap: () {
                   ref.read(
                     deleteChatMessageProvider(
-                      _DeleteMessageParams(
+                      DeleteMessageParams(
                         matchId: matchId,
                         messageId: message.id,
                         userRole: currentUserRole,
@@ -316,7 +316,7 @@ class _MessageTile extends ConsumerWidget {
             onPressed: () {
               ref.read(
                 reportChatMessageProvider(
-                  _ReportMessageParams(
+                  ReportMessageParams(
                     matchId: matchId,
                     messageId: message.id,
                     reportedBy: currentUserId,
@@ -370,7 +370,7 @@ class _MessageTile extends ConsumerWidget {
             onPressed: () {
               ref.read(
                 muteUserProvider(
-                  _MuteUserParams(
+                  MuteUserParams(
                     matchId: matchId,
                     userId: message.userId,
                     duration: Duration(minutes: selectedMinutes),

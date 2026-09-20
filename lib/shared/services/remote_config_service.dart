@@ -191,6 +191,18 @@ class RemoteConfigService {
     }
   }
 
+  /// Get a raw string value by key, with an empty-string fallback on error
+  ///
+  /// For ad-hoc LiveOps keys that don't warrant a dedicated typed getter.
+  String getString(String key) {
+    try {
+      return _remoteConfig.getString(key);
+    } catch (e) {
+      final fallback = _defaults[key];
+      return fallback is String ? fallback : '';
+    }
+  }
+
   /// Manually refresh Remote Config values
   ///
   /// Call this periodically or on user request to update values.

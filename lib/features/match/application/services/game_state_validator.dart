@@ -9,11 +9,15 @@ class GameStateValidator {
   /// - Stone counts are reasonable (0-64 total)
   /// - No more than 2 stones flipped per move (simplified check)
   static bool isValidBoardState(Board board) {
-    // Check board size
-    if (board.boardState.length != 64) return false;
+    // Check board size (board is always 8x8 = 64 cells by construction)
+    final counts = board.countStones();
+    final totalCells = (counts[Board.black] ?? 0) +
+        (counts[Board.white] ?? 0) +
+        (counts[Board.red] ?? 0) +
+        (counts[Board.empty] ?? 0);
+    if (totalCells != 64) return false;
 
     // Check stone counts
-    final counts = board.countStones();
     final total = (counts[Board.black] ?? 0) +
         (counts[Board.white] ?? 0) +
         (counts[Board.red] ?? 0);
@@ -36,7 +40,8 @@ class GameStateValidator {
   ) {
     if (submittedPositions.isEmpty) return true;
 
-    for (final (playerId, position) in submittedPositions.entries) {
+    for (final MapEntry(key: playerId, value: position)
+        in submittedPositions.entries) {
       // Check player exists
       if (!playerIds.contains(playerId)) return false;
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/friend_providers.dart';
-import '../../data/models/friend_model.dart';
 import '../widgets/friend_list_tile.dart';
 import '../widgets/friend_request_card.dart';
 
@@ -17,7 +16,6 @@ class _FriendsScreenState extends ConsumerState<FriendsScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   final _searchController = TextEditingController();
-  bool _showPendingRequests = false;
 
   @override
   void initState() {

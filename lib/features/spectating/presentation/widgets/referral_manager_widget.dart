@@ -32,12 +32,11 @@ class _ReferralManagerWidgetState extends ConsumerState<ReferralManagerWidget> {
   }
 
   void _generateReferralCode() async {
-    final asyncValue = ref.read(createReferralCodeProvider(widget.userId));
-    await asyncValue.then((code) {
-      setState(() {
-        referralCode = code;
-        codeGenerated = true;
-      });
+    final code =
+        await ref.read(createReferralCodeProvider(widget.userId).future);
+    setState(() {
+      referralCode = code;
+      codeGenerated = true;
     });
   }
 

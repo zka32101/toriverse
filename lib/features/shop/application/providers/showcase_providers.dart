@@ -48,7 +48,6 @@ final collectionComparisonProvider = FutureProvider.family<
     CollectionComparison,
     String>((ref, otherUserId) async {
   final service = ref.watch(cosmeticShowcaseServiceProvider);
-  final userId = ref.watch(userIdProvider);
   final firestore = FirebaseFirestore.instance;
 
   // Get both users' cosmetics
@@ -78,18 +77,7 @@ Future<List<CosmeticItem>> _getUserCosmetics(
     try {
       final catalogDoc = await firestore.collection('cosmetics').doc(cosmeticId).get();
       if (catalogDoc.exists) {
-        // Convert to CosmeticItem (simplified)
-        cosmetics.add(CosmeticItem(
-          id: cosmeticId,
-          name: catalogDoc['name'] ?? cosmeticId,
-          description: catalogDoc['description'],
-          type: _parseType(catalogDoc['type']),
-          rarity: _parseRarity(catalogDoc['rarity']),
-          priceJpy: catalogDoc['price_jpy'] ?? 120,
-          purchasedAt: catalogDoc['purchased_at'] != null
-              ? (catalogDoc['purchased_at'] as Timestamp).toDate()
-              : null,
-        ));
+        cosmetics.add(CosmeticItem.fromMap(catalogDoc.data()!));
       }
     } catch (_) {
       // Skip cosmetics that can't be fetched
@@ -99,49 +87,16 @@ Future<List<CosmeticItem>> _getUserCosmetics(
   return cosmetics;
 }
 
-/// Parse cosmetic type from string
-CosmeticType _parseType(String? value) {
-  switch (value) {
-    case 'board':
-      return CosmeticType.board;
-    case 'stone_black':
-      return CosmeticType.stoneBlack;
-    case 'stone_white':
-      return CosmeticType.stoneWhite;
-    case 'stone_red':
-      return CosmeticType.stoneRed;
-    default:
-      return CosmeticType.board;
-  }
-}
-
-/// Parse cosmetic rarity from string
-CosmeticRarity _parseRarity(String? value) {
-  switch (value) {
-    case 'common':
-      return CosmeticRarity.common;
-    case 'rare':
-      return CosmeticRarity.rare;
-    case 'limited':
-      return CosmeticRarity.limited;
-    default:
-      return CosmeticRarity.common;
-  }
-}
-
 /// State notifier for showcase operations
 class ShowcaseNotifier extends StateNotifier<AsyncValue<void>> {
   final FirebaseAnalytics _analytics;
   final String _userId;
-  final CosmeticShowcaseService _showcaseService;
 
   ShowcaseNotifier({
     required FirebaseAnalytics analytics,
     required String userId,
-    required CosmeticShowcaseService showcaseService,
   })  : _analytics = analytics,
         _userId = userId,
-        _showcaseService = showcaseService,
         super(const AsyncValue.data(null));
 
   /// Log collection view event
@@ -235,6 +190,5 @@ final showcaseNotifierProvider =
   return ShowcaseNotifier(
     analytics: FirebaseAnalytics.instance,
     userId: ref.watch(userIdProvider),
-    showcaseService: ref.watch(cosmeticShowcaseServiceProvider),
   );
 });

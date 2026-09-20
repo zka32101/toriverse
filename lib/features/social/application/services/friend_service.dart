@@ -9,7 +9,6 @@ import '../../../social/domain/models/friend_models.dart';
 class FriendService {
   final FirebaseFirestore _firestore;
 
-  static const String _usersCollection = 'users';
   static const String _friendshipsCollection = 'friendships';
 
   FriendService({FirebaseFirestore? firestore})

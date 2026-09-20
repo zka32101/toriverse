@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../match/data/models/user_model.dart';
 import '../../data/models/friend_model.dart';
 
 /// Service for managing friend relationships and requests
@@ -256,7 +255,7 @@ class FriendService {
         .map((snapshot) {
       return snapshot.docs
           .map(
-            (doc) => Friend.fromJson(doc.data() as Map<String, dynamic>),
+            (doc) => Friend.fromJson(doc.data()),
           )
           .toList();
     }).handleError((e) {
@@ -276,7 +275,7 @@ class FriendService {
         .map((snapshot) {
       return snapshot.docs
           .map(
-            (doc) => FriendRequest.fromJson(doc.data() as Map<String, dynamic>),
+            (doc) => FriendRequest.fromJson(doc.data()),
           )
           .toList();
     }).handleError((e) {

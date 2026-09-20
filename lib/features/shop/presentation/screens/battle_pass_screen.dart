@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:toriverse/features/shop/application/providers/battle_pass_providers.dart';
 import 'package:toriverse/features/shop/domain/services/battle_pass_service.dart';
-import 'package:toriverse/shared/services/analytics_service.dart';
 import '../widgets/battle_pass_overview_card.dart';
 import '../widgets/battle_pass_tier_card.dart';
 import '../widgets/premium_pass_upsell.dart';
@@ -23,8 +23,7 @@ class _BattlePassScreenState extends ConsumerState<BattlePassScreen> {
   }
 
   Future<void> _logScreenOpened() async {
-    final analyticsService = AnalyticsService();
-    await analyticsService.logEvent(
+    await FirebaseAnalytics.instance.logEvent(
       name: 'battle_pass_screen_opened',
       parameters: {},
     );
@@ -33,7 +32,6 @@ class _BattlePassScreenState extends ConsumerState<BattlePassScreen> {
   @override
   Widget build(BuildContext context) {
     final progressAsync = ref.watch(userBattlePassProgressProvider);
-    final hasPremiumAsync = ref.watch(hasPremiumPassProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -138,7 +136,7 @@ class _BattlePassScreenState extends ConsumerState<BattlePassScreen> {
             duration: Duration(seconds: 2),
           ),
         );
-        ref.refresh(userBattlePassProgressProvider);
+        ref.invalidate(userBattlePassProgressProvider);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -163,7 +161,7 @@ class _BattlePassScreenState extends ConsumerState<BattlePassScreen> {
             duration: Duration(seconds: 2),
           ),
         );
-        ref.refresh(userBattlePassProgressProvider);
+        ref.invalidate(userBattlePassProgressProvider);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

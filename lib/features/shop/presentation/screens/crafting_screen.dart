@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:toriverse/features/shop/application/providers/crafting_providers.dart';
-import 'package:toriverse/shared/services/analytics_service.dart';
 import '../widgets/crafting_recipe_card.dart';
 import '../widgets/crafting_progress_widget.dart';
 
@@ -21,8 +21,7 @@ class _CraftingScreenState extends ConsumerState<CraftingScreen> {
   }
 
   Future<void> _logScreenOpened() async {
-    final analyticsService = AnalyticsService();
-    await analyticsService.logEvent(
+    await FirebaseAnalytics.instance.logEvent(
       name: 'crafting_screen_opened',
       parameters: {},
     );

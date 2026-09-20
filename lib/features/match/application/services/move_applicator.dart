@@ -80,7 +80,6 @@ class MoveApplicator {
 
       for (int playerIndex = 0; playerIndex < playerIds.length; playerIndex++) {
         final playerId = playerIds[playerIndex];
-        final stoneType = playerIndex == 0 ? Board.black : (playerIndex == 1 ? Board.white : Board.red);
         final stoneCounts_list = [
           stoneCounts[Board.black] ?? 0,
           stoneCounts[Board.white] ?? 0,
@@ -143,13 +142,15 @@ class MoveApplicator {
     final positionMap = <int, List<String>>{};
 
     // Group players by position
-    for (final (playerId, position) in submittedPositions.entries) {
+    for (final MapEntry(key: playerId, value: position)
+        in submittedPositions.entries) {
       positionMap.putIfAbsent(position, () => []).add(playerId);
     }
 
     // Resolve collisions
     final random = Random();
-    for (final (position, players) in positionMap.entries) {
+    for (final MapEntry(key: position, value: players)
+        in positionMap.entries) {
       if (players.length > 1) {
         // Randomly pick winner
         final winner = players[random.nextInt(players.length)];

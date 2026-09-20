@@ -20,9 +20,6 @@ class _CreateTournamentParams {
   final String organizerId;
   final String organizerName;
   final List<String> rules;
-  final bool isFeatured;
-  final String? bannerUrl;
-  final String? logoUrl;
 
   _CreateTournamentParams({
     required this.name,
@@ -35,9 +32,6 @@ class _CreateTournamentParams {
     required this.organizerId,
     required this.organizerName,
     required this.rules,
-    this.isFeatured = false,
-    this.bannerUrl,
-    this.logoUrl,
   });
 
   @override
@@ -67,23 +61,20 @@ final createTournamentProvider = FutureProvider.autoDispose.family<String, _Crea
       organizerId: params.organizerId,
       organizerName: params.organizerName,
       rules: params.rules,
-      isFeatured: params.isFeatured,
-      bannerUrl: params.bannerUrl,
-      logoUrl: params.logoUrl,
     );
   },
 );
 
 // Get tournament parameters
-class _GetTournamentParams {
+class GetTournamentParams {
   final String tournamentId;
 
-  _GetTournamentParams(this.tournamentId);
+  GetTournamentParams(this.tournamentId);
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _GetTournamentParams &&
+      other is GetTournamentParams &&
           runtimeType == other.runtimeType &&
           tournamentId == other.tournamentId;
 
@@ -92,7 +83,7 @@ class _GetTournamentParams {
 }
 
 /// Get tournament details
-final tournamentProvider = FutureProvider.family<Tournament?, _GetTournamentParams>(
+final tournamentProvider = FutureProvider.family<Tournament?, GetTournamentParams>(
   (ref, params) async {
     final repository = ref.watch(tournamentRepositoryProvider);
     return repository.getTournament(params.tournamentId);
@@ -100,7 +91,7 @@ final tournamentProvider = FutureProvider.family<Tournament?, _GetTournamentPara
 );
 
 /// Watch tournament for real-time updates
-final tournamentStreamProvider = StreamProvider.family<Tournament?, _GetTournamentParams>(
+final tournamentStreamProvider = StreamProvider.family<Tournament?, GetTournamentParams>(
   (ref, params) {
     final repository = ref.watch(tournamentRepositoryProvider);
     return repository.watchTournament(params.tournamentId);
@@ -182,32 +173,30 @@ final startTournamentProvider = FutureProvider.autoDispose.family<void, _OpenReg
 // Get matches parameters
 class _GetMatchesParams {
   final String tournamentId;
-  final int? round;
 
-  _GetMatchesParams({required this.tournamentId, this.round});
+  _GetMatchesParams({required this.tournamentId});
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is _GetMatchesParams &&
           runtimeType == other.runtimeType &&
-          tournamentId == other.tournamentId &&
-          round == other.round;
+          tournamentId == other.tournamentId;
 
   @override
-  int get hashCode => tournamentId.hashCode ^ (round?.hashCode ?? 0);
+  int get hashCode => tournamentId.hashCode;
 }
 
 /// Get tournament matches
 final tournamentMatchesProvider = FutureProvider.family<List<TournamentMatch>, _GetMatchesParams>(
   (ref, params) async {
     final repository = ref.watch(tournamentRepositoryProvider);
-    return repository.getMatches(params.tournamentId, round: params.round);
+    return repository.getMatches(params.tournamentId);
   },
 );
 
 /// Watch live matches
-final liveMatchesProvider = StreamProvider.family<List<TournamentMatch>, _GetTournamentParams>(
+final liveMatchesProvider = StreamProvider.family<List<TournamentMatch>, GetTournamentParams>(
   (ref, params) {
     final repository = ref.watch(tournamentRepositoryProvider);
     return repository.watchLiveMatches(params.tournamentId);
@@ -295,7 +284,7 @@ final completeMatchProvider = FutureProvider.autoDispose.family<void, _CompleteM
 );
 
 /// Get tournament standings
-final standingsProvider = FutureProvider.family<List<TournamentParticipant>, _GetTournamentParams>(
+final standingsProvider = FutureProvider.family<List<TournamentParticipant>, GetTournamentParams>(
   (ref, params) async {
     final repository = ref.watch(tournamentRepositoryProvider);
     return repository.getStandings(params.tournamentId);
@@ -303,7 +292,7 @@ final standingsProvider = FutureProvider.family<List<TournamentParticipant>, _Ge
 );
 
 /// Watch tournament standings for real-time updates
-final standingsStreamProvider = StreamProvider.family<List<TournamentParticipant>, _GetTournamentParams>(
+final standingsStreamProvider = StreamProvider.family<List<TournamentParticipant>, GetTournamentParams>(
   (ref, params) {
     final repository = ref.watch(tournamentRepositoryProvider);
     return repository.watchStandings(params.tournamentId);
@@ -438,7 +427,7 @@ final featuredMatchesStreamProvider = StreamProvider<List<FeaturedMatch>>((ref) 
 });
 
 /// Get tournament highlights
-final highlightsProvider = FutureProvider.family<List<TournamentHighlight>, _GetTournamentParams>(
+final highlightsProvider = FutureProvider.family<List<TournamentHighlight>, GetTournamentParams>(
   (ref, params) async {
     final repository = ref.watch(tournamentRepositoryProvider);
     return repository.getHighlights(params.tournamentId);

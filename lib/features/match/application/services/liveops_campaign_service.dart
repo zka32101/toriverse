@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../shared/services/remote_config_service.dart';
+import 'package:toriverse/shared/services/remote_config_service.dart';
 
 /// Service for managing LiveOps campaigns and seasonal events
 ///
@@ -14,9 +14,9 @@ class LiveOpsCampaignService {
 
   LiveOpsCampaignService({
     FirebaseFirestore? firestore,
-    required RemoteConfigService remoteConfig,
+    RemoteConfigService? remoteConfig,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _remoteConfig = remoteConfig;
+        _remoteConfig = remoteConfig ?? RemoteConfigService();
 
   /// Fetch all active campaigns
   ///

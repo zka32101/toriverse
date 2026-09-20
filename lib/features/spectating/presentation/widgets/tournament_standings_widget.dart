@@ -17,7 +17,7 @@ class TournamentStandingsWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final standingsAsync = ref.watch(
-      standingsStreamProvider(_GetTournamentParams(tournamentId)),
+      standingsStreamProvider(GetTournamentParams(tournamentId)),
     );
 
     return standingsAsync.when(

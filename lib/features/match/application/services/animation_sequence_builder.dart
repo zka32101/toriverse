@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../../../data/models/round_result_model.dart';
+import '../../data/models/round_result_model.dart';
 import '../providers/animation_orchestrator_provider.dart';
 
 /// Builds animation sequences from game events
@@ -174,8 +174,8 @@ class AnimationSequenceBuilder {
             winnerIndex: playerIndices.indexWhere(
               (idx) => idx.toString() == collision.winnerPlayerId,
             ),
-            boardRow: collision.position[0],
-            boardCol: collision.position[1],
+            boardRow: collision.position ~/ 8,
+            boardCol: collision.position % 8,
             durationMs: 4000,
           ),
         );

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:toriverse/features/spectating/application/providers/tournament_providers.dart';
 import 'package:toriverse/features/spectating/domain/models/tournament.dart';
 
 /// Tournament browser and discovery widget

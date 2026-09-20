@@ -14,7 +14,7 @@ final streamerVerificationProvider = FutureProvider.family<StreamerVerification,
 });
 
 /// Check tier upgrade eligibility
-final tierUpgradeEligibilityProvider = FutureProvider.family<TierUpgradeEligibility, _CheckTierEligibilityParams>((ref, params) async {
+final tierUpgradeEligibilityProvider = FutureProvider.family<TierUpgradeEligibility, CheckTierEligibilityParams>((ref, params) async {
   final repo = ref.watch(influencerProgramRepositoryProvider);
   return repo.checkTierUpgradeEligibility(params.userId, params.nextTier);
 });
@@ -45,7 +45,7 @@ final streamerReferralsProvider = StreamProvider.family<List<ReferralRecord>, St
 });
 
 /// Get streamer analytics
-final streamerAnalyticsProvider = FutureProvider.family<StreamerAnalytics, _GetAnalyticsParams>((ref, params) async {
+final streamerAnalyticsProvider = FutureProvider.family<StreamerAnalytics, GetAnalyticsParams>((ref, params) async {
   final repo = ref.watch(influencerProgramRepositoryProvider);
   return repo.getStreamerAnalytics(
     userId: params.userId,
@@ -59,7 +59,6 @@ final streamerLeaderboardProvider = FutureProvider.family<List<StreamerLeaderboa
   final repo = ref.watch(influencerProgramRepositoryProvider);
   return repo.getStreamerLeaderboard(
     metric: params.metric,
-    limit: params.limit,
   );
 });
 
@@ -102,11 +101,11 @@ final suspendStreamerProvider = FutureProvider.autoDispose.family<void, _Suspend
 // ============================================================================
 
 /// Parameters for checking tier upgrade eligibility
-class _CheckTierEligibilityParams {
+class CheckTierEligibilityParams {
   final String userId;
   final StreamerTier nextTier;
 
-  _CheckTierEligibilityParams({
+  CheckTierEligibilityParams({
     required this.userId,
     required this.nextTier,
   });
@@ -114,7 +113,7 @@ class _CheckTierEligibilityParams {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _CheckTierEligibilityParams &&
+      other is CheckTierEligibilityParams &&
           runtimeType == other.runtimeType &&
           userId == other.userId &&
           nextTier == other.nextTier;
@@ -168,12 +167,12 @@ class _ClaimReferralParams {
 }
 
 /// Parameters for getting analytics
-class _GetAnalyticsParams {
+class GetAnalyticsParams {
   final String userId;
   final DateTime periodStart;
   final DateTime periodEnd;
 
-  _GetAnalyticsParams({
+  GetAnalyticsParams({
     required this.userId,
     required this.periodStart,
     required this.periodEnd,
@@ -182,7 +181,7 @@ class _GetAnalyticsParams {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _GetAnalyticsParams &&
+      other is GetAnalyticsParams &&
           runtimeType == other.runtimeType &&
           userId == other.userId &&
           periodStart == other.periodStart &&
@@ -195,11 +194,9 @@ class _GetAnalyticsParams {
 /// Parameters for getting leaderboard
 class _GetLeaderboardParams {
   final String metric;
-  final int limit;
 
   _GetLeaderboardParams({
     required this.metric,
-    this.limit = 50,
   });
 
   @override
@@ -207,11 +204,10 @@ class _GetLeaderboardParams {
       identical(this, other) ||
       other is _GetLeaderboardParams &&
           runtimeType == other.runtimeType &&
-          metric == other.metric &&
-          limit == other.limit;
+          metric == other.metric;
 
   @override
-  int get hashCode => metric.hashCode ^ limit.hashCode;
+  int get hashCode => metric.hashCode;
 }
 
 /// Parameters for awarding badge

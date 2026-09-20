@@ -117,8 +117,11 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
                             const SizedBox(height: 4),
                             userPreference.when(
                               data: (pref) {
-                                final isActive = pref.activeCosmeticIds
-                                    .contains(widget.cosmetic.id);
+                                final isActive = _activeCosmeticIdFor(
+                                      pref,
+                                      widget.cosmetic.type,
+                                    ) ==
+                                    widget.cosmetic.id;
                                 return SizedBox(
                                   width: double.infinity,
                                   height: 28,
@@ -176,7 +179,7 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '¥${widget.cosmetic.priceJpy}',
+                              '¥${widget.cosmetic.price}',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodySmall
@@ -255,7 +258,7 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
       cosmeticId: widget.cosmetic.id,
       cosmeticType: widget.cosmetic.typeString,
       rarity: widget.cosmetic.rarity.toString().split('.').last,
-      priceYen: widget.cosmetic.priceJpy,
+      priceYen: widget.cosmetic.price,
       isOwned: isOwned,
     );
   }
@@ -265,7 +268,7 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
     try {
       await ref
           .read(cosmeticsShopNotifierProvider.notifier)
-          .purchaseCosmetic(widget.cosmetic.id);
+          .purchaseCosmetic(widget.cosmetic);
 
       if (!mounted) return;
 
@@ -297,7 +300,7 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
       cosmeticId: widget.cosmetic.id,
       cosmeticType: widget.cosmetic.typeString,
       rarity: widget.cosmetic.rarity.toString().split('.').last,
-      priceYen: widget.cosmetic.priceJpy,
+      priceYen: widget.cosmetic.price,
       paymentMethod: 'in_app',
     );
   }
@@ -323,7 +326,7 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
     try {
       await ref
           .read(cosmeticsShopNotifierProvider.notifier)
-          .setActiveCosmectic(widget.cosmetic.id);
+          .setActiveCosmectic(widget.cosmetic.id, widget.cosmetic.type);
 
       if (!mounted) return;
 
@@ -348,6 +351,23 @@ class _CosmeticItemCardState extends ConsumerState<CosmeticItemCard> {
       cosmeticType: widget.cosmetic.typeString,
       rarity: widget.cosmetic.rarity.toString().split('.').last,
     );
+  }
+
+  /// Get the currently active cosmetic ID for [type] from [pref]
+  String _activeCosmeticIdFor(
+    UserCosmeticsPreference pref,
+    CosmeticType type,
+  ) {
+    switch (type) {
+      case CosmeticType.board:
+        return pref.activeBoard;
+      case CosmeticType.stoneBlack:
+        return pref.activeStoneBlack;
+      case CosmeticType.stoneWhite:
+        return pref.activeStoneWhite;
+      case CosmeticType.stoneRed:
+        return pref.activeStoneRed;
+    }
   }
 
   Color _getCosmeticPreviewColor(CosmeticItem cosmetic) {
@@ -434,7 +454,7 @@ class _CosmeticDetailDialog extends ConsumerWidget {
 
             // Description
             Text(
-              cosmetic.description ?? 'No description available',
+              cosmetic.description,
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             const SizedBox(height: 12),
@@ -464,7 +484,7 @@ class _CosmeticDetailDialog extends ConsumerWidget {
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 Text(
-                  '¥${cosmetic.priceJpy}',
+                  '¥${cosmetic.price}',
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),

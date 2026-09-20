@@ -27,7 +27,7 @@ class TierUpgradeCard extends ConsumerWidget {
     }
 
     final eligibility = ref.watch(tierUpgradeEligibilityProvider(
-      _CheckTierEligibilityParams(
+      CheckTierEligibilityParams(
         userId: userId,
         nextTier: nextTier,
       ),

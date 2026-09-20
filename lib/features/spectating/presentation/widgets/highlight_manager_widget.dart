@@ -365,7 +365,7 @@ class _HighlightManagerWidgetState extends ConsumerState<HighlightManagerWidget>
       case HighlightType.close_call:
         return Colors.yellow;
       case HighlightType.championship:
-        return Colors.gold;
+        return gold;
     }
   }
 

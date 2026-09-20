@@ -9,7 +9,6 @@ import '../../../profile/domain/models/player_profile_models.dart';
 class PlayerProfileService {
   final FirebaseFirestore _firestore;
 
-  static const String _usersCollection = 'users';
   static const String _profilesCollection = 'profiles';
   static const String _achievementsCollection = 'achievements';
 

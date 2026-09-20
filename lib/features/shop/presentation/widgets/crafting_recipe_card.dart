@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:toriverse/features/shop/domain/services/cosmetics_crafting_service.dart';
 import 'package:toriverse/features/shop/application/providers/crafting_providers.dart';
-import 'package:toriverse/shared/services/analytics_service.dart';
 
 /// Card widget displaying a crafting recipe
 class CraftingRecipeCard extends ConsumerStatefulWidget {
@@ -234,7 +234,7 @@ class _CraftingRecipeCardState extends ConsumerState<CraftingRecipeCard> {
         );
 
         // Refresh data
-        ref.refresh(userCraftingProgressProvider);
+        ref.invalidate(userCraftingProgressProvider);
       } else {
         _logCraftStartFailed('unknown');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -263,8 +263,7 @@ class _CraftingRecipeCardState extends ConsumerState<CraftingRecipeCard> {
   }
 
   void _logCraftStarted() {
-    final analyticsService = AnalyticsService();
-    analyticsService.logEvent(
+    FirebaseAnalytics.instance.logEvent(
       name: 'craft_started',
       parameters: {
         'cosmetic_id': widget.recipe.resultId,
@@ -275,8 +274,7 @@ class _CraftingRecipeCardState extends ConsumerState<CraftingRecipeCard> {
   }
 
   void _logCraftStartFailed(String reason) {
-    final analyticsService = AnalyticsService();
-    analyticsService.logEvent(
+    FirebaseAnalytics.instance.logEvent(
       name: 'craft_start_failed',
       parameters: {
         'cosmetic_id': widget.recipe.resultId,

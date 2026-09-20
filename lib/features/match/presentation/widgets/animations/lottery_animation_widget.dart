@@ -158,7 +158,6 @@ class _LotteryAnimationWidgetState extends State<LotteryAnimationWidget>
     final cards = <Widget>[];
 
     for (int i = 0; i < widget.processOrder.length; i++) {
-      final playerId = widget.processOrder[i];
       final playerName = widget.playerNames[i];
       final playerIndexInList = widget.playerIndices[i];
       final stoneColor = ToriverseTheme.getStoneColor(playerIndexInList);

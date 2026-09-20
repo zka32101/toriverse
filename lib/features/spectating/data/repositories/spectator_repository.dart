@@ -16,6 +16,10 @@ class SpectatorRepository {
 
   SpectatorRepository(this._firestore, this._auth);
 
+  /// The Firebase Auth instance backing this repository (used by callers
+  /// that need to check/verify the current spectator's identity).
+  FirebaseAuth get auth => _auth;
+
   /// Watch all spectators currently watching a match (real-time stream)
   Stream<List<SpectatorSession>> watchMatchSpectators(String matchId) {
     return _firestore
@@ -190,7 +194,7 @@ class SpectatorRepository {
         .count()
         .get();
 
-    return snapshot.count;
+    return snapshot.count ?? 0;
   }
 
   /// Get match metadata including spectator info

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../config/theme.dart';
 import '../../data/models/round_result_model.dart';
-import 'animations/animations_barrel.dart';
 
 /// 同時公開・くじ引き演出ウィジェット（GAME_DESIGN_UI_REFORM.md §3.3）
 ///

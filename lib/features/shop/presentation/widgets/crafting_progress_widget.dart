@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:toriverse/features/shop/application/providers/crafting_providers.dart';
-import 'package:toriverse/shared/services/analytics_service.dart';
 
 /// Widget showing active crafting progress
 class CraftingProgressWidget extends ConsumerStatefulWidget {
@@ -204,7 +204,7 @@ class _CraftingProgressWidgetState extends ConsumerState<CraftingProgressWidget>
         );
 
         // Refresh data
-        ref.refresh(userCraftingProgressProvider);
+        ref.invalidate(userCraftingProgressProvider);
       } else {
         _logCraftClaimFailed('unknown');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -229,8 +229,7 @@ class _CraftingProgressWidgetState extends ConsumerState<CraftingProgressWidget>
   }
 
   void _logCraftClaimed() {
-    final analyticsService = AnalyticsService();
-    analyticsService.logEvent(
+    FirebaseAnalytics.instance.logEvent(
       name: 'craft_claimed',
       parameters: {
         'cosmetic_id': widget.progress.cosmeticId,
@@ -244,8 +243,7 @@ class _CraftingProgressWidgetState extends ConsumerState<CraftingProgressWidget>
   }
 
   void _logCraftClaimFailed(String reason) {
-    final analyticsService = AnalyticsService();
-    analyticsService.logEvent(
+    FirebaseAnalytics.instance.logEvent(
       name: 'craft_claim_failed',
       parameters: {
         'cosmetic_id': widget.progress.cosmeticId,
@@ -273,7 +271,7 @@ class _CraftingProgressWidgetState extends ConsumerState<CraftingProgressWidget>
 
 /// Claim button with loading state
 class _ClaimButton extends ConsumerStatefulWidget {
-  final VoidCallback onPressed;
+  final Future<void> Function() onPressed;
 
   const _ClaimButton({
     required this.onPressed,

@@ -14,7 +14,6 @@ final userBattlePassProgressProvider =
     StreamProvider<UserBattlePassProgress?>((ref) {
   final userId = ref.watch(userIdProvider);
   final firestore = FirebaseFirestore.instance;
-  final battlePassService = ref.watch(battlePassServiceProvider);
 
   return firestore
       .collection('users')

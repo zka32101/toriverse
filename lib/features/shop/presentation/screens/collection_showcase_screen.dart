@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:toriverse/features/shop/application/providers/showcase_providers.dart';
-import 'package:toriverse/shared/services/analytics_service.dart';
+import 'package:toriverse/shared/models/cosmetic_item.dart';
 import '../widgets/collection_summary_card.dart';
 import '../widgets/collection_grid.dart';
 import '../widgets/achievement_badges.dart';
@@ -25,8 +26,7 @@ class _CollectionShowcaseScreenState
   }
 
   Future<void> _logScreenOpened() async {
-    final analyticsService = AnalyticsService();
-    await analyticsService.logEvent(
+    await FirebaseAnalytics.instance.logEvent(
       name: 'collection_showcase_opened',
       parameters: {},
     );
@@ -161,10 +161,17 @@ class _CollectionShowcaseScreenState
           '進捗: ${completion.toStringAsFixed(1)}%\n\n'
           '#トリバース #cosmetics';
 
-      await Share.share(shareText, subject: 'マイコレクション');
+      // `share_plus` is not available as a dependency in this project, so
+      // sharing falls back to copying the summary to the clipboard.
+      await Clipboard.setData(ClipboardData(text: shareText));
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('コレクション情報をコピーしました')),
+      );
 
       ref.read(showcaseNotifierProvider.notifier).logCollectionShared(
-            platform: 'share',
+            platform: 'clipboard',
             cosmeticCount: showcase.totalOwned,
           );
     } catch (e) {
@@ -223,5 +230,3 @@ class _RaritySection extends StatelessWidget {
     );
   }
 }
-
-import 'package:toriverse/shared/models/cosmetic_item.dart';

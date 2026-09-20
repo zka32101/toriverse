@@ -1,6 +1,8 @@
+import 'dart:convert';
+import 'dart:io' show Platform;
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'dart:io' show Platform;
 
 /// Service for managing Firebase Cloud Messaging and local notifications
 ///
@@ -40,7 +42,7 @@ class FirebaseMessagingService {
           alert: true,
           announcement: true,
           badge: true,
-          carefullyChoosedOption: false,
+          carPlay: false,
           criticalAlert: false,
           provisional: false,
           sound: true,
@@ -104,43 +106,43 @@ class FirebaseMessagingService {
 
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          id: 'milestone_channel',
-          name: 'Milestone Notifications',
+          'milestone_channel',
+          'Milestone Notifications',
           description: 'Notifications for streak milestones',
           importance: Importance.high,
-          enableSound: true,
+          playSound: true,
           enableVibration: true,
         ),
       );
 
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          id: 'streak_reset_channel',
-          name: 'Streak Recovery',
+          'streak_reset_channel',
+          'Streak Recovery',
           description: 'Notifications to help recover streaks',
           importance: Importance.high,
-          enableSound: true,
+          playSound: true,
           enableVibration: true,
         ),
       );
 
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          id: 'campaign_channel',
-          name: 'Campaigns & Events',
+          'campaign_channel',
+          'Campaigns & Events',
           description: 'Notifications for seasonal events and campaigns',
-          importance: Importance.default_,
-          enableSound: true,
+          importance: Importance.defaultImportance,
+          playSound: true,
         ),
       );
 
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
-          id: 'match_channel',
-          name: 'Match Updates',
+          'match_channel',
+          'Match Updates',
           description: 'Notifications for match availability',
-          importance: Importance.default_,
-          enableSound: false,
+          importance: Importance.defaultImportance,
+          playSound: false,
         ),
       );
     } catch (e) {
@@ -249,7 +251,6 @@ class FirebaseMessagingService {
             priority: Priority.high,
             showWhen: true,
             enableVibration: true,
-            enableSound: true,
             playSound: true,
           ),
           iOS: const DarwinNotificationDetails(
@@ -314,6 +315,3 @@ class FirebaseMessagingService {
     }
   }
 }
-
-/// Import for jsonEncode/jsonDecode
-import 'dart:convert';

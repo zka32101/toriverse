@@ -355,7 +355,7 @@ class AnalyticsService {
     required bool isPaidSubscriber,
   }) async {
     try {
-      await _analytics.setUserId(userId);
+      await _analytics.setUserId(id: userId);
       await _analytics.setUserProperty(
         name: 'account_age_minutes',
         value: accountAgeMinutes.toString(),

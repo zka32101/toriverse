@@ -11,20 +11,17 @@ final seasonalCosmeticsServiceProvider = Provider<SeasonalCosmeticsService>((ref
 
 /// Provider for current season
 final currentSeasonProvider = Provider<Season?>((ref) {
-  final service = ref.watch(seasonalCosmeticsServiceProvider);
-  return service.getCurrentSeason();
+  return SeasonalCosmeticsService.getCurrentSeason();
 });
 
 /// Provider for next upcoming season
 final nextSeasonProvider = Provider<Season?>((ref) {
-  final service = ref.watch(seasonalCosmeticsServiceProvider);
-  return service.getNextSeason();
+  return SeasonalCosmeticsService.getNextSeason();
 });
 
 /// Provider for cosmetics in current season
 final currentSeasonalCosmeticsProvider =
     FutureProvider<List<CosmeticItem>>((ref) async {
-  final service = ref.watch(seasonalCosmeticsServiceProvider);
   final allCosmetics = await ref.watch(availableCosmeticsProvider.future);
   final currentSeason = ref.watch(currentSeasonProvider);
 
@@ -38,16 +35,14 @@ final currentSeasonalCosmeticsProvider =
 /// Provider for cosmetics expiring within N days
 final cosmeticsExpiringProvider =
     FutureProvider.family<List<String>, int>((ref, days) {
-  final service = ref.watch(seasonalCosmeticsServiceProvider);
-  return service.getCosmeticsExpiringWithin(days);
+  return SeasonalCosmeticsService.getCosmeticsExpiringWithin(days);
 });
 
 /// Provider for archived (unavailable) cosmetics
 final archivedCosmeticsProvider =
     FutureProvider<List<CosmeticItem>>((ref) async {
-  final service = ref.watch(seasonalCosmeticsServiceProvider);
   final allCosmetics = await ref.watch(availableCosmeticsProvider.future);
-  final archived = service.getArchivedCosmetics();
+  final archived = SeasonalCosmeticsService.getArchivedCosmetics();
 
   return allCosmetics
       .where((cosmetic) => archived.contains(cosmetic.id))
@@ -56,31 +51,26 @@ final archivedCosmeticsProvider =
 
 /// Provider for days until current season ends
 final daysUntilSeasonEndProvider = Provider<int>((ref) {
-  final service = ref.watch(seasonalCosmeticsServiceProvider);
   final currentSeason = ref.watch(currentSeasonProvider);
 
   if (currentSeason == null) return 0;
 
-  return service.getDaysUntilSeasonEnd(currentSeason);
+  return SeasonalCosmeticsService.getDaysUntilSeasonEnd(currentSeason);
 });
 
 /// Provider for availability status text
 final cosmeticAvailabilityProvider =
     Provider.family<String, String>((ref, cosmeticId) {
-  final service = ref.watch(seasonalCosmeticsServiceProvider);
-  return service.getAvailabilityStatus(cosmeticId);
+  return SeasonalCosmeticsService.getAvailabilityStatus(cosmeticId);
 });
 
 /// State notifier for seasonal operations
 class SeasonalNotifier extends StateNotifier<AsyncValue<void>> {
   final FirebaseAnalytics _analytics;
-  final SeasonalCosmeticsService _seasonalService;
 
   SeasonalNotifier({
     required FirebaseAnalytics analytics,
-    required SeasonalCosmeticsService seasonalService,
   })  : _analytics = analytics,
-        _seasonalService = seasonalService,
         super(const AsyncValue.data(null));
 
   /// Log seasonal cosmetic viewed event
@@ -177,6 +167,5 @@ final seasonalNotifierProvider =
     StateNotifierProvider<SeasonalNotifier, AsyncValue<void>>((ref) {
   return SeasonalNotifier(
     analytics: FirebaseAnalytics.instance,
-    seasonalService: ref.watch(seasonalCosmeticsServiceProvider),
   );
 });

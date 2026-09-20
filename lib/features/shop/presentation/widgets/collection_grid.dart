@@ -138,7 +138,7 @@ class _CosmeticGridItem extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                cosmetic.description ?? 'No description',
+                cosmetic.description,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               const SizedBox(height: 12),

@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:toriverse/features/organizing/domain/models/organizer.dart';
 
 /// Repository for tournament organization and management
@@ -8,13 +7,10 @@ import 'package:toriverse/features/organizing/domain/models/organizer.dart';
 /// participant management, and payout processing.
 class OrganizerRepository {
   final FirebaseFirestore _firestore;
-  final FirebaseAuth _auth;
 
   OrganizerRepository({
     FirebaseFirestore? firestore,
-    FirebaseAuth? auth,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _auth = auth ?? FirebaseAuth.instance;
+  }) : _firestore = firestore ?? FirebaseFirestore.instance;
 
   // ============================================================================
   // ORGANIZER PROFILE OPERATIONS
@@ -128,7 +124,7 @@ class OrganizerRepository {
         prizePool: prizePool,
       );
 
-      final docRef = await _firestore.collection('tournaments').add(draft.toJson());
+      await _firestore.collection('tournaments').add(draft.toJson());
 
       return draft.copyWith(); // Add ID if needed
     } catch (e) {
