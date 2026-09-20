@@ -114,15 +114,26 @@ class RoundResolutionService {
       previousBonusActivations: bonusActivationCounts,
     );
 
+    // Recompute the resulting board using the same process order the
+    // result was actually built with, since RoundResultModel itself
+    // doesn't carry board state (that lives on MatchModel).
+    final boardAfter = MoveApplicator.computeAppliedBoard(
+      boardBefore: boardBefore,
+      playerIds: playerIds,
+      processOrder: result.processOrder,
+      submittedPositions: submittedPositions,
+      collisions: result.collisionResolved,
+    );
+
     // Check if game is over
-    final isGameOver = processor.isGameOver(result.boardAfter);
+    final isGameOver = processor.isGameOver(boardAfter);
     final winners = isGameOver
-        ? processor.determineWinners(result.boardAfter, playerIds)
+        ? processor.determineWinners(boardAfter, playerIds)
         : <String>[];
 
     return RoundResolution(
       result: result,
-      boardAfter: result.boardAfter,
+      boardAfter: boardAfter,
       isGameOver: isGameOver,
       winners: winners,
     );

@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 import '../../data/models/match_model.dart';
 import '../../data/repositories/match_repository.dart';
-import 'game_state.dart';
 
 /// Match initialization state
 class MatchInitializationState {

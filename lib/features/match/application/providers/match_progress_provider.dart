@@ -1,6 +1,5 @@
 import 'package:riverpod/riverpod.dart';
 import 'firestore_match_provider.dart';
-import '../services/firebase_error_handler.dart';
 
 /// Represents the progress state of a match
 class MatchProgressState {
@@ -107,7 +106,7 @@ final matchProgressProvider = StateNotifierProvider.family<
 /// Stream provider for sync-from-firestore (optional secondary sync)
 final matchProgressFromFirestoreProvider =
     StreamProvider.family<MatchProgressState?, String>((ref, matchId) {
-  final firestoreRepo = ref.watch(firestoreRepositoryProvider);
+  ref.watch(firestoreRepositoryProvider);
   // This would be implemented to stream match progress from Firestore
   // For now, returns null as the primary source is the local StateNotifier
   return const Stream.empty();

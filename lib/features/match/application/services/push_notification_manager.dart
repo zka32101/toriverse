@@ -35,52 +35,6 @@ class PushNotificationManager {
     }
   }
 
-  /// Handle milestone achievement notification tap
-  void _handleMilestoneNotification(Map<String, dynamic> data) {
-    try {
-      final milestone = int.tryParse(data['milestone'] ?? '');
-      if (milestone != null) {
-        // Navigate to match result screen with celebration
-        // In real implementation, would use navigation context
-      }
-    } catch (e) {
-      // Silent fail
-    }
-  }
-
-  /// Handle streak reset recovery notification tap
-  void _handleStreakResetNotification(Map<String, dynamic> data) {
-    try {
-      final streakLost = int.tryParse(data['streak_lost'] ?? '');
-      if (streakLost != null) {
-        // Show recovery prompt or navigate to home
-      }
-    } catch (e) {
-      // Silent fail
-    }
-  }
-
-  /// Handle campaign/seasonal event notification tap
-  void _handleCampaignNotification(Map<String, dynamic> data) {
-    try {
-      final campaignId = data['campaign_id'] as String?;
-      if (campaignId != null) {
-        // Navigate to campaign details screen
-      }
-    } catch (e) {
-      // Silent fail
-    }
-  }
-
-  /// Handle match available notification tap
-  void _handleMatchAvailableNotification(Map<String, dynamic> data) {
-    try {
-      // Navigate to matchmaking screen
-    } catch (e) {
-      // Silent fail
-    }
-  }
-
   /// Send milestone achievement notification
   ///
   /// Called server-side after milestone is confirmed.

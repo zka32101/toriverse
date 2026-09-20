@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../../config/theme.dart';
 import '../../../application/providers/animation_orchestrator_provider.dart';
 import 'weak_bonus_animation_widget.dart';
 import 'rescue_card_animation_widget.dart';
@@ -142,9 +141,6 @@ class AnimationOverlay extends ConsumerWidget {
             ],
           ),
         );
-
-      default:
-        return const SizedBox.shrink();
     }
   }
 }

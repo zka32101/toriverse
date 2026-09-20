@@ -31,28 +31,13 @@ class MoveApplicator {
     final collisions = _detectCollisions(submittedPositions, playerIds);
 
     // Step 2: Apply moves in process order (excluding losers of collisions)
-    final boardAfter = boardBefore.clone();
-    final appliedMoves = <String>{};
-
-    for (final playerId in processOrder) {
-      final position = submittedPositions[playerId];
-      if (position == null) continue;
-
-      // Skip if this player lost a collision
-      if (collisions.any((c) => c.losers.contains(playerId))) {
-        continue;
-      }
-
-      final row = position ~/ 8;
-      final col = position % 8;
-      final playerIndex = playerIds.indexOf(playerId);
-
-      // Only apply if move is still valid on current board state
-      if (boardAfter.getValidMoves(playerIndex).any((m) => m[0] == row && m[1] == col)) {
-        boardAfter.placeStone(row, col, playerIndex);
-        appliedMoves.add(playerId);
-      }
-    }
+    final boardAfter = computeAppliedBoard(
+      boardBefore: boardBefore,
+      playerIds: playerIds,
+      processOrder: processOrder,
+      submittedPositions: submittedPositions,
+      collisions: collisions,
+    );
 
     // Step 3: Build submitted moves list
     final submittedMoves = <SubmittedMove>[];
@@ -131,6 +116,44 @@ class MoveApplicator {
       bonusTriggered: bonusTriggeredPlayerId,
       rescueCardsGranted: _getRescueCardRecipients(collisions),
     );
+  }
+
+  /// Apply moves to a cloned board in process order, skipping collision losers
+  /// and moves that are no longer valid by the time they're applied.
+  ///
+  /// Shared by [applyRoundMoves] and by callers (e.g. round resolution) that
+  /// need the resulting board independently, using the same [processOrder]
+  /// that was actually used (e.g. from a previously-built [RoundResultModel])
+  /// so the outcome is reproducible.
+  static Board computeAppliedBoard({
+    required Board boardBefore,
+    required List<String> playerIds,
+    required List<String> processOrder,
+    required Map<String, int> submittedPositions,
+    required List<CollisionResolution> collisions,
+  }) {
+    final boardAfter = boardBefore.clone();
+
+    for (final playerId in processOrder) {
+      final position = submittedPositions[playerId];
+      if (position == null) continue;
+
+      // Skip if this player lost a collision
+      if (collisions.any((c) => c.losers.contains(playerId))) {
+        continue;
+      }
+
+      final row = position ~/ 8;
+      final col = position % 8;
+      final playerIndex = playerIds.indexOf(playerId);
+
+      // Only apply if move is still valid on current board state
+      if (boardAfter.getValidMoves(playerIndex).any((m) => m[0] == row && m[1] == col)) {
+        boardAfter.placeStone(row, col, playerIndex);
+      }
+    }
+
+    return boardAfter;
   }
 
   /// Detect moves where 2+ players submitted the same position

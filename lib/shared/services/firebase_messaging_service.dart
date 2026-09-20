@@ -102,7 +102,7 @@ class FirebaseMessagingService {
   /// Create Android notification channels
   Future<void> _createNotificationChannels() async {
     try {
-      const androidPlugin = AndroidFlutterLocalNotificationsPlugin();
+      final androidPlugin = AndroidFlutterLocalNotificationsPlugin();
 
       await androidPlugin.createNotificationChannel(
         const AndroidNotificationChannel(
