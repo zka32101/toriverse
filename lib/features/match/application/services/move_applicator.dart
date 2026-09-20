@@ -30,16 +30,7 @@ class MoveApplicator {
     // Step 1: Detect same-square collisions
     final collisions = _detectCollisions(submittedPositions, playerIds);
 
-    // Step 2: Apply moves in process order (excluding losers of collisions)
-    final boardAfter = computeAppliedBoard(
-      boardBefore: boardBefore,
-      playerIds: playerIds,
-      processOrder: processOrder,
-      submittedPositions: submittedPositions,
-      collisions: collisions,
-    );
-
-    // Step 3: Build submitted moves list
+    // Step 2: Build submitted moves list
     final submittedMoves = <SubmittedMove>[];
     for (final playerId in playerIds) {
       final position = submittedPositions[playerId];
