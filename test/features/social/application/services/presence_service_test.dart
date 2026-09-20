@@ -13,12 +13,19 @@ class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 class MockCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
+class MockQueryDocumentSnapshot extends Mock
+    implements QueryDocumentSnapshot<Map<String, dynamic>> {}
+
+// ignore: subtype_of_sealed_class
 class MockQuery extends Mock implements Query<Map<String, dynamic>> {}
 
 class MockQuerySnapshot extends Mock
@@ -209,12 +216,12 @@ void main() {
         final mockSnapshot = MockQuerySnapshot();
         final now = DateTime.now();
 
-        final doc1 = MockDocumentSnapshot();
+        final doc1 = MockQueryDocumentSnapshot();
         when(() => doc1.id).thenReturn('uid1');
         when(() => doc1['isOnline']).thenReturn(true);
         when(() => doc1['lastSeenAt']).thenReturn(now.toIso8601String());
 
-        final doc2 = MockDocumentSnapshot();
+        final doc2 = MockQueryDocumentSnapshot();
         when(() => doc2.id).thenReturn('uid2');
         when(() => doc2['isOnline']).thenReturn(false);
         when(() => doc2['lastSeenAt']).thenReturn(now.toIso8601String());
@@ -290,7 +297,7 @@ void main() {
         final mockQuery = MockQuery();
         final mockSnapshot = MockQuerySnapshot();
 
-        final doc1 = MockDocumentSnapshot();
+        final doc1 = MockQueryDocumentSnapshot();
         when(() => doc1.reference).thenReturn(MockDocumentReference());
         when(() => doc1.reference.delete()).thenAnswer((_) async => {});
 

@@ -80,7 +80,7 @@ void main() {
       });
 
       test('subscribeToCohortTopic handles common cohorts', () async {
-        when(mockMessaging.subscribeToTopic(any)).thenAnswer((_) async {});
+        when(mockMessaging.subscribeToTopic(any as String)).thenAnswer((_) async {});
 
         final cohorts = ['new_players_day_1', 'high_engagement', 'at_risk_churn', 'vip_subscribers', 'locale_japan'];
 
@@ -136,7 +136,7 @@ void main() {
       });
 
       test('enableAllNotifications subscribes to default topics', () async {
-        when(mockMessaging.subscribeToTopic(any)).thenAnswer((_) async {});
+        when(mockMessaging.subscribeToTopic(any as String)).thenAnswer((_) async {});
 
         await manager.enableAllNotifications();
 
@@ -145,7 +145,7 @@ void main() {
       });
 
       test('enableAllNotifications handles error silently', () async {
-        when(mockMessaging.subscribeToTopic(any))
+        when(mockMessaging.subscribeToTopic(any as String))
             .thenThrow(Exception('Enable failed'));
 
         // Should not throw

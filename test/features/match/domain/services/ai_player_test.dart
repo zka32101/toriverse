@@ -7,7 +7,7 @@ void main() {
     late Board board;
 
     setUp(() {
-      board = Board.standard();
+      board = Board.initial();
     });
 
     group('Move Selection', () {
@@ -24,7 +24,7 @@ void main() {
 
       test('selectMove returns null when no moves available', () {
         // Create a board where red has no valid moves
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
 
         // Red (player 2) has no moves initially
         final move = AIPlayer.selectMove(testBoard, Board.red);
@@ -155,7 +155,7 @@ void main() {
     group('Move Quality', () {
       test('AI corner preference works', () {
         // After some moves, AI should eventually prefer corners if available
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
 
         // Play through a few rounds
         for (int i = 0; i < 5; i++) {

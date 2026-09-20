@@ -20,6 +20,9 @@ class TestFirebaseException implements FirebaseException {
   String get message => 'Firebase error: $code';
 
   @override
+  String get plugin => 'cloud_firestore';
+
+  @override
   StackTrace? get stackTrace => null;
 
   @override

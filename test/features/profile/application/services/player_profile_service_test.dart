@@ -14,12 +14,19 @@ class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 class MockCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
+class MockQueryDocumentSnapshot extends Mock
+    implements QueryDocumentSnapshot<Map<String, dynamic>> {}
+
+// ignore: subtype_of_sealed_class
 class MockQuery extends Mock implements Query<Map<String, dynamic>> {}
 
 class MockQuerySnapshot extends Mock
@@ -534,8 +541,8 @@ void _setupProfileSearch(
   when(() => mockQuery.limit(any())).thenReturn(mockQuery);
 }
 
-MockDocumentSnapshot _createMockAchievementDoc(String id) {
-  final mockDoc = MockDocumentSnapshot();
+MockQueryDocumentSnapshot _createMockAchievementDoc(String id) {
+  final mockDoc = MockQueryDocumentSnapshot();
   when(() => mockDoc.data()).thenReturn({
     'id': id,
     'name': 'Achievement Name',
@@ -547,8 +554,8 @@ MockDocumentSnapshot _createMockAchievementDoc(String id) {
   return mockDoc;
 }
 
-MockDocumentSnapshot _createMockProfileDoc(String uid, String username) {
-  final mockDoc = MockDocumentSnapshot();
+MockQueryDocumentSnapshot _createMockProfileDoc(String uid, String username) {
+  final mockDoc = MockQueryDocumentSnapshot();
   when(() => mockDoc.id).thenReturn(uid);
   when(() => mockDoc.data()).thenReturn({
     'uid': uid,

@@ -94,7 +94,7 @@ void main() {
 
     test('resolves a simple round with human players', () async {
       // Setup a basic board with opening moves
-      final board = Board.createBoard();
+      final board = Board.initial();
       board.placeStone(2, 3, 0); // Player 0 (Black) plays valid move
 
       final resolution = await service.resolveRound(
@@ -117,7 +117,7 @@ void main() {
 
     test('detects game over when no valid moves remain', () async {
       // Create a near-endgame board
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       // Play until most of the board is filled (simplified for test)
       // In a real test, we'd set up a specific endgame position
@@ -137,7 +137,7 @@ void main() {
     });
 
     test('determines winners correctly', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final resolution = await service.resolveRound(
         matchId: 'test_match_3',
@@ -153,7 +153,7 @@ void main() {
     });
 
     test('handles bonus activation tracking', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
       board.placeStone(2, 3, 0); // Valid opening move
 
       final resolution = await service.resolveRound(
@@ -172,7 +172,7 @@ void main() {
     });
 
     test('processes multiple submitted moves', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final resolution = await service.resolveRound(
         matchId: 'test_match_5',
@@ -190,7 +190,7 @@ void main() {
     });
 
     test('calculates correct scores', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final resolution = await service.resolveRound(
         matchId: 'test_match_6',
@@ -211,15 +211,16 @@ void main() {
 
   group('RoundResolution', () {
     test('indicates game over correctly', () {
-      final board = Board.createBoard();
+      final board = Board.initial();
       final result = RoundResultModel(
+        id: 'test_0',
         matchId: 'test',
         roundIndex: 0,
-        boardAfter: board,
         processOrder: ['player1', 'player2', 'player3'],
-        replayEvents: [],
+        replayEvents: const [],
+        createdAt: DateTime.now(),
         bonusTriggered: '',
-        rescueCardsGranted: [],
+        rescueCardsGranted: const [],
       );
 
       final resolution = RoundResolution(
@@ -234,15 +235,16 @@ void main() {
     });
 
     test('stores winners when game is over', () {
-      final board = Board.createBoard();
+      final board = Board.initial();
       final result = RoundResultModel(
+        id: 'test_0',
         matchId: 'test',
         roundIndex: 0,
-        boardAfter: board,
         processOrder: ['player1', 'player2', 'player3'],
-        replayEvents: [],
+        replayEvents: const [],
+        createdAt: DateTime.now(),
         bonusTriggered: '',
-        rescueCardsGranted: [],
+        rescueCardsGranted: const [],
       );
 
       final resolution = RoundResolution(

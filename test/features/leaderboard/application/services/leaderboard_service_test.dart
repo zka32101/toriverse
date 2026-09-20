@@ -6,18 +6,24 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:toriverse/features/leaderboard/application/services/leaderboard_service.dart';
-import 'package:toriverse/features/leaderboard/domain/models/leaderboard_models.dart';
 
 // Mock classes
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
 class MockCollectionReference extends Mock implements CollectionReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockQuery extends Mock implements Query<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentReference extends Mock implements DocumentReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentSnapshot extends Mock implements DocumentSnapshot<Map<String, dynamic>> {}
+
+// ignore: subtype_of_sealed_class
+class MockQueryDocumentSnapshot extends Mock
+    implements QueryDocumentSnapshot<Map<String, dynamic>> {}
 
 class MockQuerySnapshot extends Mock implements QuerySnapshot<Map<String, dynamic>> {}
 
@@ -342,7 +348,7 @@ void main() {
 }
 
 // Helper functions
-MockDocumentSnapshot _createMockDocumentSnapshot(
+MockQueryDocumentSnapshot _createMockDocumentSnapshot(
   String uid,
   String username,
   int rankPoints,
@@ -352,7 +358,7 @@ MockDocumentSnapshot _createMockDocumentSnapshot(
   int totalLosses,
   double winRate,
 ) {
-  final mockDoc = MockDocumentSnapshot();
+  final mockDoc = MockQueryDocumentSnapshot();
   when(() => mockDoc.id).thenReturn(uid);
   when(() => mockDoc.data()).thenReturn({
     'username': username,

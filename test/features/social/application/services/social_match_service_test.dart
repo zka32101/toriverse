@@ -7,7 +7,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:toriverse/features/social/application/services/social_match_service.dart';
 import 'package:toriverse/features/leaderboard/application/services/rank_calculation_service.dart';
-import 'package:toriverse/features/leaderboard/domain/models/leaderboard_models.dart';
 
 // Mock classes
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
@@ -15,15 +14,22 @@ class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 class MockCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {}
+
+// ignore: subtype_of_sealed_class
+class MockQueryDocumentSnapshot extends Mock
+    implements QueryDocumentSnapshot<Map<String, dynamic>> {}
 
 class MockQuerySnapshot extends Mock
     implements QuerySnapshot<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockQuery extends Mock implements Query<Map<String, dynamic>> {}
 
 class MockWriteBatch extends Mock implements WriteBatch {}
@@ -447,8 +453,8 @@ void _setupGetMatchHistory(
   when(() => mockQuery.where(any(), isGreaterThan: any())).thenReturn(mockQuery);
 }
 
-MockDocumentSnapshot _createMockMatchDoc(String matchId) {
-  final mockDoc = MockDocumentSnapshot();
+MockQueryDocumentSnapshot _createMockMatchDoc(String matchId) {
+  final mockDoc = MockQueryDocumentSnapshot();
   when(() => mockDoc['matchId']).thenReturn(matchId);
   when(() => mockDoc['matchType']).thenReturn('MatchType.ranked');
   when(() => mockDoc['participants']).thenReturn(['uid1', 'uid2', 'uid3']);

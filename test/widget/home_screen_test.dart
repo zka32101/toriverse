@@ -28,10 +28,10 @@ void main() {
         ProviderScope(
           overrides: [
             userStateProvider
-                .overrideWith((ref) => container.read(userStateProvider)),
+                .overrideWith((ref) => container.read(userStateProvider.notifier)),
           ],
           child: MaterialApp(
-            theme: appTheme,
+            theme: ToriverseTheme.lightTheme(),
             home: HomeScreen(),
           ),
         ),
@@ -45,10 +45,10 @@ void main() {
         ProviderScope(
           overrides: [
             userStateProvider
-                .overrideWith((ref) => container.read(userStateProvider)),
+                .overrideWith((ref) => container.read(userStateProvider.notifier)),
           ],
           child: MaterialApp(
-            theme: appTheme,
+            theme: ToriverseTheme.lightTheme(),
             home: HomeScreen(),
           ),
         ),
@@ -65,10 +65,10 @@ void main() {
         ProviderScope(
           overrides: [
             userStateProvider
-                .overrideWith((ref) => container.read(userStateProvider)),
+                .overrideWith((ref) => container.read(userStateProvider.notifier)),
           ],
           child: MaterialApp(
-            theme: appTheme,
+            theme: ToriverseTheme.lightTheme(),
             home: HomeScreen(),
           ),
         ),
@@ -86,10 +86,10 @@ void main() {
         ProviderScope(
           overrides: [
             userStateProvider
-                .overrideWith((ref) => container.read(userStateProvider)),
+                .overrideWith((ref) => container.read(userStateProvider.notifier)),
           ],
           child: MaterialApp(
-            theme: appTheme,
+            theme: ToriverseTheme.lightTheme(),
             home: HomeScreen(),
           ),
         ),
@@ -104,10 +104,10 @@ void main() {
         ProviderScope(
           overrides: [
             userStateProvider
-                .overrideWith((ref) => container.read(userStateProvider)),
+                .overrideWith((ref) => container.read(userStateProvider.notifier)),
           ],
           child: MaterialApp(
-            theme: appTheme,
+            theme: ToriverseTheme.lightTheme(),
             home: HomeScreen(),
           ),
         ),
@@ -124,10 +124,10 @@ void main() {
         ProviderScope(
           overrides: [
             userStateProvider
-                .overrideWith((ref) => container.read(userStateProvider)),
+                .overrideWith((ref) => container.read(userStateProvider.notifier)),
           ],
           child: MaterialApp(
-            theme: appTheme,
+            theme: ToriverseTheme.lightTheme(),
             home: HomeScreen(),
           ),
         ),
@@ -145,10 +145,10 @@ void main() {
         ProviderScope(
           overrides: [
             userStateProvider
-                .overrideWith((ref) => container.read(userStateProvider)),
+                .overrideWith((ref) => container.read(userStateProvider.notifier)),
           ],
           child: MaterialApp(
-            theme: appTheme,
+            theme: ToriverseTheme.lightTheme(),
             home: HomeScreen(),
           ),
         ),
@@ -162,12 +162,12 @@ void main() {
         ProviderScope(
           overrides: [
             userStateProvider
-                .overrideWith((ref) => container.read(userStateProvider)),
+                .overrideWith((ref) => container.read(userStateProvider.notifier)),
             matchingStateProvider
-                .overrideWith((ref) => container.read(matchingStateProvider)),
+                .overrideWith((ref) => container.read(matchingStateProvider.notifier)),
           ],
           child: MaterialApp(
-            theme: appTheme,
+            theme: ToriverseTheme.lightTheme(),
             home: HomeScreen(),
           ),
         ),
@@ -211,10 +211,10 @@ void main() {
         ProviderScope(
           overrides: [
             userStateProvider
-                .overrideWith((ref) => container.read(userStateProvider)),
+                .overrideWith((ref) => container.read(userStateProvider.notifier)),
           ],
           child: MaterialApp(
-            theme: appTheme,
+            theme: ToriverseTheme.lightTheme(),
             home: HomeScreen(),
           ),
         ),
@@ -237,10 +237,10 @@ void main() {
         ProviderScope(
           overrides: [
             userStateProvider
-                .overrideWith((ref) => container.read(userStateProvider)),
+                .overrideWith((ref) => container.read(userStateProvider.notifier)),
           ],
           child: MaterialApp(
-            theme: appTheme,
+            theme: ToriverseTheme.lightTheme(),
             home: HomeScreen(),
           ),
         ),

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:toriverse/features/match/application/services/move_applicator.dart';
+import 'package:toriverse/features/match/data/models/round_result_model.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
-import 'package:toriverse/features/match/domain/services/bonus_calculator.dart';
 
 void main() {
   group('MoveApplicator', () {
@@ -9,7 +9,7 @@ void main() {
     late List<String> playerIds;
 
     setUp(() {
-      board = Board.standard();
+      board = Board.initial();
       playerIds = ['player1', 'player2', 'player3'];
     });
 
@@ -73,7 +73,7 @@ void main() {
 
       test('isGameOver returns true when no players have valid moves', () {
         // Create a board state with no valid moves (artificial state)
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
         // Modify board to have no valid moves - this is tricky without filling it
         // For now, test the logic structure
         final allPlayersNoMove = !MoveApplicator.isGameOver(testBoard);
@@ -84,7 +84,7 @@ void main() {
     group('Weak Bonus Integration', () {
       test('applyRoundMoves detects weak bonus eligibility', () {
         // Create a board state where player 2 (red) is far behind
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
 
         // Simulate many moves to create a stone deficit
         // For simplicity, we'll just test with bottom 20% detection
@@ -113,7 +113,7 @@ void main() {
       });
 
       test('applyRoundMoves respects bonus activation limits', () {
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
         final submittedPositions = <String, int>{};
 
         // Test with max activations already reached (previousBonusActivations = [2, 2, 2])
@@ -133,7 +133,7 @@ void main() {
       });
 
       test('applyRoundMoves includes bonus events in replay', () {
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
         const initialReplayEvents = <ReplayEvent>[];
 
         final result = MoveApplicator.applyRoundMoves(

@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:toriverse/features/shop/domain/services/cosmetics_crafting_service.dart';
+import 'package:toriverse/shared/models/cosmetic_item.dart';
 
 void main() {
   group('CosmeticsCraftingService', () {

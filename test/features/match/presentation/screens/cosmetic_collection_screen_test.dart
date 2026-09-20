@@ -54,20 +54,20 @@ void main() {
       List<CosmeticItem>? catalog,
       List<OwnedCosmetic>? ownedCosmetics,
     }) {
-      return ProviderContainer(
-        child: MaterialApp(
-          home: ProviderScope(
-            overrides: [
-              cosmeticProvider.overrideWithValue(
-                CosmeticState(
-                  ownedCosmetics: ownedCosmetics ?? testOwnedCosmetics,
-                  activeBoardId: 'board_wood_dark',
-                  catalogItems: catalog ?? testCatalog,
-                ),
+      return ProviderScope(
+        overrides: [
+          cosmeticProvider.overrideWith(
+            (ref) => CosmeticNotifier(
+              CosmeticState(
+                ownedCosmetics: ownedCosmetics ?? testOwnedCosmetics,
+                activeBoardId: 'board_wood_dark',
+                catalogItems: catalog ?? testCatalog,
               ),
-            ],
-            child: const CosmeticCollectionScreen(),
+            ),
           ),
+        ],
+        child: const MaterialApp(
+          home: CosmeticCollectionScreen(),
         ),
       );
     }

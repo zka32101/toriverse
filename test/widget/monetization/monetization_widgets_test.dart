@@ -1,10 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:toriverse/features/monetization/presentation/widgets/creator_earnings_dashboard_widget.dart';
-import 'package:toriverse/features/monetization/presentation/widgets/subscription_tier_widget.dart';
-import 'package:toriverse/features/monetization/presentation/widgets/virtual_gift_shop_widget.dart';
-import 'package:toriverse/features/monetization/presentation/widgets/payout_management_widget.dart';
 
 /// Widget tests for Phase 2i Creator Monetization & Advanced Tools
 void main() {

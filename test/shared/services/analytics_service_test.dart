@@ -341,7 +341,7 @@ void main() {
           isPaidSubscriber: false,
         );
 
-        verify(mockFirebaseAnalytics.setUserId('user_12345')).called(1);
+        verify(mockFirebaseAnalytics.setUserId(id: 'user_12345')).called(1);
       });
 
       test('Sets all user properties', () async {
@@ -370,7 +370,7 @@ void main() {
     group('Error handling', () {
       test('Silently handles event logging errors', () async {
         when(mockFirebaseAnalytics.logEvent(
-          name: any,
+          name: any as String,
           parameters: any,
         )).thenThrow(Exception('Firebase unavailable'));
 
@@ -385,7 +385,7 @@ void main() {
       });
 
       test('Silently handles user property errors', () async {
-        when(mockFirebaseAnalytics.setUserId(any))
+        when(mockFirebaseAnalytics.setUserId(id: anyNamed('id')))
             .thenThrow(Exception('Firebase error'));
 
         // Should not throw

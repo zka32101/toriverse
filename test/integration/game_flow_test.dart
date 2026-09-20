@@ -1,7 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:toriverse/config/theme.dart';
 import 'package:toriverse/features/match/application/providers/game_state.dart';
 import 'package:toriverse/features/match/application/providers/user_state.dart';
 import 'package:toriverse/features/match/application/providers/matching_state.dart';
@@ -20,7 +18,7 @@ void main() {
       container.dispose();
     });
 
-    test('ユーザーログイン → マッチング → 対局開始', () {
+    test('ユーザーログイン → マッチング → 対局開始', () async {
       // Step 1: ユーザーログイン
       container.read(userStateProvider.notifier).initializeUser(
         'player_0',
@@ -32,14 +30,14 @@ void main() {
       expect(userState!.uid, 'player_0');
       expect(userState.displayName, 'TestPlayer');
 
-      // Step 2: マッチング開始
-      container.read(matchingStateProvider.notifier).startMatching();
+      // Step 2: マッチング開始（AIで即席補完）
+      // startMatching() の30秒ポーリングを待たず、AI補完を直接呼び出してテストする
+      await container.read(matchingStateProvider.notifier).completeWithAI();
       var matchingState = container.read(matchingStateProvider);
-      expect(matchingState, isNotNull);
-      expect(matchingState!.matchCount, 1);
+      expect(matchingState.playersWaiting, 3);
 
       // Step 3: ゲーム開始（マッチング完了）
-      final players = matchingState.players;
+      final players = matchingState.playerIds;
       container.read(gameStateProvider.notifier).startGame(
         playerIds: players,
       );
@@ -64,7 +62,7 @@ void main() {
       final move1 = gameState.validMoves.first;
       await container
           .read(gameStateProvider.notifier)
-          .placeStone(move1.row, move1.col);
+          .placeStone(move1[0], move1[1]);
 
       gameState = container.read(gameStateProvider)!;
       expect(gameState.roundIndex, initialRound + 1);
@@ -73,10 +71,10 @@ void main() {
       // ラウンド2
       final move2 = gameState.validMoves.isNotEmpty
           ? gameState.validMoves.first
-          : (row: 2, col: 4);
+          : [2, 4];
       await container
           .read(gameStateProvider.notifier)
-          .placeStone(move2.row, move2.col);
+          .placeStone(move2[0], move2[1]);
 
       gameState = container.read(gameStateProvider)!;
       expect(gameState.roundIndex, initialRound + 2);
@@ -84,10 +82,10 @@ void main() {
       // ラウンド3
       final move3 = gameState.validMoves.isNotEmpty
           ? gameState.validMoves.first
-          : (row: 2, col: 2);
+          : [2, 2];
       await container
           .read(gameStateProvider.notifier)
-          .placeStone(move3.row, move3.col);
+          .placeStone(move3[0], move3[1]);
 
       gameState = container.read(gameStateProvider)!;
       expect(gameState.roundIndex, initialRound + 3);
@@ -106,7 +104,7 @@ void main() {
           final move = gameState.validMoves.first;
           await container
               .read(gameStateProvider.notifier)
-              .placeStone(move.row, move.col);
+              .placeStone(move[0], move[1]);
         } else {
           break;
         }
@@ -187,15 +185,16 @@ void main() {
       expect(userState.freeMatchUsedToday, 0);
     });
 
-    test('マッチング中のAI補完', () {
+    test('マッチング中のAI補完', () async {
       container.read(userStateProvider.notifier).initializeUser('player_0');
-      container.read(matchingStateProvider.notifier).startMatching();
+      // startMatching() の30秒ポーリングを待たず、AI補完を直接呼び出してテストする
+      await container.read(matchingStateProvider.notifier).completeWithAI();
 
-      var matchingState = container.read(matchingStateProvider)!;
-      expect(matchingState.playerCount, lessThanOrEqualTo(3));
+      var matchingState = container.read(matchingStateProvider);
+      expect(matchingState.playersWaiting, lessThanOrEqualTo(3));
 
       // プレイヤーリストを確認
-      final players = matchingState.players;
+      final players = matchingState.playerIds;
       expect(players.length, 3);
     });
 
@@ -239,7 +238,7 @@ void main() {
       final move = initialState.validMoves.first;
       await container
           .read(gameStateProvider.notifier)
-          .placeStone(move.row, move.col);
+          .placeStone(move[0], move[1]);
 
       final updatedState = container.read(gameStateProvider)!;
       final updatedBoard = updatedState.board;
@@ -267,13 +266,14 @@ void main() {
       expect(userState.uid, 'player_0');
       expect(userState.displayName, 'TestPlayer');
 
-      // 2. マッチング開始
-      container.read(matchingStateProvider.notifier).startMatching();
-      var matchingState = container.read(matchingStateProvider)!;
-      expect(matchingState.matchCount, 1);
+      // 2. マッチング開始（AIで即席補完）
+      // startMatching() の30秒ポーリングを待たず、AI補完を直接呼び出してテストする
+      await container.read(matchingStateProvider.notifier).completeWithAI();
+      var matchingState = container.read(matchingStateProvider);
+      expect(matchingState.playersWaiting, 3);
 
       // 3. ゲーム開始
-      final players = matchingState.players;
+      final players = matchingState.playerIds;
       container.read(gameStateProvider.notifier).startGame(
         playerIds: players,
       );
@@ -289,7 +289,7 @@ void main() {
           final move = gameState.validMoves.first;
           await container
               .read(gameStateProvider.notifier)
-              .placeStone(move.row, move.col);
+              .placeStone(move[0], move[1]);
         }
       }
 
@@ -315,8 +315,8 @@ void main() {
         playerIds: ['player_0', 'player_1', 'AI_1'],
       );
 
-      var gameState = container.read(gameStateProvider)!;
-      expect(gameState.status, GameStatus.playing);
+      GameState? gameState = container.read(gameStateProvider);
+      expect(gameState!.status, GameStatus.playing);
 
       container.read(gameStateProvider.notifier).resetGame();
       gameState = container.read(gameStateProvider);
@@ -327,8 +327,8 @@ void main() {
         playerIds: ['player_0', 'player_2', 'AI_2'],
       );
 
-      gameState = container.read(gameStateProvider)!;
-      expect(gameState.status, GameStatus.playing);
+      gameState = container.read(gameStateProvider);
+      expect(gameState!.status, GameStatus.playing);
       expect(gameState.playerIds.length, 3);
     });
 
@@ -346,7 +346,7 @@ void main() {
         for (int j = 0; j < 8; j++) {
           bool isValid = false;
           for (final move in validMoves) {
-            if (move.row == i && move.col == j) {
+            if (move[0] == i && move[1] == j) {
               isValid = true;
               break;
             }

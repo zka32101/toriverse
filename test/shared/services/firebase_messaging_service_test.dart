@@ -14,7 +14,7 @@ class MockRemoteMessage extends Mock implements RemoteMessage {
   @override
   final Map<String, dynamic> data;
   @override
-  final AndroidNotification? notification;
+  final RemoteNotification? notification;
 
   MockRemoteMessage({
     required this.data,
@@ -22,13 +22,13 @@ class MockRemoteMessage extends Mock implements RemoteMessage {
   });
 }
 
-class MockAndroidNotification extends Mock implements AndroidNotification {
+class MockRemoteNotification extends Mock implements RemoteNotification {
   @override
   final String? title;
   @override
   final String? body;
 
-  MockAndroidNotification({this.title, this.body});
+  MockRemoteNotification({this.title, this.body});
 }
 
 void main() {
@@ -42,7 +42,7 @@ void main() {
       mockLocalNotifications = MockFlutterLocalNotificationsPlugin();
 
       // Default mock behaviors
-      when(mockLocalNotifications.initialize(any, onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse')))
+      when(mockLocalNotifications.initialize(any as InitializationSettings, onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse')))
           .thenAnswer((_) async => true);
     });
 
@@ -55,24 +55,23 @@ void main() {
 
         // Mock FCM request permission
         when(mockFcm.requestPermission(
-          alert: anyNamed('alert'),
-          announcement: anyNamed('announcement'),
-          badge: anyNamed('badge'),
-          carefullyChoosedOption: anyNamed('carefullyChoosedOption'),
-          criticalAlert: anyNamed('criticalAlert'),
-          provisional: anyNamed('provisional'),
-          sound: anyNamed('sound'),
-        )).thenAnswer((_) async => NotificationSettings(
+          alert: anyNamed('alert') as bool,
+          announcement: anyNamed('announcement') as bool,
+          badge: anyNamed('badge') as bool,
+          carPlay: anyNamed('carPlay') as bool,
+          criticalAlert: anyNamed('criticalAlert') as bool,
+          provisional: anyNamed('provisional') as bool,
+          sound: anyNamed('sound') as bool,
+        )).thenAnswer((_) async => const NotificationSettings(
           alert: AppleNotificationSetting.enabled,
           announcement: AppleNotificationSetting.enabled,
           authorizationStatus: AuthorizationStatus.authorized,
           badge: AppleNotificationSetting.enabled,
-          carefullyChoosedOption: AppleNotificationSetting.disabled,
+          carPlay: AppleNotificationSetting.disabled,
           criticalAlert: AppleNotificationSetting.disabled,
           lockScreen: AppleNotificationSetting.enabled,
           notificationCenter: AppleNotificationSetting.enabled,
-          provisional: AppleNotificationSetting.disabled,
-          showPreview: ShowPreviewSetting.always,
+          showPreviews: AppleShowPreviewSetting.always,
           sound: AppleNotificationSetting.enabled,
           timeSensitive: AppleNotificationSetting.disabled,
         ));
@@ -91,7 +90,7 @@ void main() {
           localNotifications: mockLocalNotifications,
         );
 
-        when(mockLocalNotifications.initialize(any, onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse')))
+        when(mockLocalNotifications.initialize(any as InitializationSettings, onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse')))
             .thenThrow(Exception('Init failed'));
 
         // Should not throw
@@ -140,7 +139,7 @@ void main() {
       });
 
       test('unsubscribeFromAll unsubscribes from all topics', () async {
-        when(mockFcm.unsubscribeFromTopic(any)).thenAnswer((_) async {});
+        when(mockFcm.unsubscribeFromTopic(any as String)).thenAnswer((_) async {});
 
         await service.unsubscribeFromAll();
 
@@ -192,13 +191,10 @@ void main() {
       });
 
       test('milestone notification routed correctly', () {
-        var called = false;
         service = FirebaseMessagingService(
           fcm: mockFcm,
           localNotifications: mockLocalNotifications,
-          onMilestoneNotification: (_) {
-            called = true;
-          },
+          onMilestoneNotification: (_) {},
         );
 
         // Simulate routing (this would be called internally)
@@ -207,39 +203,30 @@ void main() {
       });
 
       test('campaign notification routed correctly', () {
-        var called = false;
         service = FirebaseMessagingService(
           fcm: mockFcm,
           localNotifications: mockLocalNotifications,
-          onCampaignNotification: (_) {
-            called = true;
-          },
+          onCampaignNotification: (_) {},
         );
 
         expect(service, isNotNull);
       });
 
       test('streak reset notification routed correctly', () {
-        var called = false;
         service = FirebaseMessagingService(
           fcm: mockFcm,
           localNotifications: mockLocalNotifications,
-          onStreakResetNotification: (_) {
-            called = true;
-          },
+          onStreakResetNotification: (_) {},
         );
 
         expect(service, isNotNull);
       });
 
       test('match available notification routed correctly', () {
-        var called = false;
         service = FirebaseMessagingService(
           fcm: mockFcm,
           localNotifications: mockLocalNotifications,
-          onMatchAvailableNotification: (_) {
-            called = true;
-          },
+          onMatchAvailableNotification: (_) {},
         );
 
         expect(service, isNotNull);
@@ -256,24 +243,23 @@ void main() {
 
       test('initializes with proper channel configuration', () async {
         when(mockFcm.requestPermission(
-          alert: anyNamed('alert'),
-          announcement: anyNamed('announcement'),
-          badge: anyNamed('badge'),
-          carefullyChoosedOption: anyNamed('carefullyChoosedOption'),
-          criticalAlert: anyNamed('criticalAlert'),
-          provisional: anyNamed('provisional'),
-          sound: anyNamed('sound'),
-        )).thenAnswer((_) async => NotificationSettings(
+          alert: anyNamed('alert') as bool,
+          announcement: anyNamed('announcement') as bool,
+          badge: anyNamed('badge') as bool,
+          carPlay: anyNamed('carPlay') as bool,
+          criticalAlert: anyNamed('criticalAlert') as bool,
+          provisional: anyNamed('provisional') as bool,
+          sound: anyNamed('sound') as bool,
+        )).thenAnswer((_) async => const NotificationSettings(
           alert: AppleNotificationSetting.enabled,
           announcement: AppleNotificationSetting.enabled,
           authorizationStatus: AuthorizationStatus.authorized,
           badge: AppleNotificationSetting.enabled,
-          carefullyChoosedOption: AppleNotificationSetting.disabled,
+          carPlay: AppleNotificationSetting.disabled,
           criticalAlert: AppleNotificationSetting.disabled,
           lockScreen: AppleNotificationSetting.enabled,
           notificationCenter: AppleNotificationSetting.enabled,
-          provisional: AppleNotificationSetting.disabled,
-          showPreview: ShowPreviewSetting.always,
+          showPreviews: AppleShowPreviewSetting.always,
           sound: AppleNotificationSetting.enabled,
           timeSensitive: AppleNotificationSetting.disabled,
         ));
@@ -282,7 +268,7 @@ void main() {
 
         await service.initialize();
 
-        verify(mockLocalNotifications.initialize(any, onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse'))).called(1);
+        verify(mockLocalNotifications.initialize(any as InitializationSettings, onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse'))).called(1);
       });
     });
 
@@ -303,7 +289,7 @@ void main() {
       });
 
       test('handles multiple topic subscriptions', () async {
-        when(mockFcm.subscribeToTopic(any)).thenAnswer((_) async {});
+        when(mockFcm.subscribeToTopic(any as String)).thenAnswer((_) async {});
 
         await service.subscribeToTopic('topic_1');
         await service.subscribeToTopic('topic_2');

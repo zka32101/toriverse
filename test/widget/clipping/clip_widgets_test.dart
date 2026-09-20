@@ -1,9 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:toriverse/features/clipping/presentation/widgets/clip_generator_widget.dart';
-import 'package:toriverse/features/clipping/presentation/widgets/clip_metrics_widget.dart';
-import 'package:toriverse/features/clipping/presentation/widgets/trending_clips_widget.dart';
 
 /// Widget tests for Phase 2h Clip Generation & Social Sharing
 void main() {

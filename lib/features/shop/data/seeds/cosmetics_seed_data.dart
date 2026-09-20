@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:toriverse/shared/models/cosmetic_item.dart';
 
 /// Seed data for cosmetics catalog
@@ -263,34 +264,12 @@ class CosmeticsSeedData {
       ...limitedEditionCosmetics,
     ];
 
-    return allData
-        .map((data) => CosmeticItem.fromMap({
-              'id': data['id'],
-              'name': data['name'],
-              'typeString': data['typeString'],
-              'priceJpy': data['priceJpy'],
-              'description': data['description'],
-              'rarity': data['rarity'],
-              'availableFrom': data['availableFrom'],
-              'availableUntil': data['availableUntil'],
-            }))
-        .toList();
+    return allData.map(_toCosmeticItem).toList();
   }
 
   /// Get board cosmetics only
   static List<CosmeticItem> getBoardCosmetics() {
-    return boardCosmetics
-        .map((data) => CosmeticItem.fromMap({
-              'id': data['id'],
-              'name': data['name'],
-              'typeString': data['typeString'],
-              'priceJpy': data['priceJpy'],
-              'description': data['description'],
-              'rarity': data['rarity'],
-              'availableFrom': data['availableFrom'],
-              'availableUntil': data['availableUntil'],
-            }))
-        .toList();
+    return boardCosmetics.map(_toCosmeticItem).toList();
   }
 
   /// Get stone cosmetics only
@@ -301,33 +280,61 @@ class CosmeticsSeedData {
       ...stoneRedCosmetics,
     ];
 
-    return stoneData
-        .map((data) => CosmeticItem.fromMap({
-              'id': data['id'],
-              'name': data['name'],
-              'typeString': data['typeString'],
-              'priceJpy': data['priceJpy'],
-              'description': data['description'],
-              'rarity': data['rarity'],
-              'availableFrom': data['availableFrom'],
-              'availableUntil': data['availableUntil'],
-            }))
-        .toList();
+    return stoneData.map(_toCosmeticItem).toList();
   }
 
   /// Get limited edition cosmetics only
   static List<CosmeticItem> getLimitedEditionCosmetics() {
-    return limitedEditionCosmetics
-        .map((data) => CosmeticItem.fromMap({
-              'id': data['id'],
-              'name': data['name'],
-              'typeString': data['typeString'],
-              'priceJpy': data['priceJpy'],
-              'description': data['description'],
-              'rarity': data['rarity'],
-              'availableFrom': data['availableFrom'],
-              'availableUntil': data['availableUntil'],
-            }))
-        .toList();
+    return limitedEditionCosmetics.map(_toCosmeticItem).toList();
+  }
+
+  /// Convert one of this class's raw seed table rows (using the shorthand
+  /// keys `typeString`/`priceJpy`/`availableFrom`/`availableUntil`) into the
+  /// Firestore-document shape that [CosmeticItem.fromMap] actually expects
+  /// (`type`/`price`/`release_date`/`limited_edition_end_date`, plus the
+  /// catalog metadata fields that aren't tracked in the seed tables).
+  static CosmeticItem _toCosmeticItem(Map<String, dynamic> data) {
+    final availableFrom = data['availableFrom'] as String?;
+    final availableUntil = data['availableUntil'] as String?;
+    final id = data['id'] as String;
+
+    return CosmeticItem.fromMap({
+      'id': id,
+      'name': data['name'],
+      'type': _typeStringToWireFormat(data['typeString'] as String),
+      'price': data['priceJpy'],
+      'description': data['description'],
+      'rarity': data['rarity'],
+      // Not tracked per-item in the seed tables; a stable placeholder keeps
+      // CosmeticItem.fromMap's required fields satisfied.
+      'color_scheme': 'default',
+      'preview_image_url': 'assets/cosmetics/$id.png',
+      'release_date': Timestamp.fromDate(
+        availableFrom != null ? DateTime.parse(availableFrom) : DateTime(2026, 8, 27),
+      ),
+      'limited_edition_end_date': availableUntil != null
+          ? Timestamp.fromDate(DateTime.parse(availableUntil))
+          : null,
+      'revenueket_product_id': 'cosmetic_$id',
+    });
+  }
+
+  /// Convert this class's `typeString` shorthand (`board`, `stoneBlack`,
+  /// `stoneWhite`, `stoneRed`) to the snake_case wire format
+  /// [CosmeticItem.fromMap] parses (matching [CosmeticItem.typeString]'s
+  /// own output).
+  static String _typeStringToWireFormat(String typeString) {
+    switch (typeString) {
+      case 'board':
+        return 'board';
+      case 'stoneBlack':
+        return 'stone_black';
+      case 'stoneWhite':
+        return 'stone_white';
+      case 'stoneRed':
+        return 'stone_red';
+      default:
+        return 'board';
+    }
   }
 }

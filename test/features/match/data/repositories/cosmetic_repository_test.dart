@@ -1,16 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mock_cloud_firestore/mock_cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:toriverse/features/match/data/repositories/cosmetic_repository.dart';
 import 'package:toriverse/features/match/application/providers/cosmetic_state.dart';
 
 void main() {
   group('CosmeticRepository', () {
     late CosmeticRepository repository;
-    late MockFirebaseFirestore mockFirestore;
+    late FakeFirebaseFirestore mockFirestore;
 
     setUp(() {
-      mockFirestore = MockFirebaseFirestore();
+      mockFirestore = FakeFirebaseFirestore();
       repository = CosmeticRepository(firestore: mockFirestore);
     });
 
@@ -45,7 +44,7 @@ void main() {
 
       test('Returns default catalog on fetch error', () async {
         // Force error by using invalid repository setup
-        final repo = CosmeticRepository(firestore: MockFirebaseFirestore());
+        final repo = CosmeticRepository(firestore: FakeFirebaseFirestore());
         final catalog = await repo.fetchCosmeticCatalog();
 
         expect(catalog, isNotEmpty);
