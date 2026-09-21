@@ -12,6 +12,10 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // Required by flutter_local_notifications (10+): it relies on Java 8+
+        // library desugaring to support scheduled notifications with
+        // backwards compatibility on older Android versions.
+        isCoreLibraryDesugaringEnabled = true
     }
 
     defaultConfig {
@@ -46,4 +50,12 @@ kotlin {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    // Version matches what flutter_local_notifications' own example app
+    // pins (confirmed present in its android/build.gradle and
+    // example/android/app/build.gradle), since this sandbox has no
+    // network access to Maven Central to verify a newer version exists.
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 }

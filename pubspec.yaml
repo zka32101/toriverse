@@ -33,7 +33,12 @@ dependencies:
 
   # 認証（OAuth）
   google_sign_in: ^6.1.0
-  sign_in_with_apple: ^5.0.0
+  # >=6.1.1 required: earlier versions' Android Kotlin source still
+  # references Flutter's removed v1 plugin embedding (PluginRegistry
+  # .Registrar), fixed in 6.1.1 ("Removes references to Flutter v1
+  # Android embedding classes"). No Dart-facing breaking changes;
+  # this app only uses the stable getAppleIDCredential() API.
+  sign_in_with_apple: ^6.1.1
 
   # 課金・広告
   # >=8.0.0 required: 7.x's Android plugin still references Flutter's
