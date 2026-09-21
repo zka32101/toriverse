@@ -184,9 +184,12 @@ void main() {
         expect(result1, true);
 
         // Round 2: failure but recovers
+        var round2Attempt = 0;
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
-            .thenThrow(TestFirebaseException('unavailable'))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          round2Attempt++;
+          if (round2Attempt == 1) throw TestFirebaseException('unavailable');
+        });
 
         var result2 = await service.saveRoundResultWithRetry(
           RoundResultModel(
@@ -230,9 +233,12 @@ void main() {
 
     group('State Consistency on Failure', () {
       test('match state update includes timestamp even on retry', () async {
+        var attempt = 0;
         when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
-            .thenThrow(TestFirebaseException('deadline-exceeded'))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          attempt++;
+          if (attempt == 1) throw TestFirebaseException('deadline-exceeded');
+        });
 
         await service.updateMatchStateAfterRound(
           matchId: 'test_match',

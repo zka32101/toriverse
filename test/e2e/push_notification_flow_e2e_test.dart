@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:toriverse/features/match/application/providers/notification_state.dart';
-import 'package:flutter/material.dart';
 
 /// Mock FirebaseRemoteConfig for push notification testing
 class MockFirebaseRemoteConfig extends Mock implements FirebaseRemoteConfig {

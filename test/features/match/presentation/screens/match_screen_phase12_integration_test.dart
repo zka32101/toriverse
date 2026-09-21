@@ -13,7 +13,7 @@ void main() {
     });
 
     test('AI selector selects move based on difficulty', () {
-      final board = Board.createBoard();
+      final board = Board.initial();
       final difficulties = [
         AIDifficulty.easy,
         AIDifficulty.normal,
@@ -34,7 +34,7 @@ void main() {
     });
 
     test('different AI difficulties produce valid moves', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final easyMove = await getAIMove(board, 0, AIDifficulty.easy);
       final normalMove = await getAIMove(board, 0, AIDifficulty.normal);
@@ -160,7 +160,7 @@ void main() {
 
   group('Phase 12 Integration - Round Resolution Service', () {
     test('round resolution service resolves round correctly', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final service = RoundResolutionService(
         processor: RoundProcessor(),
@@ -185,7 +185,7 @@ void main() {
     });
 
     test('round resolution handles bonus activations', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final service = RoundResolutionService(
         processor: RoundProcessor(),
@@ -205,7 +205,7 @@ void main() {
     });
 
     test('round resolution determines winners on game over', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final service = RoundResolutionService(
         processor: RoundProcessor(),
@@ -252,7 +252,7 @@ void main() {
     });
 
     test('AI difficulty, bonus state, and resolution work together', () {
-      final board = Board.createBoard();
+      final board = Board.initial();
       final selector = AIMoveSelector(difficulty: AIDifficulty.normal);
       final bonusNotifier = BonusActivationNotifier(
         playerIds: ['player1', 'player2', 'player3'],
@@ -284,7 +284,7 @@ void main() {
         () => service.resolveRound(
           matchId: 'match1',
           roundIndex: 0,
-          boardBefore: Board.createBoard(),
+          boardBefore: Board.initial(),
           playerIds: ['player1', 'player2', 'player3'],
           submittedPositions: {},
           bonusActivationCounts: [0, 0, 0],
@@ -295,7 +295,7 @@ void main() {
 
     test('AI selector handles empty board gracefully', () {
       final selector = AIMoveSelector(difficulty: AIDifficulty.normal);
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       // Should not throw
       final move = selector.selectMove(board, 0);

@@ -71,9 +71,12 @@ void main() {
       });
 
       test('retries on retryable error', () async {
+        var attempt = 0;
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
-            .thenThrow(TestFirebaseException('unavailable'))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          attempt++;
+          if (attempt == 1) throw TestFirebaseException('unavailable');
+        });
 
         final result = await service.saveRoundResultWithRetry(testResult);
 
@@ -102,9 +105,12 @@ void main() {
       });
 
       test('handles deadline-exceeded as retryable', () async {
+        var attempt = 0;
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
-            .thenThrow(TestFirebaseException('deadline-exceeded'))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          attempt++;
+          if (attempt == 1) throw TestFirebaseException('deadline-exceeded');
+        });
 
         final result = await service.saveRoundResultWithRetry(testResult);
 
@@ -113,9 +119,12 @@ void main() {
       });
 
       test('handles aborted as retryable', () async {
+        var attempt = 0;
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
-            .thenThrow(TestFirebaseException('aborted'))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          attempt++;
+          if (attempt == 1) throw TestFirebaseException('aborted');
+        });
 
         final result = await service.saveRoundResultWithRetry(testResult);
 
@@ -124,9 +133,12 @@ void main() {
       });
 
       test('handles internal as retryable', () async {
+        var attempt = 0;
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
-            .thenThrow(TestFirebaseException('internal'))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          attempt++;
+          if (attempt == 1) throw TestFirebaseException('internal');
+        });
 
         final result = await service.saveRoundResultWithRetry(testResult);
 
@@ -183,9 +195,12 @@ void main() {
       });
 
       test('retries on retryable error', () async {
+        var attempt = 0;
         when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
-            .thenThrow(TestFirebaseException('deadline-exceeded'))
-            .thenAnswer((_) async {});
+            .thenAnswer((_) async {
+          attempt++;
+          if (attempt == 1) throw TestFirebaseException('deadline-exceeded');
+        });
 
         final result = await service.updateMatchStateAfterRound(
           matchId: 'match_001',

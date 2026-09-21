@@ -9,6 +9,13 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  # firebase/ holds Cloud Functions deployment reference code (deployed via
+  # a separate Node/Dart Functions toolchain, not this Flutter app's
+  # pubspec), so it isn't part of this project's dependency graph.
+  exclude:
+    - firebase/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`

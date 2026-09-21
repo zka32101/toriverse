@@ -5,6 +5,7 @@ import 'package:mockito/mockito.dart';
 import 'package:toriverse/shared/services/firebase_messaging_service.dart';
 import 'package:toriverse/features/match/application/services/push_notification_manager.dart';
 import 'package:toriverse/features/match/application/services/liveops_campaign_service.dart';
+import 'package:toriverse/shared/services/remote_config_service.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 /// Mock FirebaseRemoteConfig for testing
@@ -39,7 +40,7 @@ void main() {
       mockRemoteConfig = MockFirebaseRemoteConfig();
       campaignService = LiveOpsCampaignService(
         firestore: fakeFirestore,
-        remoteConfig: mockRemoteConfig,
+        remoteConfig: RemoteConfigService(remoteConfig: mockRemoteConfig),
       );
     });
 
@@ -107,9 +108,9 @@ void main() {
           userId: userId,
           campaignId: 'camp_001',
         );
-        expect(progress.challengesCompleted, equals(3));
-        expect(progress.totalChallenges, equals(3));
-        expect(progress.hasClaimedReward, isFalse);
+        expect(progress!.challengesCompleted, equals(3));
+        expect(progress!.totalChallenges, equals(3));
+        expect(progress!.hasClaimedReward, isFalse);
 
         // Step 5: Claim reward
         final claimResult = await campaignService.claimCampaignReward(
@@ -124,7 +125,7 @@ void main() {
           userId: userId,
           campaignId: 'camp_001',
         );
-        expect(updatedProgress.hasClaimedReward, isTrue);
+        expect(updatedProgress!.hasClaimedReward, isTrue);
 
         // Step 7: Track participation (claimed_reward event)
         await campaignService.trackCampaignParticipation(
@@ -175,15 +176,15 @@ void main() {
           userId: userId,
           campaignId: 'camp_001',
         );
-        expect(progress1.hasClaimedReward, isTrue);
-        expect(progress1.challengesCompleted, equals(3));
+        expect(progress1!.hasClaimedReward, isTrue);
+        expect(progress1!.challengesCompleted, equals(3));
 
         final progress2 = await campaignService.getUserCampaignProgress(
           userId: userId,
           campaignId: 'camp_002',
         );
-        expect(progress2.hasClaimedReward, isFalse);
-        expect(progress2.challengesCompleted, equals(2));
+        expect(progress2!.hasClaimedReward, isFalse);
+        expect(progress2!.challengesCompleted, equals(2));
       });
 
       test('user can claim multiple rewards from same campaign', () async {
@@ -245,7 +246,7 @@ void main() {
           userId: userId,
           campaignId: campaignId,
         );
-        expect(progress.hasClaimedReward, isTrue);
+        expect(progress!.hasClaimedReward, isTrue);
 
         // Verify no duplication
         final progressDoc = await fakeFirestore
@@ -305,8 +306,8 @@ void main() {
             userId: userId,
             campaignId: campaignId,
           );
-          expect(progress.hasClaimedReward, isTrue);
-          expect(progress.challengesCompleted, equals(3 - idx));
+          expect(progress!.hasClaimedReward, isTrue);
+          expect(progress!.challengesCompleted, equals(3 - idx));
         }
       });
 
