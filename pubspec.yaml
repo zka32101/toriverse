@@ -25,7 +25,11 @@ dependencies:
   firebase_messaging: ^14.7.10
 
   # プッシュ通知（ローカル表示）
-  flutter_local_notifications: ^16.3.0
+  # >=17.2.1 required: 17.0.0-17.2.0 fail to compile against modern
+  # Android SDKs (ambiguous bigLargeIcon(Bitmap|Icon) overload with a
+  # null argument); fixed in 17.2.1. No Dart-facing breaking changes
+  # since 16.3.x other than compileSdk 34 (already satisfied here).
+  flutter_local_notifications: ^17.2.1
 
   # 認証（OAuth）
   google_sign_in: ^6.1.0
