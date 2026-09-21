@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:toriverse/config/theme.dart';
 import '../../domain/services/rivalry_tracker.dart';
 
 /// Rivalry/Alliance indicator widget (GAME_DESIGN_UI_REFORM.md §2.2)

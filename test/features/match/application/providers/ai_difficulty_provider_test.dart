@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:toriverse/features/match/application/providers/ai_difficulty_provider.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
-import 'package:toriverse/features/match/domain/services/ai_player.dart';
 
 void main() {
   group('AIDifficulty Enum', () {
@@ -48,7 +47,7 @@ void main() {
 
     test('selectMove returns valid move for easy difficulty', () {
       final selector = AIMoveSelector(difficulty: AIDifficulty.easy);
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final move = selector.selectMove(board, 0); // Player 0 (Black)
 
@@ -64,7 +63,7 @@ void main() {
 
     test('selectMove returns valid move for normal difficulty', () {
       final selector = AIMoveSelector(difficulty: AIDifficulty.normal);
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final move = selector.selectMove(board, 1); // Player 1 (White)
 
@@ -76,7 +75,7 @@ void main() {
 
     test('selectMove returns valid move for hard difficulty', () {
       final selector = AIMoveSelector(difficulty: AIDifficulty.hard);
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final move = selector.selectMove(board, 2); // Player 2 (Red)
 
@@ -88,7 +87,7 @@ void main() {
 
     test('selectMove returns valid move for expert difficulty', () {
       final selector = AIMoveSelector(difficulty: AIDifficulty.expert);
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final move = selector.selectMove(board, 0);
 
@@ -100,7 +99,7 @@ void main() {
 
     test('suggestMove returns position integer', () {
       final selector = AIMoveSelector(difficulty: AIDifficulty.normal);
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final position = selector.suggestMove(board, 0);
 
@@ -113,7 +112,7 @@ void main() {
 
     test('selectMove handles no valid moves', () {
       final selector = AIMoveSelector(difficulty: AIDifficulty.easy);
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       // Try to get moves when there might not be any (depends on board state)
       final move = selector.selectMove(board, 0);
@@ -128,7 +127,7 @@ void main() {
 
   group('getAIMove', () {
     test('returns valid move for easy difficulty', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final move = await getAIMove(board, 0, AIDifficulty.easy);
 
@@ -139,7 +138,7 @@ void main() {
     });
 
     test('returns valid move for normal difficulty', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final move = await getAIMove(board, 1, AIDifficulty.normal);
 
@@ -150,7 +149,7 @@ void main() {
     });
 
     test('returns valid move for hard difficulty', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final move = await getAIMove(board, 2, AIDifficulty.hard);
 
@@ -161,7 +160,7 @@ void main() {
     });
 
     test('returns valid move for expert difficulty', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final move = await getAIMove(board, 0, AIDifficulty.expert);
 
@@ -172,7 +171,7 @@ void main() {
     });
 
     test('uses correct depth for each difficulty level', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       // Test that different difficulties can be called without error
       final easyMove = await getAIMove(board, 0, AIDifficulty.easy);
@@ -191,7 +190,7 @@ void main() {
 
   group('AI Move Selection Consistency', () {
     test('same difficulty produces consistent move on same board', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
       final selector = AIMoveSelector(difficulty: AIDifficulty.normal);
 
       final move1 = selector.selectMove(board, 0);
@@ -203,7 +202,7 @@ void main() {
     });
 
     test('different difficulties can produce different moves', () async {
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final easySelector = AIMoveSelector(difficulty: AIDifficulty.easy);
       final hardSelector = AIMoveSelector(difficulty: AIDifficulty.hard);
@@ -223,7 +222,7 @@ void main() {
   group('Edge Cases', () {
     test('selectMove with player index 0', () {
       final selector = AIMoveSelector(difficulty: AIDifficulty.normal);
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final move = selector.selectMove(board, 0);
 
@@ -234,7 +233,7 @@ void main() {
 
     test('selectMove with player index 1', () {
       final selector = AIMoveSelector(difficulty: AIDifficulty.normal);
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final move = selector.selectMove(board, 1);
 
@@ -245,7 +244,7 @@ void main() {
 
     test('selectMove with player index 2', () {
       final selector = AIMoveSelector(difficulty: AIDifficulty.normal);
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       final move = selector.selectMove(board, 2);
 
@@ -256,7 +255,7 @@ void main() {
 
     test('suggestMove returns valid position range', () {
       final selector = AIMoveSelector(difficulty: AIDifficulty.normal);
-      final board = Board.createBoard();
+      final board = Board.initial();
 
       for (int i = 0; i < 3; i++) {
         final position = selector.suggestMove(board, i);

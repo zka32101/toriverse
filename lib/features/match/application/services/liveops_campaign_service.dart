@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../../shared/services/remote_config_service.dart';
+import 'package:toriverse/shared/services/remote_config_service.dart';
 
 /// Service for managing LiveOps campaigns and seasonal events
 ///
@@ -14,16 +14,16 @@ class LiveOpsCampaignService {
 
   LiveOpsCampaignService({
     FirebaseFirestore? firestore,
-    required RemoteConfigService remoteConfig,
+    RemoteConfigService? remoteConfig,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
-        _remoteConfig = remoteConfig;
+        _remoteConfig = remoteConfig ?? RemoteConfigService();
 
   /// Fetch all active campaigns
   ///
   /// Active = currently_live: true AND now > startTime AND now < endTime
   Future<List<Campaign>> fetchActiveCampaigns() async {
     try {
-      final now = DateTime.now();
+      final now = DateTime.now().toIso8601String();
       final snapshot = await _firestore
           .collection('campaigns')
           .where('currently_live', isEqualTo: true)
@@ -47,12 +47,13 @@ class LiveOpsCampaignService {
   /// Displayed on home screen banner.
   Future<Campaign?> fetchFeaturedCampaign() async {
     try {
+      final now = DateTime.now().toIso8601String();
       final snapshot = await _firestore
           .collection('campaigns')
           .where('currently_live', isEqualTo: true)
           .where('is_featured', isEqualTo: true)
-          .where('start_time', isLessThanOrEqualTo: DateTime.now())
-          .where('end_time', isGreaterThan: DateTime.now())
+          .where('start_time', isLessThanOrEqualTo: now)
+          .where('end_time', isGreaterThan: now)
           .orderBy('priority', descending: true)
           .limit(1)
           .get()
@@ -70,7 +71,11 @@ class LiveOpsCampaignService {
   /// Provides live updates when campaigns are added/removed/modified.
   Stream<List<Campaign>> streamActiveCampaigns() {
     try {
-      final now = DateTime.now();
+      // campaigns/ stores start_time/end_time as ISO8601 strings (see
+      // Campaign.fromFirestore's DateTime.parse), so the range filters
+      // below must compare against a string too, not a raw DateTime —
+      // Firestore's range comparisons require matching stored/query types.
+      final now = DateTime.now().toIso8601String();
       return _firestore
           .collection('campaigns')
           .where('currently_live', isEqualTo: true)

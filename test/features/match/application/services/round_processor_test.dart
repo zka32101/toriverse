@@ -1,6 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:toriverse/features/match/application/services/move_applicator.dart';
-import 'package:toriverse/features/match/application/services/remote_config_service.dart';
 import 'package:toriverse/features/match/application/services/round_processor.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
 
@@ -12,7 +10,7 @@ void main() {
 
     setUp(() {
       processor = RoundProcessor();
-      board = Board.standard();
+      board = Board.initial();
       playerIds = ['player1', 'player2', 'player3'];
     });
 
@@ -112,7 +110,7 @@ void main() {
 
       test('determineWinners handles tie', () {
         // Standard starting position has black and white both at 2
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
         final winners = processor.determineWinners(testBoard, playerIds);
 
         // With red at 0, either black or white wins, not both
@@ -136,7 +134,7 @@ void main() {
       test('isGameOver detects when no valid moves exist', () {
         // This requires a specific board state with no valid moves
         // For now, verify the logic structure works
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
         final gameOver = processor.isGameOver(testBoard);
 
         // Standard board should not be game over

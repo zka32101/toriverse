@@ -143,7 +143,7 @@ class AnalyticsAndModerationRepository {
           .get();
 
       if (doc.docs.isNotEmpty) {
-        final data = doc.docs.first.data() as Map<String, dynamic>;
+        final data = doc.docs.first.data();
         return Map<int, double>.from(data['retentionCurve'] ?? {});
       }
 
@@ -182,7 +182,7 @@ class AnalyticsAndModerationRepository {
     String format = 'pdf',
   }) async {
     try {
-      final dashboard = await getCreatorAnalyticsDashboard(creatorId);
+      await getCreatorAnalyticsDashboard(creatorId);
 
       await _analytics.logEvent(
         name: 'analytics_report_exported',

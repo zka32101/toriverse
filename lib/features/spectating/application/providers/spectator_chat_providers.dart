@@ -34,7 +34,7 @@ final matchPinnedMessagesProvider =
 /// Validates message content and applies automatic moderation.
 /// Returns the message ID on success.
 final sendChatMessageProvider = FutureProvider.autoDispose
-    .family<String, _SendMessageParams>((ref, params) async {
+    .family<String, SendMessageParams>((ref, params) async {
   final repo = ref.watch(spectatorChatRepositoryProvider);
 
   return repo.sendMessage(
@@ -48,7 +48,7 @@ final sendChatMessageProvider = FutureProvider.autoDispose
 
 /// Pin a message (commentators/moderators only)
 final pinChatMessageProvider = FutureProvider.autoDispose
-    .family<void, _PinMessageParams>((ref, params) async {
+    .family<void, PinMessageParams>((ref, params) async {
   final repo = ref.watch(spectatorChatRepositoryProvider);
 
   return repo.pinMessage(
@@ -60,7 +60,7 @@ final pinChatMessageProvider = FutureProvider.autoDispose
 
 /// Unpin a message
 final unpinChatMessageProvider = FutureProvider.autoDispose
-    .family<void, _PinMessageParams>((ref, params) async {
+    .family<void, PinMessageParams>((ref, params) async {
   final repo = ref.watch(spectatorChatRepositoryProvider);
 
   return repo.unpinMessage(
@@ -72,7 +72,7 @@ final unpinChatMessageProvider = FutureProvider.autoDispose
 
 /// Delete a message (moderators only)
 final deleteChatMessageProvider = FutureProvider.autoDispose
-    .family<void, _DeleteMessageParams>((ref, params) async {
+    .family<void, DeleteMessageParams>((ref, params) async {
   final repo = ref.watch(spectatorChatRepositoryProvider);
 
   return repo.deleteMessage(
@@ -84,7 +84,7 @@ final deleteChatMessageProvider = FutureProvider.autoDispose
 
 /// Report a message as inappropriate
 final reportChatMessageProvider = FutureProvider.autoDispose
-    .family<void, _ReportMessageParams>((ref, params) async {
+    .family<void, ReportMessageParams>((ref, params) async {
   final repo = ref.watch(spectatorChatRepositoryProvider);
 
   return repo.reportMessage(
@@ -97,7 +97,7 @@ final reportChatMessageProvider = FutureProvider.autoDispose
 
 /// Mute a user from chat (moderators only)
 final muteUserProvider = FutureProvider.autoDispose
-    .family<void, _MuteUserParams>((ref, params) async {
+    .family<void, MuteUserParams>((ref, params) async {
   final repo = ref.watch(spectatorChatRepositoryProvider);
 
   return repo.muteUser(
@@ -122,7 +122,7 @@ final unmuteUserProvider = FutureProvider.autoDispose
 
 /// Check if a user is currently muted
 final isUserMutedProvider =
-    FutureProvider.autoDispose.family<bool, _CheckMuteParams>((ref, params) {
+    FutureProvider.autoDispose.family<bool, CheckMuteParams>((ref, params) {
   final repo = ref.watch(spectatorChatRepositoryProvider);
   return repo.isUserMuted(params.matchId, params.userId);
 });
@@ -137,9 +137,10 @@ final matchChatStatsProvider =
 /// Record spectator chat analytics event
 final recordChatEventProvider = FutureProvider.autoDispose
     .family<void, SpectatorChatEvent>((ref, event) async {
-  final repo = ref.watch(spectatorChatRepositoryProvider);
-  // The repository already logs events internally
-  // This provider is for explicit event tracking if needed
+  // The repository already logs events internally as part of each chat
+  // operation (send/pin/delete/report/mute). This provider intentionally
+  // has no body — it exists for explicit event tracking call sites, if
+  // ever needed, without requiring a repository dependency.
 });
 
 // ============================================================================
@@ -147,14 +148,14 @@ final recordChatEventProvider = FutureProvider.autoDispose
 // ============================================================================
 
 /// Parameters for sending a chat message
-class _SendMessageParams {
+class SendMessageParams {
   final String matchId;
   final String userId;
   final String displayName;
   final String text;
   final SpectatorChatRole role;
 
-  _SendMessageParams({
+  SendMessageParams({
     required this.matchId,
     required this.userId,
     required this.displayName,
@@ -165,7 +166,7 @@ class _SendMessageParams {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _SendMessageParams &&
+      other is SendMessageParams &&
           runtimeType == other.runtimeType &&
           matchId == other.matchId &&
           userId == other.userId &&
@@ -183,12 +184,12 @@ class _SendMessageParams {
 }
 
 /// Parameters for pinning/unpinning a message
-class _PinMessageParams {
+class PinMessageParams {
   final String matchId;
   final String messageId;
   final SpectatorChatRole userRole;
 
-  _PinMessageParams({
+  PinMessageParams({
     required this.matchId,
     required this.messageId,
     required this.userRole,
@@ -197,7 +198,7 @@ class _PinMessageParams {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _PinMessageParams &&
+      other is PinMessageParams &&
           runtimeType == other.runtimeType &&
           matchId == other.matchId &&
           messageId == other.messageId &&
@@ -209,12 +210,12 @@ class _PinMessageParams {
 }
 
 /// Parameters for deleting a message
-class _DeleteMessageParams {
+class DeleteMessageParams {
   final String matchId;
   final String messageId;
   final SpectatorChatRole userRole;
 
-  _DeleteMessageParams({
+  DeleteMessageParams({
     required this.matchId,
     required this.messageId,
     required this.userRole,
@@ -223,7 +224,7 @@ class _DeleteMessageParams {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _DeleteMessageParams &&
+      other is DeleteMessageParams &&
           runtimeType == other.runtimeType &&
           matchId == other.matchId &&
           messageId == other.messageId &&
@@ -235,13 +236,13 @@ class _DeleteMessageParams {
 }
 
 /// Parameters for reporting a message
-class _ReportMessageParams {
+class ReportMessageParams {
   final String matchId;
   final String messageId;
   final String reportedBy;
   final String reason;
 
-  _ReportMessageParams({
+  ReportMessageParams({
     required this.matchId,
     required this.messageId,
     required this.reportedBy,
@@ -251,7 +252,7 @@ class _ReportMessageParams {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _ReportMessageParams &&
+      other is ReportMessageParams &&
           runtimeType == other.runtimeType &&
           matchId == other.matchId &&
           messageId == other.messageId &&
@@ -267,13 +268,13 @@ class _ReportMessageParams {
 }
 
 /// Parameters for muting a user
-class _MuteUserParams {
+class MuteUserParams {
   final String matchId;
   final String userId;
   final Duration duration;
   final SpectatorChatRole userRole;
 
-  _MuteUserParams({
+  MuteUserParams({
     required this.matchId,
     required this.userId,
     required this.duration,
@@ -283,7 +284,7 @@ class _MuteUserParams {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _MuteUserParams &&
+      other is MuteUserParams &&
           runtimeType == other.runtimeType &&
           matchId == other.matchId &&
           userId == other.userId &&
@@ -325,11 +326,11 @@ class _UnmuteUserParams {
 }
 
 /// Parameters for checking if user is muted
-class _CheckMuteParams {
+class CheckMuteParams {
   final String matchId;
   final String userId;
 
-  _CheckMuteParams({
+  CheckMuteParams({
     required this.matchId,
     required this.userId,
   });
@@ -337,7 +338,7 @@ class _CheckMuteParams {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is _CheckMuteParams &&
+      other is CheckMuteParams &&
           runtimeType == other.runtimeType &&
           matchId == other.matchId &&
           userId == other.userId;

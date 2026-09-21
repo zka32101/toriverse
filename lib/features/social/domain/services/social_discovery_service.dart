@@ -17,8 +17,6 @@ class SocialDiscoveryService {
         return [];
       }
 
-      final lowerQuery = query.toLowerCase();
-
       // Search by exact UID match first
       final uidMatch = await _firestore
           .collection('users')
@@ -44,9 +42,7 @@ class SocialDiscoveryService {
           .get();
 
       return nameSnapshot.docs
-          .map((doc) => UserPublicProfile.fromJson(
-            doc.data() as Map<String, dynamic>,
-          ))
+          .map((doc) => UserPublicProfile.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];

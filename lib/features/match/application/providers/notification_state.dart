@@ -1,5 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// Sentinel marking a copyWith parameter as "not passed", distinct from an
+/// explicitly-passed null.
+const Object _unset = Object();
+
 /// Represents user's notification preferences
 class NotificationPreferences {
   /// Enable/disable all notifications
@@ -44,7 +48,13 @@ class NotificationPreferences {
       campaignNotifications &&
       matchAvailableNotifications;
 
-  /// Create a copy with optional updates
+  /// Create a copy with optional updates.
+  ///
+  /// quietHourStart/quietHourEnd are themselves nullable (clearing quiet
+  /// hours is a real operation, see setQuietHours(null, null)), so a plain
+  /// `x ?? this.x` fallback can't tell "not passed" apart from "explicitly
+  /// cleared" — both look like a null argument. Use `_unset` as the default
+  /// so only an actually-omitted argument falls back to the current value.
   NotificationPreferences copyWith({
     bool? enabled,
     bool? milestoneNotifications,
@@ -53,8 +63,8 @@ class NotificationPreferences {
     bool? matchAvailableNotifications,
     bool? soundEnabled,
     bool? vibrationEnabled,
-    TimeOfDay? quietHourStart,
-    TimeOfDay? quietHourEnd,
+    Object? quietHourStart = _unset,
+    Object? quietHourEnd = _unset,
   }) {
     return NotificationPreferences(
       enabled: enabled ?? this.enabled,
@@ -64,8 +74,12 @@ class NotificationPreferences {
       matchAvailableNotifications: matchAvailableNotifications ?? this.matchAvailableNotifications,
       soundEnabled: soundEnabled ?? this.soundEnabled,
       vibrationEnabled: vibrationEnabled ?? this.vibrationEnabled,
-      quietHourStart: quietHourStart ?? this.quietHourStart,
-      quietHourEnd: quietHourEnd ?? this.quietHourEnd,
+      quietHourStart: identical(quietHourStart, _unset)
+          ? this.quietHourStart
+          : quietHourStart as TimeOfDay?,
+      quietHourEnd: identical(quietHourEnd, _unset)
+          ? this.quietHourEnd
+          : quietHourEnd as TimeOfDay?,
     );
   }
 
@@ -94,6 +108,8 @@ class NotificationPreferences {
       matchAvailableNotifications: map['match_available_notifications'] as bool? ?? false,
       soundEnabled: map['sound_enabled'] as bool? ?? true,
       vibrationEnabled: map['vibration_enabled'] as bool? ?? true,
+      quietHourStart: TimeOfDay.parse(map['quiet_hour_start'] as String?),
+      quietHourEnd: TimeOfDay.parse(map['quiet_hour_end'] as String?),
     );
   }
 
@@ -109,6 +125,14 @@ class TimeOfDay {
   const TimeOfDay({required this.hour, required this.minute});
 
   @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TimeOfDay && other.hour == hour && other.minute == minute);
+
+  @override
+  int get hashCode => Object.hash(hour, minute);
+
+  @override
   String toString() => '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
 
   static TimeOfDay? parse(String? value) {
@@ -118,6 +142,7 @@ class TimeOfDay {
     final hour = int.tryParse(parts[0]);
     final minute = int.tryParse(parts[1]);
     if (hour == null || minute == null) return null;
+    if (hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
     return TimeOfDay(hour: hour, minute: minute);
   }
 }

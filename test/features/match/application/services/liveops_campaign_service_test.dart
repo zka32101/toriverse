@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:toriverse/features/match/application/services/liveops_campaign_service.dart';
 import 'package:toriverse/shared/services/remote_config_service.dart';
@@ -31,8 +30,8 @@ void main() {
           'name': 'Summer Festival',
           'description': 'Join our summer celebration!',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': false,
           'priority': 5,
           'campaign_type': 'seasonal',
@@ -42,8 +41,8 @@ void main() {
           'name': 'Winter Sale',
           'description': 'Winter discount event',
           'currently_live': false,
-          'start_time': DateTime.now().subtract(Duration(days: 30)),
-          'end_time': DateTime.now().subtract(Duration(days: 10)),
+          'start_time': DateTime.now().subtract(Duration(days: 30)).toIso8601String(),
+          'end_time': DateTime.now().subtract(Duration(days: 10)).toIso8601String(),
           'is_featured': false,
           'priority': 10,
           'campaign_type': 'promotional',
@@ -75,8 +74,8 @@ void main() {
           'name': 'Featured Summer',
           'description': 'Featured summer event',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': true,
           'priority': 1,
           'campaign_type': 'seasonal',
@@ -87,8 +86,8 @@ void main() {
           'name': 'Regular Campaign',
           'description': 'Regular campaign',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': false,
           'priority': 5,
           'campaign_type': 'promotional',
@@ -114,8 +113,8 @@ void main() {
           'name': 'Active Campaign',
           'description': 'Active campaign',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': false,
           'priority': 5,
           'campaign_type': 'seasonal',
@@ -143,8 +142,8 @@ void main() {
           'name': 'Test Campaign',
           'description': 'Test',
           'currently_live': true,
-          'start_time': DateTime.now(),
-          'end_time': DateTime.now().add(Duration(days: 1)),
+          'start_time': DateTime.now().toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 1)).toIso8601String(),
           'is_featured': false,
           'priority': 5,
         });
@@ -170,8 +169,8 @@ void main() {
           'name': 'No Rewards Campaign',
           'description': 'Test',
           'currently_live': true,
-          'start_time': DateTime.now(),
-          'end_time': DateTime.now().add(Duration(days: 1)),
+          'start_time': DateTime.now().toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 1)).toIso8601String(),
           'is_featured': false,
           'priority': 5,
         });
@@ -365,9 +364,9 @@ void main() {
 
     group('special event bonuses', () {
       test('getSpecialEventBonuses returns bonuses from Remote Config', () async {
-        when(mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('2.0');
-        when(mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.1');
-        when(mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('1.5');
+        when(() => mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('2.0');
+        when(() => mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.1');
+        when(() => mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('1.5');
 
         final bonuses = await service.getSpecialEventBonuses();
 
@@ -378,9 +377,9 @@ void main() {
       });
 
       test('getSpecialEventBonuses returns defaults on error', () async {
-        when(mockRemoteConfig.getString('weekend_streak_multiplier')).thenThrow(Exception());
-        when(mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenThrow(Exception());
-        when(mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenThrow(Exception());
+        when(() => mockRemoteConfig.getString('weekend_streak_multiplier')).thenThrow(Exception());
+        when(() => mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenThrow(Exception());
+        when(() => mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenThrow(Exception());
 
         final bonuses = await service.getSpecialEventBonuses();
 
@@ -391,9 +390,9 @@ void main() {
       });
 
       test('getSpecialEventBonuses parses numeric strings correctly', () async {
-        when(mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('3.5');
-        when(mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.25');
-        when(mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('2.0');
+        when(() => mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('3.5');
+        when(() => mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.25');
+        when(() => mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('2.0');
 
         final bonuses = await service.getSpecialEventBonuses();
 
@@ -403,9 +402,9 @@ void main() {
       });
 
       test('getSpecialEventBonuses handles invalid numeric strings', () async {
-        when(mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('invalid');
-        when(mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('also_invalid');
-        when(mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('not_a_number');
+        when(() => mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('invalid');
+        when(() => mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('also_invalid');
+        when(() => mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('not_a_number');
 
         final bonuses = await service.getSpecialEventBonuses();
 
@@ -490,8 +489,8 @@ void main() {
           'name': '',
           'description': 'No name campaign',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': false,
           'priority': 5,
         });
@@ -507,8 +506,8 @@ void main() {
           'name': '🎉 スペシャル キャンペーン 🎊',
           'description': 'Special event',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': false,
           'priority': 5,
         });
@@ -524,8 +523,8 @@ void main() {
           'name': 'High Priority',
           'description': 'High priority campaign',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': false,
           'priority': 999999,
         });
@@ -540,8 +539,8 @@ void main() {
           'name': 'Minimal Campaign',
           'description': 'Minimal data',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': false,
           'priority': 5,
           // banner_image_url and campaign_type are null

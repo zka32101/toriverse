@@ -202,16 +202,16 @@ class _ReplayPlayerScreenState extends ConsumerState<ReplayPlayerScreen> {
                               ),
                               label: const Text('Like'),
                             ),
-                            loading: () => const ElevatedButton.icon(
+                            loading: () => ElevatedButton.icon(
                               onPressed: null,
-                              icon: SizedBox(
+                              icon: const SizedBox(
                                 height: 16,
                                 width: 16,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
                                 ),
                               ),
-                              label: Text('Like'),
+                              label: const Text('Like'),
                             ),
                             error: (err, stack) => ElevatedButton.icon(
                               onPressed: null,

@@ -19,7 +19,7 @@ class StreamerAnalyticsWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final analytics = ref.watch(streamerAnalyticsProvider(
-      _GetAnalyticsParams(
+      GetAnalyticsParams(
         userId: userId,
         periodStart: periodStart,
         periodEnd: periodEnd,

@@ -22,7 +22,7 @@ class EventLeaderboardService {
         .map((snapshot) {
       return snapshot.docs
           .map((doc) =>
-              LeaderboardEntry.fromJson(doc.data() as Map<String, dynamic>))
+              LeaderboardEntry.fromJson(doc.data()))
           .toList();
     }).handleError((e) {
       return [];
@@ -45,7 +45,7 @@ class EventLeaderboardService {
 
       return snapshot.docs
           .map((doc) =>
-              LeaderboardEntry.fromJson(doc.data() as Map<String, dynamic>))
+              LeaderboardEntry.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];
@@ -194,7 +194,7 @@ class EventLeaderboardService {
 
       return snapshot.docs
           .map((doc) =>
-              LeaderboardEntry.fromJson(doc.data() as Map<String, dynamic>))
+              LeaderboardEntry.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];
@@ -233,7 +233,7 @@ class EventLeaderboardService {
 
       return snapshot.docs
           .map((doc) =>
-              LeaderboardEntry.fromJson(doc.data() as Map<String, dynamic>))
+              LeaderboardEntry.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];

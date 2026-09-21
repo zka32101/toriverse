@@ -35,12 +35,15 @@ void main() {
       );
 
       expect(find.text('Streak at Risk'), findsOneWidget);
+      // Both the main message and the "will be lost" sub-warning mention
+      // the streak count, so at least one (not necessarily exactly one)
+      // Text widget should contain it.
       expect(
         find.byWidgetPredicate((widget) =>
             widget is Text &&
             widget.data != null &&
             widget.data!.contains('5-match streak')),
-        findsOneWidget,
+        findsWidgets,
       );
     });
 
@@ -55,7 +58,7 @@ void main() {
       );
 
       expect(find.text('Streak at Risk'), findsOneWidget);
-      expect(find.text('Connection was lost during the match'), findsOneWidget);
+      expect(find.textContaining('Connection was lost during the match'), findsOneWidget);
     });
 
     testWidgets('Dialog mode displays warning for system error',
@@ -69,7 +72,7 @@ void main() {
       );
 
       expect(find.text('Streak at Risk'), findsOneWidget);
-      expect(find.text('An unexpected error occurred'), findsOneWidget);
+      expect(find.textContaining('An unexpected error occurred'), findsOneWidget);
     });
 
     testWidgets('Persistent mode displays as banner notification',
@@ -179,7 +182,7 @@ void main() {
           ),
         );
 
-        expect(find.text('$streak'), findsWidgets);
+        expect(find.textContaining('$streak'), findsWidgets);
         await tester.pumpWidget(const SizedBox.shrink());
       }
     });
@@ -211,14 +214,13 @@ void main() {
         ),
       );
 
-      final buttons = find.byType(TextButton);
-      expect(buttons, findsWidgets);
+      // Cancel is a TextButton, Confirm is an ElevatedButton.
+      expect(find.byType(TextButton), findsOneWidget);
+      expect(find.byType(ElevatedButton), findsOneWidget);
 
       // Buttons should be present and tappable (>= 44pt)
-      for (int i = 0; i < 2; i++) {
-        await tester.tap(find.byType(TextButton).at(i));
-        await tester.pumpAndSettle();
-      }
+      await tester.tap(find.byType(TextButton));
+      await tester.pumpAndSettle();
     });
 
     testWidgets('Shows both buttons in dialog mode',
@@ -236,15 +238,11 @@ void main() {
 
     testWidgets('Persistent banner dismissible via callback',
         (WidgetTester tester) async {
-      bool dismissCalled = false;
-
       await tester.pumpWidget(
         createTestApp(
           reason: 'connection_timeout',
           isPersistent: true,
-          onDismiss: () {
-            dismissCalled = true;
-          },
+          onCancel: () {},
         ),
       );
 

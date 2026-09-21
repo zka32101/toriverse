@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:toriverse/features/match/application/services/push_notification_manager.dart';
 import 'package:toriverse/shared/services/firebase_messaging_service.dart';
 import 'package:toriverse/shared/services/remote_config_service.dart';
@@ -28,15 +28,15 @@ void main() {
 
     group('initialization', () {
       test('initialize calls messaging initialization', () async {
-        when(mockMessaging.initialize()).thenAnswer((_) async {});
+        when(() => mockMessaging.initialize()).thenAnswer((_) async {});
 
         await manager.initialize();
 
-        verify(mockMessaging.initialize()).called(1);
+        verify(() => mockMessaging.initialize()).called(1);
       });
 
       test('initialize handles error silently', () async {
-        when(mockMessaging.initialize()).thenThrow(Exception('Init failed'));
+        when(() => mockMessaging.initialize()).thenThrow(Exception('Init failed'));
 
         // Should not throw
         await manager.initialize();
@@ -45,16 +45,16 @@ void main() {
 
     group('device token management', () {
       test('getDeviceToken returns token from messaging service', () async {
-        when(mockMessaging.getFcmToken()).thenAnswer((_) async => 'device_token_123');
+        when(() => mockMessaging.getFcmToken()).thenAnswer((_) async => 'device_token_123');
 
         final token = await manager.getDeviceToken();
 
         expect(token, equals('device_token_123'));
-        verify(mockMessaging.getFcmToken()).called(1);
+        verify(() => mockMessaging.getFcmToken()).called(1);
       });
 
       test('getDeviceToken returns null on error', () async {
-        when(mockMessaging.getFcmToken()).thenThrow(Exception('Token error'));
+        when(() => mockMessaging.getFcmToken()).thenThrow(Exception('Token error'));
 
         final token = await manager.getDeviceToken();
 
@@ -62,7 +62,8 @@ void main() {
       });
 
       test('onTokenRefresh returns stream from messaging service', () {
-        when(mockMessaging.onTokenRefresh).thenReturn(Stream.value('new_token'));
+        when(() => mockMessaging.onTokenRefresh)
+            .thenAnswer((_) => Stream.value('new_token'));
 
         final stream = manager.onTokenRefresh;
 
@@ -72,15 +73,15 @@ void main() {
 
     group('cohort topic management', () {
       test('subscribeToCohortTopic subscribes to topic', () async {
-        when(mockMessaging.subscribeToTopic('new_players_day_1')).thenAnswer((_) async {});
+        when(() => mockMessaging.subscribeToTopic('new_players_day_1')).thenAnswer((_) async {});
 
         await manager.subscribeToCohortTopic('new_players_day_1');
 
-        verify(mockMessaging.subscribeToTopic('new_players_day_1')).called(1);
+        verify(() => mockMessaging.subscribeToTopic('new_players_day_1')).called(1);
       });
 
       test('subscribeToCohortTopic handles common cohorts', () async {
-        when(mockMessaging.subscribeToTopic(any)).thenAnswer((_) async {});
+        when(() => mockMessaging.subscribeToTopic(any())).thenAnswer((_) async {});
 
         final cohorts = ['new_players_day_1', 'high_engagement', 'at_risk_churn', 'vip_subscribers', 'locale_japan'];
 
@@ -89,12 +90,12 @@ void main() {
         }
 
         for (final cohort in cohorts) {
-          verify(mockMessaging.subscribeToTopic(cohort)).called(1);
+          verify(() => mockMessaging.subscribeToTopic(cohort)).called(1);
         }
       });
 
       test('subscribeToCohortTopic handles error silently', () async {
-        when(mockMessaging.subscribeToTopic('test_cohort'))
+        when(() => mockMessaging.subscribeToTopic('test_cohort'))
             .thenThrow(Exception('Subscribe failed'));
 
         // Should not throw
@@ -102,15 +103,15 @@ void main() {
       });
 
       test('unsubscribeFromCohortTopic unsubscribes from topic', () async {
-        when(mockMessaging.unsubscribeFromTopic('new_players_day_1')).thenAnswer((_) async {});
+        when(() => mockMessaging.unsubscribeFromTopic('new_players_day_1')).thenAnswer((_) async {});
 
         await manager.unsubscribeFromCohortTopic('new_players_day_1');
 
-        verify(mockMessaging.unsubscribeFromTopic('new_players_day_1')).called(1);
+        verify(() => mockMessaging.unsubscribeFromTopic('new_players_day_1')).called(1);
       });
 
       test('unsubscribeFromCohortTopic handles error silently', () async {
-        when(mockMessaging.unsubscribeFromTopic('test_cohort'))
+        when(() => mockMessaging.unsubscribeFromTopic('test_cohort'))
             .thenThrow(Exception('Unsubscribe failed'));
 
         // Should not throw
@@ -120,15 +121,15 @@ void main() {
 
     group('notification disabling/enabling', () {
       test('disableAllNotifications unsubscribes from all', () async {
-        when(mockMessaging.unsubscribeFromAll()).thenAnswer((_) async {});
+        when(() => mockMessaging.unsubscribeFromAll()).thenAnswer((_) async {});
 
         await manager.disableAllNotifications();
 
-        verify(mockMessaging.unsubscribeFromAll()).called(1);
+        verify(() => mockMessaging.unsubscribeFromAll()).called(1);
       });
 
       test('disableAllNotifications handles error silently', () async {
-        when(mockMessaging.unsubscribeFromAll())
+        when(() => mockMessaging.unsubscribeFromAll())
             .thenThrow(Exception('Disable failed'));
 
         // Should not throw
@@ -136,16 +137,16 @@ void main() {
       });
 
       test('enableAllNotifications subscribes to default topics', () async {
-        when(mockMessaging.subscribeToTopic(any)).thenAnswer((_) async {});
+        when(() => mockMessaging.subscribeToTopic(any())).thenAnswer((_) async {});
 
         await manager.enableAllNotifications();
 
-        verify(mockMessaging.subscribeToTopic('all_players')).called(1);
-        verify(mockMessaging.subscribeToTopic('locale_japan')).called(1);
+        verify(() => mockMessaging.subscribeToTopic('all_players')).called(1);
+        verify(() => mockMessaging.subscribeToTopic('locale_japan')).called(1);
       });
 
       test('enableAllNotifications handles error silently', () async {
-        when(mockMessaging.subscribeToTopic(any))
+        when(() => mockMessaging.subscribeToTopic(any()))
             .thenThrow(Exception('Enable failed'));
 
         // Should not throw
@@ -167,7 +168,7 @@ void main() {
       });
 
       test('sendStreakRecoveryNotification checks Remote Config', () async {
-        when(mockRemoteConfig.isFeatureEnabled('push_notifications'))
+        when(() => mockRemoteConfig.isFeatureEnabled('push_notifications'))
             .thenReturn(true);
 
         await manager.sendStreakRecoveryNotification(
@@ -175,11 +176,11 @@ void main() {
           streakLost: 5,
         );
 
-        verify(mockRemoteConfig.isFeatureEnabled('push_notifications')).called(1);
+        verify(() => mockRemoteConfig.isFeatureEnabled('push_notifications')).called(1);
       });
 
       test('sendStreakRecoveryNotification skips when disabled', () async {
-        when(mockRemoteConfig.isFeatureEnabled('push_notifications'))
+        when(() => mockRemoteConfig.isFeatureEnabled('push_notifications'))
             .thenReturn(false);
 
         await manager.sendStreakRecoveryNotification(
@@ -187,7 +188,7 @@ void main() {
           streakLost: 5,
         );
 
-        verify(mockRemoteConfig.isFeatureEnabled('push_notifications')).called(1);
+        verify(() => mockRemoteConfig.isFeatureEnabled('push_notifications')).called(1);
       });
 
       test('broadcastMatchAvailableNotification handles gracefully', () async {
@@ -345,43 +346,43 @@ void main() {
 
     group('cohort targeting scenarios', () {
       test('new player onboarding cohort', () async {
-        when(mockMessaging.subscribeToTopic('new_players_day_1')).thenAnswer((_) async {});
+        when(() => mockMessaging.subscribeToTopic('new_players_day_1')).thenAnswer((_) async {});
 
         await manager.subscribeToCohortTopic('new_players_day_1');
 
-        verify(mockMessaging.subscribeToTopic('new_players_day_1')).called(1);
+        verify(() => mockMessaging.subscribeToTopic('new_players_day_1')).called(1);
       });
 
       test('high engagement cohort', () async {
-        when(mockMessaging.subscribeToTopic('high_engagement')).thenAnswer((_) async {});
+        when(() => mockMessaging.subscribeToTopic('high_engagement')).thenAnswer((_) async {});
 
         await manager.subscribeToCohortTopic('high_engagement');
 
-        verify(mockMessaging.subscribeToTopic('high_engagement')).called(1);
+        verify(() => mockMessaging.subscribeToTopic('high_engagement')).called(1);
       });
 
       test('at risk churn cohort', () async {
-        when(mockMessaging.subscribeToTopic('at_risk_churn')).thenAnswer((_) async {});
+        when(() => mockMessaging.subscribeToTopic('at_risk_churn')).thenAnswer((_) async {});
 
         await manager.subscribeToCohortTopic('at_risk_churn');
 
-        verify(mockMessaging.subscribeToTopic('at_risk_churn')).called(1);
+        verify(() => mockMessaging.subscribeToTopic('at_risk_churn')).called(1);
       });
 
       test('VIP subscriber cohort', () async {
-        when(mockMessaging.subscribeToTopic('vip_subscribers')).thenAnswer((_) async {});
+        when(() => mockMessaging.subscribeToTopic('vip_subscribers')).thenAnswer((_) async {});
 
         await manager.subscribeToCohortTopic('vip_subscribers');
 
-        verify(mockMessaging.subscribeToTopic('vip_subscribers')).called(1);
+        verify(() => mockMessaging.subscribeToTopic('vip_subscribers')).called(1);
       });
 
       test('locale-specific cohort', () async {
-        when(mockMessaging.subscribeToTopic('locale_japan')).thenAnswer((_) async {});
+        when(() => mockMessaging.subscribeToTopic('locale_japan')).thenAnswer((_) async {});
 
         await manager.subscribeToCohortTopic('locale_japan');
 
-        verify(mockMessaging.subscribeToTopic('locale_japan')).called(1);
+        verify(() => mockMessaging.subscribeToTopic('locale_japan')).called(1);
       });
     });
   });

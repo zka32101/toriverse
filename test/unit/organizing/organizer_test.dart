@@ -178,6 +178,7 @@ void main() {
       final totalDistributed =
           distribution.values.reduce((a, b) => a + b);
       expect(totalDistributed, 500000);
+      expect(pool.totalAmount, totalDistributed);
     });
 
     test('serializes and deserializes prize pool', () {

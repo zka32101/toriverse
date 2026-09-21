@@ -148,7 +148,7 @@ void main() {
       monitor = monitor.recordActivity('player_0');
       final newTime = monitor.lastActivityByPlayer['player_0']!;
 
-      expect(newTime, isAfter(originalTime));
+      expect(newTime.isAfter(originalTime), isTrue);
     });
 
     test('getInactivePlayers() returns only inactive players', () async {

@@ -6,23 +6,34 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:toriverse/features/social/application/services/friend_service.dart';
-import 'package:toriverse/features/social/domain/models/friend_models.dart';
 
 // Mock classes
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
+// ignore: subtype_of_sealed_class
 class MockCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {}
 
 class MockWriteBatch extends Mock implements WriteBatch {}
 
 void main() {
+  setUpAll(() {
+    // WriteBatch.update()'s `document` parameter is declared as the raw
+    // (unparameterized) `DocumentReference`, i.e. `DocumentReference<Object?>`.
+    // mocktail looks up fallbacks via `is`, and Dart's generics are
+    // covariant, so a `DocumentReference<Map<String, dynamic>>` instance
+    // also satisfies that lookup.
+    registerFallbackValue(MockDocumentReference());
+  });
+
   late MockFirebaseFirestore mockFirestore;
   late FriendService friendService;
 

@@ -1,9 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:toriverse/features/match/application/services/liveops_campaign_service.dart';
-import 'package:toriverse/features/match/application/providers/notification_state.dart';
 import 'package:toriverse/shared/services/remote_config_service.dart';
 
 /// Mock RemoteConfigService
@@ -28,9 +26,9 @@ void main() {
       testCampaignId = 'campaign_summer_2026';
 
       // Setup Remote Config defaults
-      when(mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('2.0');
-      when(mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.1');
-      when(mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('1.5');
+      when(() => mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('2.0');
+      when(() => mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.1');
+      when(() => mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('1.5');
     });
 
     group('basic campaign claiming', () {
@@ -40,8 +38,8 @@ void main() {
           'name': 'Summer Festival',
           'description': 'Summer celebration campaign',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': true,
           'priority': 1,
           'campaign_type': 'seasonal',
@@ -381,8 +379,8 @@ void main() {
           'name': 'Active Campaign',
           'description': 'Test campaign',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': true,
           'priority': 1,
         });
@@ -402,8 +400,8 @@ void main() {
           'name': 'Campaign 1',
           'description': 'Test',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': false,
           'priority': 3,
         });
@@ -412,8 +410,8 @@ void main() {
           'name': 'Campaign 2',
           'description': 'Test',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 2)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 2)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': false,
           'priority': 1,
         });
@@ -433,8 +431,8 @@ void main() {
           'name': 'Complete Flow Campaign',
           'description': 'Test complete flow',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': true,
           'priority': 1,
         });
@@ -515,8 +513,8 @@ void main() {
           'name': 'Multi-user Campaign',
           'description': 'Test',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': false,
           'priority': 5,
         });
@@ -600,8 +598,8 @@ void main() {
           'name': 'Bonus Campaign',
           'description': 'Test',
           'currently_live': true,
-          'start_time': DateTime.now().subtract(Duration(days: 1)),
-          'end_time': DateTime.now().add(Duration(days: 7)),
+          'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
+          'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'is_featured': false,
           'priority': 5,
         });

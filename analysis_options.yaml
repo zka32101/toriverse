@@ -9,6 +9,16 @@
 # packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
+analyzer:
+  # firebase/ holds Cloud Functions deployment reference code (deployed via
+  # a separate Node/Dart Functions toolchain, not this Flutter app's
+  # pubspec), so it isn't part of this project's dependency graph.
+  exclude:
+    - firebase/**
+    - build/**
+    - android/**
+    - ios/**
+
 linter:
   # The lint rules applied to this project can be customized in the
   # section below to disable rules from the `package:flutter_lints/flutter.yaml`
@@ -35,7 +45,6 @@ linter:
     - control_flow_in_finally
     - empty_statements
     - hash_and_equals
-    - invariant_booleans
     - iterable_contains_unrelated_type
     - list_remove_unrelated_type
     - no_adjacent_strings_in_list
@@ -51,7 +60,6 @@ linter:
     - always_put_required_named_parameters_first
     - annotate_overrides
     - avoid_bool_literals_in_conditional_expressions
-    - avoid_catches
     - avoid_catching_errors
     - avoid_classes_with_only_static_members
     - avoid_double_and_int_checks
@@ -63,7 +71,6 @@ linter:
     - avoid_private_typedef_functions
     - avoid_renaming_method_parameters
     - avoid_returning_null
-    - avoid_returning_null_for_future
     - avoid_returning_this
     - avoid_returning_null_for_void
     - avoid_setters_without_getters
@@ -90,7 +97,6 @@ linter:
     - library_private_types_in_public_api
     - lines_longer_than_80_chars
     - no_leading_underscores_for_library_prefixes
-    - no_leading_underscores_for_local_variables
     - null_closures
     - omit_local_variable_types
     - one_member_abstracts
@@ -110,7 +116,6 @@ linter:
     - prefer_const_literals_to_create_immutables
     - prefer_constructors_over_static_methods
     - prefer_contains
-    - prefer_equal_for_default_values
     - prefer_expression_function_bodies
     - prefer_final_fields
     - prefer_final_in_for_each
@@ -120,8 +125,6 @@ linter:
     - prefer_function_declarations_over_variables
     - prefer_generic_function_type_aliases
     - prefer_if_elements_to_conditional_expressions
-    - prefer_if_null_to_conditional_expressions
-    - prefer_if_on_single_line_is_else
     - prefer_initializing_formals
     - prefer_inlined_adds
     - prefer_int_literals
@@ -129,19 +132,15 @@ linter:
     - prefer_is_empty
     - prefer_is_not_empty
     - prefer_is_not_operator
-    - prefer_is_null_check_on_cascade_expressions
     - prefer_iterable_whereType
     - prefer_mixin
     - prefer_null_aware_operators
-    - prefer_null_coalescing_operators
-    - prefer_relative_import_paths
     - prefer_single_quotes
     - prefer_spread_collections
     - provide_deprecation_message
     - recursive_getters
     - sized_box_for_whitespace
     - sized_box_shrink_expand
-    - sized_box_shrink_when_not_limited
     - slash_for_doc_comments
     - sort_child_properties_last
     - sort_constructors_first
@@ -160,7 +159,6 @@ linter:
     - unnecessary_null_aware_assignments
     - unnecessary_null_checks
     - unnecessary_null_in_if_null_operators
-    - unnecessary_null_operator_on_extension_on_nullable
     - unnecessary_nullable_for_final_variable_declarations
     - unnecessary_overrides
     - unnecessary_parenthesis
@@ -169,13 +167,10 @@ linter:
     - unnecessary_string_interpolations
     - unnecessary_this
     - unnecessary_to_list_in_spreads
-    - unrelated_type_equality_checks
     - unsafe_html
     - use_build_context_synchronously
     - use_full_hex_values_for_flutter_colors
     - use_function_type_syntax_for_parameters
-    - use_getters_to_get_values
-    - use_if_null_to_convert_nullability
     - use_is_even_rather_than_modulo
     - use_key_in_widget_constructors
     - use_late_for_private_fields_and_variables
@@ -183,7 +178,6 @@ linter:
     - use_setters_to_change_properties
     - use_string_buffers
     - use_test_throws_matchers
-    - use_to_close_over_async_dispose
     - void_checks
 
 # Additional information about this file can be found at

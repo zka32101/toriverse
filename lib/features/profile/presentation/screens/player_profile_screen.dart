@@ -4,7 +4,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../profile/domain/models/player_profile_models.dart';
+
+import '../../domain/models/player_profile_models.dart';
 
 class PlayerProfileScreen extends ConsumerStatefulWidget {
   final String uid;
@@ -181,7 +182,7 @@ class _PlayerProfileScreenState extends ConsumerState<PlayerProfileScreen> {
         ),
         const SizedBox(height: 12),
         // Achievements list
-        for (int i = 0; i < 3; i++)
+        for (final achievement in AchievementDefinitions.ALL.take(3))
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Card(
@@ -191,7 +192,7 @@ class _PlayerProfileScreenState extends ConsumerState<PlayerProfileScreen> {
                 child: Row(
                   children: [
                     Text(
-                      '🏆',
+                      achievement.icon,
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     const SizedBox(width: 12),
@@ -199,15 +200,15 @@ class _PlayerProfileScreenState extends ConsumerState<PlayerProfileScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'First Victory',
-                            style: TextStyle(
+                          Text(
+                            achievement.name,
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const Text(
-                            'Win your first match',
-                            style: TextStyle(
+                          Text(
+                            achievement.description,
+                            style: const TextStyle(
                               fontSize: 12,
                               color: Colors.grey,
                             ),

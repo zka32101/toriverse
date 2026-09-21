@@ -22,21 +22,27 @@ void main() {
       container.dispose();
     });
 
-    testWidgets('ボードが8x8グリッドで表示される', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: Scaffold(
-              body: BoardWidget(),
+    Widget buildTestApp() {
+      final gameState = container.read(gameStateProvider)!;
+      return ProviderScope(
+        overrides: [
+          gameStateProvider
+              .overrideWith((ref) => container.read(gameStateProvider.notifier)),
+        ],
+        child: MaterialApp(
+          theme: ToriverseTheme.lightTheme(),
+          home: Scaffold(
+            body: BoardWidget(
+              board: gameState.board,
+              validMoves: gameState.validMoves,
             ),
           ),
         ),
       );
+    }
+
+    testWidgets('ボードが8x8グリッドで表示される', (WidgetTester tester) async {
+      await tester.pumpWidget(buildTestApp());
 
       expect(find.byType(GridView), findsOneWidget);
       // 8x8 = 64 マス
@@ -44,20 +50,7 @@ void main() {
     });
 
     testWidgets('初期盤面の石が正しく表示される', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: Scaffold(
-              body: BoardWidget(),
-            ),
-          ),
-        ),
-      );
+      await tester.pumpWidget(buildTestApp());
 
       // 初期盤面では黒2、白2の合計4石
       final board = container.read(gameStateProvider)!.board;
@@ -74,43 +67,17 @@ void main() {
     });
 
     testWidgets('合法手がハイライトされる', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: Scaffold(
-              body: BoardWidget(),
-            ),
-          ),
-        ),
-      );
+      await tester.pumpWidget(buildTestApp());
 
       final validMoves = container.read(gameStateProvider)!.validMoves;
       expect(validMoves.length, greaterThan(0)); // 初期状態では合法手あり
     });
 
     testWidgets('石をタップしてプレイ可能', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: Scaffold(
-              body: BoardWidget(),
-            ),
-          ),
-        ),
-      );
+      await tester.pumpWidget(buildTestApp());
 
       final board = container.read(gameStateProvider)!.board;
-      final initialBlackCount = board.stoneCounts[Board.black];
+      final initialBlackCount = board.countStones()[Board.black] ?? 0;
 
       // 合法手の1つをタップ（例: (2, 3)）
       final validMoves = container.read(gameStateProvider)!.validMoves;
@@ -118,44 +85,18 @@ void main() {
         final move = validMoves.first;
         await container
             .read(gameStateProvider.notifier)
-            .placeStone(move.row, move.col);
+            .placeStone(move[0], move[1]);
 
-        await tester.pumpWidget(
-          ProviderScope(
-            overrides: [
-              gameStateProvider
-                  .overrideWith((ref) => container.read(gameStateProvider)),
-            ],
-            child: MaterialApp(
-              theme: appTheme,
-              home: Scaffold(
-                body: BoardWidget(),
-              ),
-            ),
-          ),
-        );
+        await tester.pumpWidget(buildTestApp());
 
         final updatedBoard = container.read(gameStateProvider)!.board;
-        final updatedBlackCount = updatedBoard.stoneCounts[Board.black];
+        final updatedBlackCount = updatedBoard.countStones()[Board.black];
         expect(updatedBlackCount, greaterThan(initialBlackCount));
       }
     });
 
     testWidgets('3色（黒・白・赤）が正しく描画される', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: Scaffold(
-              body: BoardWidget(),
-            ),
-          ),
-        ),
-      );
+      await tester.pumpWidget(buildTestApp());
 
       final board = container.read(gameStateProvider)!.board;
 
@@ -171,20 +112,7 @@ void main() {
       tester.binding.window.physicalSizeTestValue = const Size(400, 800);
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: Scaffold(
-              body: BoardWidget(),
-            ),
-          ),
-        ),
-      );
+      await tester.pumpWidget(buildTestApp());
 
       expect(find.byType(GridView), findsOneWidget);
     });
@@ -204,6 +132,25 @@ void main() {
       container.dispose();
     });
 
+    Widget buildTestApp() {
+      final gameState = container.read(gameStateProvider)!;
+      return ProviderScope(
+        overrides: [
+          gameStateProvider
+              .overrideWith((ref) => container.read(gameStateProvider.notifier)),
+        ],
+        child: MaterialApp(
+          theme: ToriverseTheme.lightTheme(),
+          home: Scaffold(
+            body: BoardWidget(
+              board: gameState.board,
+              validMoves: gameState.validMoves,
+            ),
+          ),
+        ),
+      );
+    }
+
     testWidgets('複数手の後に盤面が更新される', (WidgetTester tester) async {
       // 複数の手を打つ
       await container
@@ -213,22 +160,8 @@ void main() {
           .read(gameStateProvider.notifier)
           .placeStone(2, 4);
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: Scaffold(
-              body: BoardWidget(),
-            ),
-          ),
-        ),
-      );
+      await tester.pumpWidget(buildTestApp());
 
-      final board = container.read(gameStateProvider)!.board;
       final roundIndex = container.read(gameStateProvider)!.roundIndex;
       expect(roundIndex, greaterThan(0));
     });

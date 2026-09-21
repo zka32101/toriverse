@@ -18,7 +18,7 @@ class ParticipantManagementWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final registrationsAsync = ref.watch(
-      registrationsProvider(_GetRegistrationsParams(tournamentId)),
+      registrationsProvider(GetRegistrationsParams(tournamentId)),
     );
 
     return registrationsAsync.when(

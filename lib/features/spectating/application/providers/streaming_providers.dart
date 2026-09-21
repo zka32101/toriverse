@@ -19,8 +19,6 @@ final startStreamingSessionProvider = FutureProvider.autoDispose
     userId: params.userId,
     displayName: params.displayName,
     targetPlatforms: params.targetPlatforms,
-    streamTitle: params.streamTitle,
-    streamDescription: params.streamDescription,
   );
 });
 
@@ -115,16 +113,12 @@ class _StartStreamingParams {
   final String userId;
   final String displayName;
   final List<StreamingPlatform> targetPlatforms;
-  final String? streamTitle;
-  final String? streamDescription;
 
   _StartStreamingParams({
     required this.matchId,
     required this.userId,
     required this.displayName,
     required this.targetPlatforms,
-    this.streamTitle,
-    this.streamDescription,
   });
 
   @override
@@ -135,18 +129,14 @@ class _StartStreamingParams {
           matchId == other.matchId &&
           userId == other.userId &&
           displayName == other.displayName &&
-          targetPlatforms == other.targetPlatforms &&
-          streamTitle == other.streamTitle &&
-          streamDescription == other.streamDescription;
+          targetPlatforms == other.targetPlatforms;
 
   @override
   int get hashCode =>
       matchId.hashCode ^
       userId.hashCode ^
       displayName.hashCode ^
-      targetPlatforms.hashCode ^
-      streamTitle.hashCode ^
-      streamDescription.hashCode;
+      targetPlatforms.hashCode;
 }
 
 /// Parameters for ending a streaming session

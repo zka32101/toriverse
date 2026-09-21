@@ -198,7 +198,9 @@ class Season {
   int getDuration() {
     final start = DateTime.parse(startDate);
     final end = DateTime.parse(endDate);
-    return end.difference(start).inDays;
+    // Inclusive of both the start and end date (e.g. 2026-09-01 through
+    // 2026-09-30 is a 30-day September, not the 29-day gap between them).
+    return end.difference(start).inDays + 1;
   }
 
   /// Check if season is active

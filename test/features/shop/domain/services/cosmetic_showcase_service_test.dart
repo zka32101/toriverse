@@ -2,39 +2,65 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:toriverse/features/shop/domain/services/cosmetic_showcase_service.dart';
 import 'package:toriverse/shared/models/cosmetic_item.dart';
 
+/// Builds a [CosmeticItem] with sensible defaults for the fields this test
+/// suite doesn't care about, so each test case only has to specify what it's
+/// actually exercising.
+CosmeticItem _testCosmetic({
+  required String id,
+  required String name,
+  required CosmeticType type,
+  required CosmeticRarity rarity,
+  required int price,
+  DateTime? releaseDate,
+}) {
+  return CosmeticItem(
+    id: id,
+    name: name,
+    type: type,
+    rarity: rarity,
+    price: price,
+    description: 'Test cosmetic',
+    colorScheme: 'default',
+    previewImageUrl: 'assets/test.png',
+    releaseDate: releaseDate ?? DateTime(2026, 1, 1),
+    requiresMinVersion: '0.1.0',
+    revenuekatProductId: 'test_product_$id',
+  );
+}
+
 void main() {
   group('CosmeticShowcaseService', () {
     final service = CosmeticShowcaseService();
 
     // Create test cosmetics
     final cosmetics = [
-      CosmeticItem(
+      _testCosmetic(
         id: 'board_classic',
         name: 'Classic Board',
         type: CosmeticType.board,
         rarity: CosmeticRarity.common,
-        priceJpy: 120,
+        price: 120,
       ),
-      CosmeticItem(
+      _testCosmetic(
         id: 'board_sakura',
         name: 'Sakura Board',
         type: CosmeticType.board,
         rarity: CosmeticRarity.rare,
-        priceJpy: 240,
+        price: 240,
       ),
-      CosmeticItem(
+      _testCosmetic(
         id: 'limited_apex',
         name: 'Limited Apex',
         type: CosmeticType.board,
         rarity: CosmeticRarity.limited,
-        priceJpy: 500,
+        price: 500,
       ),
-      CosmeticItem(
+      _testCosmetic(
         id: 'stone_red',
         name: 'Red Stone',
         type: CosmeticType.stoneRed,
         rarity: CosmeticRarity.common,
-        priceJpy: 120,
+        price: 120,
       ),
     ];
 
@@ -78,21 +104,21 @@ void main() {
       final older = now.subtract(const Duration(days: 1));
 
       final cosmeticsWithDates = [
-        CosmeticItem(
+        _testCosmetic(
           id: 'old',
           name: 'Old Item',
           type: CosmeticType.board,
           rarity: CosmeticRarity.common,
-          priceJpy: 120,
-          purchasedAt: older,
+          price: 120,
+          releaseDate: older,
         ),
-        CosmeticItem(
+        _testCosmetic(
           id: 'new',
           name: 'New Item',
           type: CosmeticType.board,
           rarity: CosmeticRarity.common,
-          priceJpy: 120,
-          purchasedAt: now,
+          price: 120,
+          releaseDate: now,
         ),
       ];
 
@@ -160,12 +186,12 @@ void main() {
 
     test('getAchievements tracks common collector', () {
       final commons = [
-        CosmeticItem(
+        _testCosmetic(
           id: 'common1',
           name: 'Common 1',
           type: CosmeticType.board,
           rarity: CosmeticRarity.common,
-          priceJpy: 120,
+          price: 120,
         ),
       ];
       final allCosmetics = commons;
@@ -180,12 +206,12 @@ void main() {
 
     test('getAchievements tracks exclusive owner', () {
       final owned = [
-        CosmeticItem(
+        _testCosmetic(
           id: 'limited',
           name: 'Limited',
           type: CosmeticType.board,
           rarity: CosmeticRarity.limited,
-          priceJpy: 500,
+          price: 500,
         ),
       ];
       final allCosmetics = owned;
@@ -201,12 +227,12 @@ void main() {
     test('getAchievements tracks collector milestones', () {
       final owned = List.generate(
         25,
-        (i) => CosmeticItem(
+        (i) => _testCosmetic(
           id: 'cosmetic_$i',
           name: 'Cosmetic $i',
           type: CosmeticType.board,
           rarity: CosmeticRarity.common,
-          priceJpy: 120,
+          price: 120,
         ),
       );
       final allCosmetics = owned;

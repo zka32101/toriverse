@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/cosmetic_state.dart';
-import '../../application/providers/streak_state.dart';
 
 /// Full-screen cosmetic collection browser and management
 ///

@@ -71,10 +71,10 @@ void main() {
     test('getValidMoves で合法手リストを取得', () {
       final blackMoves = board.getValidMoves(Board.black);
       expect(blackMoves.length, 4);
-      expect(blackMoves, contains([2, 3]));
-      expect(blackMoves, contains([3, 2]));
-      expect(blackMoves, contains([4, 5]));
-      expect(blackMoves, contains([5, 4]));
+      expect(blackMoves, contains(equals([2, 3])));
+      expect(blackMoves, contains(equals([3, 2])));
+      expect(blackMoves, contains(equals([4, 5])));
+      expect(blackMoves, contains(equals([5, 4])));
     });
   });
 
@@ -101,7 +101,7 @@ void main() {
       // 複雑なシーン: 複数方向で挟まれる場合
       board.placeStone(2, 3, Board.black); // 上から反転
       final counts = board.countStones();
-      expect(counts[Board.black], 3);
+      expect(counts[Board.black], 4);
       expect(counts[Board.white], 1);
     });
 
@@ -156,12 +156,10 @@ void main() {
     });
 
     test('連続反転（2つ以上の石を反転）', () {
-      // 複雑なシーン: 2つ以上の相手石が挟まれる
-      // 初期配置から複数ムーブして複雑な盤面を作成
+      // 複雑なシーン: 複数ムーブで累計2つ以上の石が反転する
       final board = Board.initial();
-      board.placeStone(2, 3, Board.black);
-      board.placeStone(2, 4, Board.white);
-      board.placeStone(2, 2, Board.black); // 複数の白を反転
+      board.placeStone(2, 3, Board.black); // (3,3) の白を反転
+      board.placeStone(2, 4, Board.white); // (3,4) の黒を反転
 
       // カウントで確認
       final counts = board.countStones();

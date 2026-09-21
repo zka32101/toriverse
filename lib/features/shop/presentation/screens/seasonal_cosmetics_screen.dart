@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:toriverse/features/shop/application/providers/seasonal_providers.dart';
-import 'package:toriverse/features/shop/domain/services/seasonal_cosmetics_service.dart';
-import 'package:toriverse/shared/services/analytics_service.dart';
 import '../widgets/seasonal_header.dart';
 import '../widgets/seasonal_cosmetic_card.dart';
 import '../widgets/archived_cosmetics_section.dart';
@@ -24,8 +23,7 @@ class _SeasonalCosmeticsScreenState extends ConsumerState<SeasonalCosmeticsScree
   }
 
   Future<void> _logScreenOpened() async {
-    final analyticsService = AnalyticsService();
-    await analyticsService.logEvent(
+    await FirebaseAnalytics.instance.logEvent(
       name: 'seasonal_cosmetics_screen_opened',
       parameters: {},
     );
@@ -33,8 +31,8 @@ class _SeasonalCosmeticsScreenState extends ConsumerState<SeasonalCosmeticsScree
 
   @override
   Widget build(BuildContext context) {
-    final currentSeasonAsync = ref.watch(currentSeasonProvider);
-    final nextSeasonAsync = ref.watch(nextSeasonProvider);
+    final currentSeason = ref.watch(currentSeasonProvider);
+    final nextSeason = ref.watch(nextSeasonProvider);
     final currentSeasonalCosmeticsAsync =
         ref.watch(currentSeasonalCosmeticsProvider);
     final archivedCosmeticsAsync = ref.watch(archivedCosmeticsProvider);
@@ -44,10 +42,8 @@ class _SeasonalCosmeticsScreenState extends ConsumerState<SeasonalCosmeticsScree
         title: const Text('シーズナルコスメティックス'),
         elevation: 0,
       ),
-      body: currentSeasonAsync.when(
-        data: (currentSeason) {
-          if (currentSeason == null) {
-            return Center(
+      body: currentSeason == null
+          ? Center(
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -66,13 +62,11 @@ class _SeasonalCosmeticsScreenState extends ConsumerState<SeasonalCosmeticsScree
                   ],
                 ),
               ),
-            );
-          }
-
-          return SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+            )
+          : SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 // Season header
                 SeasonalHeader(season: currentSeason),
 
@@ -152,7 +146,7 @@ class _SeasonalCosmeticsScreenState extends ConsumerState<SeasonalCosmeticsScree
                 const SizedBox(height: 24),
 
                 // Next season preview
-                if (nextSeasonAsync.hasValue && nextSeasonAsync.value != null)
+                if (nextSeason != null)
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Column(
@@ -182,7 +176,7 @@ class _SeasonalCosmeticsScreenState extends ConsumerState<SeasonalCosmeticsScree
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                nextSeasonAsync.value!.name,
+                                nextSeason.name,
                                 style: Theme.of(context)
                                     .textTheme
                                     .titleMedium
@@ -193,7 +187,7 @@ class _SeasonalCosmeticsScreenState extends ConsumerState<SeasonalCosmeticsScree
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                '開始: ${nextSeasonAsync.value!.startDate}',
+                                '開始: ${nextSeason.startDate}',
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodySmall
@@ -203,7 +197,7 @@ class _SeasonalCosmeticsScreenState extends ConsumerState<SeasonalCosmeticsScree
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                '${nextSeasonAsync.value!.featuredCosmetics.length} 個の新コスメティックス予定',
+                                '${nextSeason.featuredCosmetics.length} 個の新コスメティックス予定',
                                 style: Theme.of(context)
                                     .textTheme
                                     .labelSmall
@@ -236,17 +230,7 @@ class _SeasonalCosmeticsScreenState extends ConsumerState<SeasonalCosmeticsScree
                 const SizedBox(height: 24),
               ],
             ),
-          );
-        },
-        loading: () =>
-            const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text('エラー: ${error.toString()}'),
           ),
-        ),
-      ),
     );
   }
 }

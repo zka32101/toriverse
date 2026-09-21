@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/round_result_model.dart';
-import '../../domain/services/bonus_calculator.dart';
-import 'remote_config_provider.dart';
 
 /// ラウンド中の手の提出状態を管理
 class RoundSubmissionState {

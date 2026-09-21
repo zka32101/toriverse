@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../match/presentation/widgets/board_widget.dart';
-import '../../../match/application/providers/match_providers.dart';
+import '../../../match/application/providers/firestore_match_provider.dart';
+import '../../../match/data/models/match_model.dart';
+import '../../../match/domain/entities/board.dart';
 import '../../application/providers/spectator_providers.dart';
 import '../widgets/spectator_info_card.dart';
 import '../widgets/spectator_list_widget.dart';
@@ -26,7 +28,9 @@ class SpectatorViewScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch match state
-    final matchAsync = ref.watch(firebaseMatchStreamProvider(matchId));
+    final matchAsync = ref.watch(matchDocumentProvider(matchId)).whenData(
+          (doc) => MatchModel.fromJson(doc.data()! as Map<String, dynamic>),
+        );
 
     // Watch spectators for this match
     final spectatorsAsync = ref.watch(matchSpectatorsProvider(matchId));
@@ -77,8 +81,9 @@ class SpectatorViewScreen extends ConsumerWidget {
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: BoardWidget(
-                  boardState: match.boardState,
-                  onStonePressed: null, // Null = read-only (spectator mode)
+                  board: _boardFromFlatState(match.boardState),
+                  validMoves: const [], // Spectators can't move
+                  onMoveTapped: null, // Null = read-only (spectator mode)
                 ),
               ),
 
@@ -210,6 +215,20 @@ class SpectatorViewScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  /// Converts the flat 64-element Firestore board representation into a
+  /// [Board] the read-only [BoardWidget] can render.
+  Board _boardFromFlatState(List<int> flatState) {
+    final grid = List.generate(
+      8,
+      (row) => List.generate(8, (col) {
+        final value = flatState[row * 8 + col];
+        // MatchModel uses -1 for empty; Board uses Board.empty (3).
+        return value < 0 ? Board.empty : value;
+      }),
+    );
+    return Board.fromGrid(grid);
   }
 
   void _shareMatch(BuildContext context, String matchId) {

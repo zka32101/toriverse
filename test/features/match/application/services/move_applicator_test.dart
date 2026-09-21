@@ -9,7 +9,7 @@ void main() {
     late List<String> playerIds;
 
     setUp(() {
-      board = Board.standard();
+      board = Board.initial();
       playerIds = ['player1', 'player2', 'player3'];
     });
 
@@ -73,7 +73,7 @@ void main() {
 
       test('isGameOver returns true when no players have valid moves', () {
         // Create a board state with no valid moves (artificial state)
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
         // Modify board to have no valid moves - this is tricky without filling it
         // For now, test the logic structure
         final allPlayersNoMove = !MoveApplicator.isGameOver(testBoard);
@@ -84,7 +84,7 @@ void main() {
     group('Weak Bonus Integration', () {
       test('applyRoundMoves detects weak bonus eligibility', () {
         // Create a board state where player 2 (red) is far behind
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
 
         // Simulate many moves to create a stone deficit
         // For simplicity, we'll just test with bottom 20% detection
@@ -113,7 +113,7 @@ void main() {
       });
 
       test('applyRoundMoves respects bonus activation limits', () {
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
         final submittedPositions = <String, int>{};
 
         // Test with max activations already reached (previousBonusActivations = [2, 2, 2])
@@ -133,22 +133,40 @@ void main() {
       });
 
       test('applyRoundMoves includes bonus events in replay', () {
-        final testBoard = Board.standard();
-        const initialReplayEvents = <ReplayEvent>[];
+        // applyRoundMoves only appends a bonus event when a bonusCalculator
+        // is supplied *and* a player actually qualifies (late game,
+        // sufficiently behind on stones). Build a board where player3 (red)
+        // is far behind black/white to satisfy the stone-diff threshold.
+        final grid = List.generate(8, (_) => List.filled(8, Board.empty));
+        for (int row = 0; row < 2; row++) {
+          for (int col = 0; col < 8; col++) {
+            grid[row][col] = Board.black; // 16 black
+          }
+        }
+        for (int row = 5; row < 7; row++) {
+          for (int col = 0; col < 8; col++) {
+            grid[row][col] = Board.white; // 16 white
+          }
+        }
+        grid[3][0] = Board.red;
+        grid[3][1] = Board.red; // 2 red - far behind the threshold
+        final testBoard = Board.fromGrid(grid);
 
         final result = MoveApplicator.applyRoundMoves(
           matchId: 'test-match',
-          roundIndex: 10,
+          roundIndex: 55, // late game: 64 - 55 = 9 rounds remaining
           boardBefore: testBoard,
           playerIds: playerIds,
           processOrder: playerIds,
           submittedPositions: {},
           rivalryTracker: null,
-          replayEvents: initialReplayEvents,
+          bonusCalculator: BonusCalculator(),
+          previousBonusActivations: [0, 0, 0],
         );
 
-        // Should have created a result with replay events
+        // Should have created a result with a weak-bonus replay event
         expect(result.replayEvents, isNotEmpty);
+        expect(result.bonusTriggered, equals('player3'));
       });
     });
 

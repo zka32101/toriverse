@@ -1,8 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:toriverse/features/match/application/services/liveops_campaign_service.dart';
+import 'package:toriverse/shared/services/remote_config_service.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 /// Performance profiling results
@@ -60,7 +60,7 @@ void main() {
       mockRemoteConfig = MockFirebaseRemoteConfig();
       campaignService = LiveOpsCampaignService(
         firestore: fakeFirestore,
-        remoteConfig: mockRemoteConfig,
+        remoteConfig: RemoteConfigService(remoteConfig: mockRemoteConfig),
       );
       metrics.clear();
     });
@@ -126,6 +126,7 @@ void main() {
 
         expect(stopwatch.elapsedMilliseconds, lessThan(1000),
             reason: 'Stream should emit first event within 1000ms');
+        expect(eventCount, greaterThan(0));
 
         await subscription.cancel();
       });
@@ -167,7 +168,7 @@ void main() {
               .doc(campaignId)
               .set({
                 'challenges_completed': 10,
-                'total_challenges': 10,
+                'challenges_required': 10,
                 'claimed_rewards': [],
               });
         }
@@ -271,7 +272,7 @@ void main() {
               .doc(campaignId)
               .set({
                 'challenges_completed': i % 3 + 1,
-                'total_challenges': 3,
+                'challenges_required': 3,
                 'claimed_rewards': i % 2 == 0 ? ['reward_001'] : [],
               });
         }
@@ -381,7 +382,7 @@ void main() {
               .doc(campaignId)
               .set({
                 'challenges_completed': 3,
-                'total_challenges': 3,
+                'challenges_required': 3,
                 'claimed_rewards': [],
               });
         }
@@ -420,7 +421,7 @@ void main() {
             userId: userId,
             campaignId: campaignId,
           );
-          expect(progress.hasClaimedReward, isTrue);
+          expect(progress!.hasClaimedReward, isTrue);
         }
 
         expect(stopwatch.elapsedMilliseconds, lessThan(1000),

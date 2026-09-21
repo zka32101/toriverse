@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:toriverse/config/theme.dart';
 
 /// Indicator widget showing AI takeover status
 ///

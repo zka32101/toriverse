@@ -7,8 +7,7 @@ import '../../domain/services/streak_calculator.dart' as calculator_module;
 import '../widgets/streak_display_widget.dart';
 import '../widgets/milestone_reached_dialog.dart';
 import '../screens/cosmetic_collection_screen.dart';
-import '../../../shared/services/analytics_service.dart';
-import '../../../shared/models/cosmetic_item.dart';
+import '../../../../shared/services/analytics_service.dart';
 
 /// Match result screen showing game outcome, streak progress, and cosmetic rewards
 ///
@@ -111,7 +110,7 @@ class _MatchResultScreenState extends ConsumerState<MatchResultScreen>
           .shouldGrantMilestoneReward(streak)) {
         // In production, this would fetch from a reward table
         // For now, we show a placeholder
-        reward = const CosmeticItem(
+        reward = CosmeticItem(
           id: 'milestone_reward_$streak',
           type: 'board',
           name: 'Milestone $streak Board',
@@ -295,30 +294,28 @@ class _MatchResultScreenState extends ConsumerState<MatchResultScreen>
                               ),
                             ],
                           ),
-                          if (nextMilestone != null) ...[
-                            const SizedBox(height: 12),
-                            Row(
-                              mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Next Milestone',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyMedium,
-                                ),
-                                Text(
-                                  '$nextMilestone',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
-                              ],
-                            ),
-                          ],
+                          const SizedBox(height: 12),
+                          Row(
+                            mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Next Milestone',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium,
+                              ),
+                              Text(
+                                '$nextMilestone',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),

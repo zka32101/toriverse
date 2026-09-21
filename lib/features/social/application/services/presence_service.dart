@@ -9,7 +9,7 @@ class PresenceService {
   final FirebaseFirestore _firestore;
 
   static const String _presenceCollection = 'presence';
-  static const String _presenceDurationSeconds = 300; // 5 minutes
+  static const int _presenceDurationSeconds = 300; // 5 minutes
 
   PresenceService({FirebaseFirestore? firestore})
       : _firestore = firestore ?? FirebaseFirestore.instance;

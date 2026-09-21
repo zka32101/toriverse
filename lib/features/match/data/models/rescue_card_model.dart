@@ -46,4 +46,27 @@ class RescueCardModel {
       'updatedAt': updatedAt?.toIso8601String(),
     };
   }
+
+  RescueCardModel copyWith({
+    String? id,
+    String? matchId,
+    String? playerId,
+    int? consecutiveAttackedCount,
+    bool? cardAvailable,
+    int? cardActivatedRound,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return RescueCardModel(
+      id: id ?? this.id,
+      matchId: matchId ?? this.matchId,
+      playerId: playerId ?? this.playerId,
+      consecutiveAttackedCount:
+          consecutiveAttackedCount ?? this.consecutiveAttackedCount,
+      cardAvailable: cardAvailable ?? this.cardAvailable,
+      cardActivatedRound: cardActivatedRound ?? this.cardActivatedRound,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
 }

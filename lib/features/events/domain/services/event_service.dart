@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../data/models/event_model.dart';
+import '../../data/models/leaderboard_model.dart';
 
 /// Service for managing events and campaigns
 class EventService {
@@ -16,7 +17,7 @@ class EventService {
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => Event.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => Event.fromJson(doc.data()))
           .toList();
     }).handleError((e) {
       return [];
@@ -34,7 +35,7 @@ class EventService {
           .get();
 
       return snapshot.docs
-          .map((doc) => Event.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => Event.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];
@@ -83,7 +84,7 @@ class EventService {
           .get();
 
       return snapshot.docs
-          .map((doc) => Challenge.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => Challenge.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];
@@ -100,7 +101,7 @@ class EventService {
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => Challenge.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => Challenge.fromJson(doc.data()))
           .toList();
     }).handleError((e) {
       return [];
@@ -124,9 +125,6 @@ class EventService {
       if (!eventDoc.exists) {
         throw Exception('Event not found');
       }
-
-      final event =
-          Event.fromJson(eventDoc.data() as Map<String, dynamic>);
 
       // Check if already joined
       final existingProgress = await _firestore
@@ -288,7 +286,7 @@ class EventService {
       return snapshot.docs
           .map(
             (doc) => EventProgress.fromJson(
-              doc.data() as Map<String, dynamic>,
+              doc.data(),
             ),
           )
           .toList();
@@ -337,7 +335,7 @@ class EventService {
         .map((snapshot) {
       return snapshot.docs
           .map((doc) =>
-              LeaderboardEntry.fromJson(doc.data() as Map<String, dynamic>))
+              LeaderboardEntry.fromJson(doc.data()))
           .toList();
     }).handleError((e) {
       return [];
@@ -363,7 +361,7 @@ class EventService {
       }
 
       return LeaderboardEntry.fromJson(
-        snapshot.docs.first.data() as Map<String, dynamic>,
+        snapshot.docs.first.data(),
       ).rank;
     } catch (e) {
       return null;

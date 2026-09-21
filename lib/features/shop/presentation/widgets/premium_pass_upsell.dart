@@ -75,7 +75,7 @@ class PremiumPassUpsell extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _BenefitRow(
-                  icon: Icons.lightning_bolt,
+                  icon: Icons.bolt,
                   text: 'XP獲得量が 1.5 倍に',
                 ),
                 const SizedBox(height: 8),

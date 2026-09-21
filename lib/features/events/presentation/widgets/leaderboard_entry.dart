@@ -14,13 +14,6 @@ class LeaderboardEntryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color getRankColor() {
-      if (rank == 1) return Colors.amber;
-      if (rank == 2) return Colors.grey[400]!;
-      if (rank == 3) return Colors.brown.shade400;
-      return Colors.transparent;
-    }
-
     Widget getRankIcon() {
       if (rank == 1) {
         return const Icon(Icons.emoji_events, color: Colors.amber, size: 28);

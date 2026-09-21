@@ -2,7 +2,6 @@ import 'dart:math';
 import '../entities/board.dart';
 import 'ai_player.dart';
 import 'bonus_calculator.dart';
-import 'rivalry_tracker.dart';
 
 /// Monte Carlo simulation for balance verification
 /// Runs N AI-only matches to detect game-breaking mechanics

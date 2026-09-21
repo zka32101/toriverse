@@ -252,7 +252,7 @@ class StreakResetNotificationBanner extends StatelessWidget {
       reason: reason,
       currentStreak: currentStreak,
       isPersistent: true,
-      onDismiss: onDismiss,
+      onCancel: onDismiss,
     );
   }
 }

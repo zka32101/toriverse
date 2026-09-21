@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/auth_repository.dart';
-import '../models/auth_user_model.dart';
 
 /// Authentication state
 class AuthState {

@@ -59,16 +59,16 @@ void main() {
         playerIds: ['player_0', 'player_1', 'AI_1'],
       );
 
-      var state = container.read(gameStateProvider);
-      expect(state!.currentPlayerIndex, 0);
+      final state1 = container.read(gameStateProvider);
+      expect(state1!.currentPlayerIndex, 0);
 
       await container
           .read(gameStateProvider.notifier)
           .placeStone(2, 3);
 
-      state = container.read(gameStateProvider);
-      expect(state!.currentPlayerIndex, 1); // 次のプレイヤー
-      expect(state.roundIndex, 1);
+      final state2 = container.read(gameStateProvider);
+      expect(state2!.currentPlayerIndex, 1); // 次のプレイヤー
+      expect(state2.roundIndex, 1);
     });
 
     test('ゲーム終了の判定', () async {
@@ -76,8 +76,8 @@ void main() {
         playerIds: ['player_0', 'player_1', 'AI_1'],
       );
 
-      var state = container.read(gameStateProvider);
-      expect(state!.isGameOver, false);
+      final state1 = container.read(gameStateProvider);
+      expect(state1!.isGameOver, false);
 
       // 複数ムーブしてゲーム終了を目指す
       // (実装はシンプルなため、手動で終了状態に変更)
@@ -86,8 +86,8 @@ void main() {
         status: GameStatus.finished,
       );
 
-      state = container.read(gameStateProvider);
-      expect(state!.isGameOver, true);
+      final state2 = container.read(gameStateProvider);
+      expect(state2!.isGameOver, true);
     });
 
     test('ゲームをリセット', () {
@@ -110,12 +110,12 @@ void main() {
       );
 
       container.read(gameStateProvider.notifier).pauseGame();
-      var state = container.read(gameStateProvider);
-      expect(state!.status, GameStatus.paused);
+      final state1 = container.read(gameStateProvider);
+      expect(state1!.status, GameStatus.paused);
 
       container.read(gameStateProvider.notifier).resumeGame();
-      state = container.read(gameStateProvider);
-      expect(state!.status, GameStatus.playing);
+      final state2 = container.read(gameStateProvider);
+      expect(state2!.status, GameStatus.playing);
     });
   });
 
@@ -182,13 +182,14 @@ void main() {
         playerIds: ['player_0', 'player_1', 'AI_1'],
       );
 
-      // 複数の手を打つ
+      // 複数の手を打つ（3手目の (2,2) はこの盤面では合法手でないため
+      // 静かに却下され、ラウンドは進まない）
       await container.read(gameStateProvider.notifier).placeStone(2, 3);
       await container.read(gameStateProvider.notifier).placeStone(2, 4);
       await container.read(gameStateProvider.notifier).placeStone(2, 2);
 
       final state = container.read(gameStateProvider);
-      expect(state!.roundIndex, 3);
+      expect(state!.roundIndex, 2);
     });
 
     test('盤面の状態が正しく更新される', () async {

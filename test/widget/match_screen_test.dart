@@ -2,17 +2,71 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:toriverse/config/theme.dart';
+import 'package:toriverse/features/auth/application/providers/auth_provider.dart';
 import 'package:toriverse/features/match/application/providers/game_state.dart';
+import 'package:toriverse/features/match/application/providers/round_submission_provider.dart';
 import 'package:toriverse/features/match/presentation/screens/match_screen.dart';
 import 'package:toriverse/features/match/presentation/widgets/board_widget.dart';
 import 'package:toriverse/features/match/presentation/widgets/move_submission_panel.dart';
+
+const _testMatchId = 'test_match_1';
+
+// `currentUserIdProvider` derives from `authProvider`, whose real
+// implementation constructs an `AuthRepository` that reaches for
+// `FirebaseAuth.instance` — unavailable in a plain widget test (no
+// `Firebase.initializeApp()`). Overriding `currentUserIdProvider` directly
+// supplies MatchScreen's human player id without ever constructing the real
+// auth stack.
+const _testUserId = 'player_0';
+
+/// Pumps [MatchScreen] wired to the given [container] so that the game
+/// state notifier created in tests is visible to the widget tree.
+///
+/// Uses [UncontrolledProviderScope] so the widget tree shares [container]
+/// directly instead of a second, separately-owned scope — two containers
+/// both trying to dispose the same notifier crashes on teardown (see
+/// test/widget/results_screen_test.dart for the same pattern).
+///
+/// MatchScreen's `initState` schedules a one-shot 500ms `Future.delayed`
+/// (`_scheduleAIMoves`) to auto-submit AI moves. Flutter's test binding
+/// fails the test if any Timer is still pending once it completes, so we
+/// pump past that delay here to let it fire and settle.
+Future<void> _pumpMatchScreen(
+  WidgetTester tester,
+  ProviderContainer container,
+) async {
+  await tester.pumpWidget(
+    UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp(
+        theme: ToriverseTheme.lightTheme(),
+        home: const MatchScreen(matchId: _testMatchId),
+      ),
+    ),
+  );
+  await tester.pump(const Duration(milliseconds: 600));
+}
+
+ProviderContainer _createContainer() {
+  return ProviderContainer(
+    overrides: [
+      currentUserIdProvider.overrideWithValue(_testUserId),
+      // The real provider polls every 100ms (via recursive
+      // `Future.delayed`) until the round's submission timeout (~30s)
+      // elapses, which would otherwise leave a Timer pending at the end
+      // of every test. A single fixed value is enough for these tests,
+      // which only assert on static rendering.
+      timeRemainingProvider.overrideWith((ref) => Stream.value(30000)),
+    ],
+  );
+}
 
 void main() {
   group('MatchScreen - マッチ画面', () {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
+      container = _createContainer();
       container.read(gameStateProvider.notifier).startGame(
         playerIds: ['player_0', 'player_1', 'AI_1'],
       );
@@ -23,88 +77,33 @@ void main() {
     });
 
     testWidgets('マッチ画面がビルドされる', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       expect(find.byType(MatchScreen), findsOneWidget);
     });
 
     testWidgets('ボードが表示される', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       expect(find.byType(BoardWidget), findsOneWidget);
     });
 
     testWidgets('プレイヤー情報が表示される', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       final gameState = container.read(gameStateProvider)!;
       expect(gameState.playerIds.length, 3);
     });
 
     testWidgets('ラウンド情報が表示される', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       final gameState = container.read(gameStateProvider)!;
       expect(gameState.roundIndex, greaterThanOrEqualTo(0));
     });
 
     testWidgets('石数が表示される', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       final gameState = container.read(gameStateProvider)!;
       expect(gameState.stoneCounts, isNotNull);
@@ -112,35 +111,13 @@ void main() {
     });
 
     testWidgets('移動投稿パネルが表示される', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       expect(find.byType(MoveSubmissionPanel), findsOneWidget);
     });
 
     testWidgets('合法手の数が表示される', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       final gameState = container.read(gameStateProvider)!;
       expect(gameState.validMoves.length, greaterThanOrEqualTo(0));
@@ -151,7 +128,7 @@ void main() {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
+      container = _createContainer();
       container.read(gameStateProvider.notifier).startGame(
         playerIds: ['player_0', 'player_1', 'AI_1'],
       );
@@ -169,18 +146,7 @@ void main() {
           .read(gameStateProvider.notifier)
           .placeStone(2, 3);
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       gameState = container.read(gameStateProvider)!;
       expect(gameState.roundIndex, greaterThan(initialRound));
@@ -189,24 +155,13 @@ void main() {
     testWidgets('ゲーム一時停止・再開が機能する', (WidgetTester tester) async {
       container.read(gameStateProvider.notifier).pauseGame();
       var gameState = container.read(gameStateProvider)!;
-      expect(gameState.isPaused, true);
+      expect(gameState.status, GameStatus.paused);
 
       container.read(gameStateProvider.notifier).resumeGame();
       gameState = container.read(gameStateProvider)!;
-      expect(gameState.isPaused, false);
+      expect(gameState.status, isNot(GameStatus.paused));
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       expect(find.byType(MatchScreen), findsOneWidget);
     });
@@ -216,7 +171,7 @@ void main() {
       if (validMoves.isNotEmpty) {
         await container
             .read(gameStateProvider.notifier)
-            .placeStone(validMoves[0].row, validMoves[0].col);
+            .placeStone(validMoves[0][0], validMoves[0][1]);
         await container
             .read(gameStateProvider.notifier)
             .placeStone(2, 4);
@@ -225,18 +180,7 @@ void main() {
             .placeStone(2, 2);
       }
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       final gameState = container.read(gameStateProvider)!;
       expect(gameState.roundIndex, greaterThanOrEqualTo(0));
@@ -247,7 +191,7 @@ void main() {
     late ProviderContainer container;
 
     setUp(() {
-      container = ProviderContainer();
+      container = _createContainer();
       container.read(gameStateProvider.notifier).startGame(
         playerIds: ['player_0', 'player_1', 'AI_1'],
       );
@@ -259,37 +203,17 @@ void main() {
 
     testWidgets('画面がレスポンシブ', (WidgetTester tester) async {
       tester.binding.window.physicalSizeTestValue = const Size(400, 800);
+      tester.binding.window.devicePixelRatioTestValue = 1.0;
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
 
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       expect(find.byType(MatchScreen), findsOneWidget);
     });
 
     testWidgets('タイマーが表示される（時間制限あり）', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ProviderScope(
-          overrides: [
-            gameStateProvider
-                .overrideWith((ref) => container.read(gameStateProvider)),
-          ],
-          child: MaterialApp(
-            theme: appTheme,
-            home: MatchScreen(),
-          ),
-        ),
-      );
+      await _pumpMatchScreen(tester, container);
 
       // タイマーがUIに存在
       expect(find.byType(MoveSubmissionPanel), findsOneWidget);

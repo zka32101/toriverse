@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart' show PlatformException;
 import 'package:purchases_flutter/purchases_flutter.dart';
 
 /// Repository for subscription status management via RevenueCat
@@ -11,7 +12,7 @@ class SubscriptionRepository {
   /// Initialize RevenueCat SDK
   /// Call this once at app startup
   Future<void> initialize(String revenueCatApiKey) async {
-    await Purchases.setup(
+    await Purchases.configure(
       PurchasesConfiguration(revenueCatApiKey),
     );
   }
@@ -23,7 +24,7 @@ class SubscriptionRepository {
       final customerInfo = await Purchases.getCustomerInfo();
       final active = customerInfo.entitlements.all[rankPassEntitlementId]?.isActive ?? false;
       return active;
-    } on PurchasesException catch (e) {
+    } on PlatformException catch (e) {
       print('Error checking rank pass: $e');
       return false;
     }
@@ -34,8 +35,10 @@ class SubscriptionRepository {
   Future<List<String>> getActiveEntitlements(String userId) async {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
-      return customerInfo.entitlements.active.map((e) => e.identifier).toList();
-    } on PurchasesException catch (e) {
+      return customerInfo.entitlements.active.values
+          .map((e) => e.identifier)
+          .toList();
+    } on PlatformException catch (e) {
       print('Error getting entitlements: $e');
       return [];
     }
@@ -46,7 +49,7 @@ class SubscriptionRepository {
     try {
       final customerInfo = await Purchases.getCustomerInfo();
       return customerInfo.entitlements.all[rankPassEntitlementId];
-    } on PurchasesException catch (e) {
+    } on PlatformException catch (e) {
       print('Error getting rank pass info: $e');
       return null;
     }
@@ -69,7 +72,7 @@ class SubscriptionRepository {
         }
       }
       return false;
-    } on PurchasesException catch (e) {
+    } on PlatformException catch (e) {
       print('Error purchasing rank pass: $e');
       return false;
     }
@@ -81,7 +84,7 @@ class SubscriptionRepository {
     try {
       final offerings = await Purchases.getOfferings();
       return offerings.current?.availablePackages ?? [];
-    } on PurchasesException catch (e) {
+    } on PlatformException catch (e) {
       print('Error getting packages: $e');
       return [];
     }
@@ -93,7 +96,7 @@ class SubscriptionRepository {
     try {
       await Purchases.restorePurchases();
       return true;
-    } on PurchasesException catch (e) {
+    } on PlatformException catch (e) {
       print('Error restoring purchases: $e');
       return false;
     }

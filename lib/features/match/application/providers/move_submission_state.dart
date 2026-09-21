@@ -1,9 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/round_result_model.dart';
 import '../../data/repositories/round_result_repository.dart';
-import '../../data/repositories/match_repository.dart';
-import '../../domain/services/bonus_calculator.dart';
-import 'game_state.dart';
 
 // Collision resolver for same-position submissions
 class _CollisionResolver {
@@ -78,13 +75,10 @@ class MoveSubmissionState {
 /// Notifier for move submission state
 class MoveSubmissionNotifier extends StateNotifier<MoveSubmissionState> {
   final RoundResultRepository _roundResultRepository;
-  final MatchRepository _matchRepository;
 
   MoveSubmissionNotifier({
     required RoundResultRepository roundResultRepository,
-    required MatchRepository matchRepository,
   })  : _roundResultRepository = roundResultRepository,
-        _matchRepository = matchRepository,
         super(MoveSubmissionState(
           playerMoves: {},
           submittedPlayers: {},
@@ -199,11 +193,9 @@ final moveSubmissionProvider = StateNotifierProvider.family<
     MoveSubmissionState,
     String>((ref, matchId) {
   final roundResultRepository = RoundResultRepository();
-  final matchRepository = MatchRepository();
 
   return MoveSubmissionNotifier(
     roundResultRepository: roundResultRepository,
-    matchRepository: matchRepository,
   );
 });
 
@@ -235,7 +227,7 @@ final shouldRevealMovesProvider = Provider.family<bool, String>(
     final timeExpired = ref.watch(moveSubmissionTimeExpiredProvider(matchId));
 
     return switch (timeExpired) {
-      AsyncValue.data(:final value) =>
+      AsyncData(:final value) =>
         submission.allPlayersSubmitted || value,
       _ => false,
     };

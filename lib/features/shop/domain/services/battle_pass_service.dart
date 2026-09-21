@@ -1,5 +1,3 @@
-import 'package:toriverse/shared/models/cosmetic_item.dart';
-
 /// Battle pass service for seasonal progression
 ///
 /// Manages seasonal ranks, rewards, and tier progression.
@@ -60,7 +58,6 @@ class BattlePassService {
     final tier = (totalXP ~/ xpPerTier) + 1;
     final clampedTier = tier > maxTier ? maxTier : tier;
 
-    final currentTierStartXP = (clampedTier - 1) * xpPerTier;
     final nextTierStartXP = clampedTier * xpPerTier;
     final xpToNextTier = nextTierStartXP - totalXP;
 
@@ -137,7 +134,7 @@ class BattlePassService {
   bool isBattlePassActive(DateTime seasonStartDate) {
     final now = DateTime.now();
     final endDate = getSeasonEndDate(seasonStartDate);
-    return now.isBefore(endDate);
+    return !now.isBefore(seasonStartDate) && now.isBefore(endDate);
   }
 
   /// Calculate days remaining in season

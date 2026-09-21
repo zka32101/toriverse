@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/event_model.dart';
+import '../../data/models/leaderboard_model.dart';
 import '../../domain/services/event_service.dart';
 
 // Firebase instance

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:toriverse/shared/services/analytics_service.dart';
 
 class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
@@ -13,6 +13,19 @@ void main() {
     setUp(() {
       mockFirebaseAnalytics = MockFirebaseAnalytics();
       analytics = AnalyticsService(analytics: mockFirebaseAnalytics);
+
+      // Default no-op stub so calls that aren't specially stubbed in a given
+      // test don't throw on the implicit Future<void> cast.
+      when(() => mockFirebaseAnalytics.logEvent(
+            name: any(named: 'name'),
+            parameters: any(named: 'parameters'),
+          )).thenAnswer((_) async {});
+      when(() => mockFirebaseAnalytics.setUserId(id: any(named: 'id')))
+          .thenAnswer((_) async {});
+      when(() => mockFirebaseAnalytics.setUserProperty(
+            name: any(named: 'name'),
+            value: any(named: 'value'),
+          )).thenAnswer((_) async {});
     });
 
     group('logMatchCompleted', () {
@@ -24,10 +37,10 @@ void main() {
           matchDurationSeconds: 180,
         );
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'match_completed',
-          parameters: any,
-        )).called(1);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'match_completed',
+              parameters: any(named: 'parameters'),
+            )).called(1);
       });
 
       test('Includes match ID in parameters', () async {
@@ -38,10 +51,10 @@ void main() {
           matchDurationSeconds: 120,
         );
 
-        final captured = verify(mockFirebaseAnalytics.logEvent(
-          name: 'match_completed',
-          parameters: captureAnyNamed('parameters'),
-        )).captured;
+        final captured = verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'match_completed',
+              parameters: captureAny(named: 'parameters'),
+            )).captured;
 
         expect((captured[0] as Map)['match_id'], 'match_test_123');
       });
@@ -56,10 +69,10 @@ void main() {
           );
         }
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'match_completed',
-          parameters: any,
-        )).called(3);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'match_completed',
+              parameters: any(named: 'parameters'),
+            )).called(3);
       });
     });
 
@@ -71,10 +84,10 @@ void main() {
           cosmeticRarity: 'legendary',
         );
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'milestone_reached',
-          parameters: any,
-        )).called(1);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'milestone_reached',
+              parameters: any(named: 'parameters'),
+            )).called(1);
       });
 
       test('Includes milestone level in parameters', () async {
@@ -84,10 +97,10 @@ void main() {
           cosmeticRarity: 'rare',
         );
 
-        final captured = verify(mockFirebaseAnalytics.logEvent(
-          name: 'milestone_reached',
-          parameters: captureAnyNamed('parameters'),
-        )).captured;
+        final captured = verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'milestone_reached',
+              parameters: captureAny(named: 'parameters'),
+            )).captured;
 
         expect((captured[0] as Map)['milestone_level'], 25);
       });
@@ -103,10 +116,10 @@ void main() {
           );
         }
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'milestone_reached',
-          parameters: any,
-        )).called(milestones.length);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'milestone_reached',
+              parameters: any(named: 'parameters'),
+            )).called(milestones.length);
       });
 
       test('Handles null cosmetic reward', () async {
@@ -116,10 +129,10 @@ void main() {
           cosmeticRarity: 'none',
         );
 
-        final captured = verify(mockFirebaseAnalytics.logEvent(
-          name: 'milestone_reached',
-          parameters: captureAnyNamed('parameters'),
-        )).captured;
+        final captured = verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'milestone_reached',
+              parameters: captureAny(named: 'parameters'),
+            )).captured;
 
         expect((captured[0] as Map)['reward_cosmetic_id'], 'none');
       });
@@ -134,10 +147,10 @@ void main() {
           source: 'shop_purchase',
         );
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'cosmetic_activated',
-          parameters: any,
-        )).called(1);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'cosmetic_activated',
+              parameters: any(named: 'parameters'),
+            )).called(1);
       });
 
       test('Includes cosmetic details in parameters', () async {
@@ -148,10 +161,10 @@ void main() {
           source: 'milestone_reward',
         );
 
-        final captured = verify(mockFirebaseAnalytics.logEvent(
-          name: 'cosmetic_activated',
-          parameters: captureAnyNamed('parameters'),
-        )).captured;
+        final captured = verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'cosmetic_activated',
+              parameters: captureAny(named: 'parameters'),
+            )).captured;
 
         final params = captured[0] as Map;
         expect(params['cosmetic_id'], 'stone_golden');
@@ -171,10 +184,10 @@ void main() {
           paymentMethod: 'credit_card',
         );
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'cosmetic_purchased',
-          parameters: any,
-        )).called(1);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'cosmetic_purchased',
+              parameters: any(named: 'parameters'),
+            )).called(1);
       });
 
       test('Includes price and payment method', () async {
@@ -186,10 +199,10 @@ void main() {
           paymentMethod: 'apple_pay',
         );
 
-        final captured = verify(mockFirebaseAnalytics.logEvent(
-          name: 'cosmetic_purchased',
-          parameters: captureAnyNamed('parameters'),
-        )).captured;
+        final captured = verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'cosmetic_purchased',
+              parameters: captureAny(named: 'parameters'),
+            )).captured;
 
         final params = captured[0] as Map;
         expect(params['price_yen'], 150);
@@ -209,10 +222,10 @@ void main() {
           );
         }
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'cosmetic_purchased',
-          parameters: any,
-        )).called(methods.length);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'cosmetic_purchased',
+              parameters: any(named: 'parameters'),
+            )).called(methods.length);
       });
     });
 
@@ -223,10 +236,10 @@ void main() {
           reason: 'match_loss',
         );
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'streak_reset',
-          parameters: any,
-        )).called(1);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'streak_reset',
+              parameters: any(named: 'parameters'),
+            )).called(1);
       });
 
       test('Includes lost streak count and reason', () async {
@@ -235,10 +248,10 @@ void main() {
           reason: 'connection_timeout',
         );
 
-        final captured = verify(mockFirebaseAnalytics.logEvent(
-          name: 'streak_reset',
-          parameters: captureAnyNamed('parameters'),
-        )).captured;
+        final captured = verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'streak_reset',
+              parameters: captureAny(named: 'parameters'),
+            )).captured;
 
         final params = captured[0] as Map;
         expect(params['lost_streak'], 25);
@@ -255,10 +268,10 @@ void main() {
           );
         }
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'streak_reset',
-          parameters: any,
-        )).called(reasons.length);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'streak_reset',
+              parameters: any(named: 'parameters'),
+            )).called(reasons.length);
       });
     });
 
@@ -269,10 +282,10 @@ void main() {
           seasonId: 'season_1',
         );
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'rankpass_purchased',
-          parameters: any,
-        )).called(1);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'rankpass_purchased',
+              parameters: any(named: 'parameters'),
+            )).called(1);
       });
     });
 
@@ -283,10 +296,10 @@ void main() {
           platform: 'twitter',
         );
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'clip_shared',
-          parameters: any,
-        )).called(1);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'clip_shared',
+              parameters: any(named: 'parameters'),
+            )).called(1);
       });
 
       test('Logs different social platforms', () async {
@@ -299,10 +312,10 @@ void main() {
           );
         }
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'clip_shared',
-          parameters: any,
-        )).called(platforms.length);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'clip_shared',
+              parameters: any(named: 'parameters'),
+            )).called(platforms.length);
       });
     });
 
@@ -313,10 +326,10 @@ void main() {
           effectValue: 2,
         );
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'bonus_activated',
-          parameters: any,
-        )).called(1);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'bonus_activated',
+              parameters: any(named: 'parameters'),
+            )).called(1);
       });
 
       test('Logs rescue card activation', () async {
@@ -325,10 +338,10 @@ void main() {
           effectValue: 1,
         );
 
-        verify(mockFirebaseAnalytics.logEvent(
-          name: 'bonus_activated',
-          parameters: any,
-        )).called(1);
+        verify(() => mockFirebaseAnalytics.logEvent(
+              name: 'bonus_activated',
+              parameters: any(named: 'parameters'),
+            )).called(1);
       });
     });
 
@@ -341,7 +354,8 @@ void main() {
           isPaidSubscriber: false,
         );
 
-        verify(mockFirebaseAnalytics.setUserId('user_12345')).called(1);
+        verify(() => mockFirebaseAnalytics.setUserId(id: 'user_12345'))
+            .called(1);
       });
 
       test('Sets all user properties', () async {
@@ -352,27 +366,27 @@ void main() {
           isPaidSubscriber: true,
         );
 
-        verify(mockFirebaseAnalytics.setUserProperty(
-          name: 'account_age_minutes',
-          value: any,
-        )).called(1);
-        verify(mockFirebaseAnalytics.setUserProperty(
-          name: 'total_matches',
-          value: any,
-        )).called(1);
-        verify(mockFirebaseAnalytics.setUserProperty(
-          name: 'paid_subscriber',
-          value: 'true',
-        )).called(1);
+        verify(() => mockFirebaseAnalytics.setUserProperty(
+              name: 'account_age_minutes',
+              value: any(named: 'value'),
+            )).called(1);
+        verify(() => mockFirebaseAnalytics.setUserProperty(
+              name: 'total_matches',
+              value: any(named: 'value'),
+            )).called(1);
+        verify(() => mockFirebaseAnalytics.setUserProperty(
+              name: 'paid_subscriber',
+              value: 'true',
+            )).called(1);
       });
     });
 
     group('Error handling', () {
       test('Silently handles event logging errors', () async {
-        when(mockFirebaseAnalytics.logEvent(
-          name: any,
-          parameters: any,
-        )).thenThrow(Exception('Firebase unavailable'));
+        when(() => mockFirebaseAnalytics.logEvent(
+              name: any(named: 'name'),
+              parameters: any(named: 'parameters'),
+            )).thenThrow(Exception('Firebase unavailable'));
 
         // Should not throw
         await analytics.logMilestoneReached(
@@ -385,7 +399,7 @@ void main() {
       });
 
       test('Silently handles user property errors', () async {
-        when(mockFirebaseAnalytics.setUserId(any))
+        when(() => mockFirebaseAnalytics.setUserId(id: any(named: 'id')))
             .thenThrow(Exception('Firebase error'));
 
         // Should not throw

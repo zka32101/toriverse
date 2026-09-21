@@ -7,23 +7,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:toriverse/features/social/application/services/social_match_service.dart';
 import 'package:toriverse/features/leaderboard/application/services/rank_calculation_service.dart';
-import 'package:toriverse/features/leaderboard/domain/models/leaderboard_models.dart';
 
 // Mock classes
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
+// ignore: subtype_of_sealed_class
 class MockCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {}
+
+// ignore: subtype_of_sealed_class
+class MockQueryDocumentSnapshot extends Mock
+    implements QueryDocumentSnapshot<Map<String, dynamic>> {}
 
 class MockQuerySnapshot extends Mock
     implements QuerySnapshot<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockQuery extends Mock implements Query<Map<String, dynamic>> {}
 
 class MockWriteBatch extends Mock implements WriteBatch {}
@@ -32,6 +39,14 @@ class MockRankCalculationService extends Mock
     implements RankCalculationService {}
 
 void main() {
+  setUpAll(() {
+    // Some stubbed calls take a raw (unparameterized) `DocumentReference`,
+    // i.e. `DocumentReference<Object?>`; mocktail looks up fallbacks via
+    // `is`, and Dart's generics are covariant, so a
+    // `DocumentReference<Map<String, dynamic>>` instance also satisfies it.
+    registerFallbackValue(MockDocumentReference());
+  });
+
   late MockFirebaseFirestore mockFirestore;
   late MockRankCalculationService mockRankService;
   late SocialMatchService socialMatchService;
@@ -151,8 +166,8 @@ void main() {
           rankPointsAwarded: {'uid1': 30, 'uid2': 10, 'uid3': -5},
         );
 
-        // Assert
-        verify(() => mockBatch.update(any(), any())).called(3);
+        // Assert - 3 player updates + 1 to mark the match's rankChangeApplied
+        verify(() => mockBatch.update(any(), any())).called(4);
         verify(() => mockBatch.commit()).called(1);
       });
 
@@ -171,8 +186,9 @@ void main() {
           rankPointsAwarded: {'uid1': 30, 'uid2': 0, 'uid3': -5},
         );
 
-        // Assert - Should only update uid1 and uid3 (skip uid2 with 0)
-        verify(() => mockBatch.update(any(), any())).called(2);
+        // Assert - only uid1 and uid3 get player updates (skip uid2 with 0),
+        // plus 1 more to mark the match's rankChangeApplied
+        verify(() => mockBatch.update(any(), any())).called(3);
       });
     });
 
@@ -330,13 +346,35 @@ void main() {
         final mockQuery = MockQuery();
         final mockSnapshot = MockQuerySnapshot();
 
-        when(() => mockSnapshot.docs).thenReturn([
+        // Built before the when()/thenReturn() chain below: _createMockMatchDoc
+        // calls when() internally, and mocktail doesn't allow starting a new
+        // stub while another when()...then...() call is still pending.
+        final matchDocs = [
           _createMockMatchDoc('match1'),
           _createMockMatchDoc('match2'),
-        ]);
+        ];
+        when(() => mockSnapshot.docs).thenReturn(matchDocs);
         when(() => mockQuery.get()).thenAnswer((_) async => mockSnapshot);
 
         _setupGetMatchHistory(mockFirestore, mockQuery);
+
+        // getUserMatchHistory() calls getMatch() for each doc it finds, so
+        // the matches/ collection needs its own stub too.
+        final mockMatchDocRef = MockDocumentReference();
+        final mockMatchSnapshot = MockDocumentSnapshot();
+        when(() => mockMatchSnapshot.exists).thenReturn(true);
+        when(() => mockMatchSnapshot.data()).thenReturn({
+          'matchType': 'MatchType.ranked',
+          'players': ['uid1', 'uid2', 'uid3'],
+          'finalPlacement': [0, 1, 2],
+          'rankPointsAwarded': {'uid1': 30, 'uid2': 10, 'uid3': -5},
+          'rankChangeApplied': true,
+          'createdAt': DateTime.now().toIso8601String(),
+          'completedAt': DateTime.now().toIso8601String(),
+        });
+        when(() => mockMatchDocRef.get())
+            .thenAnswer((_) async => mockMatchSnapshot);
+        _setupGetMatch(mockFirestore, mockMatchDocRef);
 
         // Act
         final matches = await socialMatchService.getUserMatchHistory('uid1');
@@ -444,11 +482,12 @@ void _setupGetMatchHistory(
   when(() => mockSubCollectionRef.orderBy('joinedAt', descending: true))
       .thenReturn(mockQuery);
   when(() => mockQuery.limit(any())).thenReturn(mockQuery);
-  when(() => mockQuery.where(any(), isGreaterThan: any())).thenReturn(mockQuery);
+  when(() => mockQuery.where(any(), isGreaterThan: any(named: 'isGreaterThan')))
+      .thenReturn(mockQuery);
 }
 
-MockDocumentSnapshot _createMockMatchDoc(String matchId) {
-  final mockDoc = MockDocumentSnapshot();
+MockQueryDocumentSnapshot _createMockMatchDoc(String matchId) {
+  final mockDoc = MockQueryDocumentSnapshot();
   when(() => mockDoc['matchId']).thenReturn(matchId);
   when(() => mockDoc['matchType']).thenReturn('MatchType.ranked');
   when(() => mockDoc['participants']).thenReturn(['uid1', 'uid2', 'uid3']);

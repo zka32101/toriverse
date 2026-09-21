@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Secure storage service for sensitive data (auth tokens, credentials)
@@ -22,7 +23,7 @@ class SecureStorageService {
       ),
       iOptions: IOSOptions(
         // Use Keychain for iOS with default settings
-        accessibility: KeychainAccessibility.first_this_device_this_device_only,
+        accessibility: KeychainAccessibility.first_unlock_this_device,
       ),
     );
   }
@@ -189,8 +190,6 @@ class SecureStorageService {
 
 /// Riverpod provider for SecureStorageService
 /// Usage: ref.watch(secureStorageProvider)
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 final secureStorageProvider = Provider((ref) {
   return SecureStorageService();
 });

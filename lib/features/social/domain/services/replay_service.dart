@@ -171,10 +171,6 @@ class ReplayService {
         throw Exception('Replay not found');
       }
 
-      final replay = Replay.fromJson(
-        replayDoc.data() as Map<String, dynamic>,
-      );
-
       // Check if already favorited
       final favDoc = await _firestore
           .collection('users')
@@ -352,7 +348,7 @@ class ReplayService {
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => Replay.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => Replay.fromJson(doc.data()))
           .toList();
     }).handleError((e) {
       return [];
@@ -374,7 +370,7 @@ class ReplayService {
           .get();
 
       return snapshot.docs
-          .map((doc) => Replay.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => Replay.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];
@@ -394,7 +390,7 @@ class ReplayService {
           .get();
 
       return snapshot.docs
-          .map((doc) => Replay.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => Replay.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];

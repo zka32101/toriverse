@@ -8,7 +8,7 @@ void main() {
     late List<String> playerIds;
 
     setUp(() {
-      board = Board.standard();
+      board = Board.initial();
       playerIds = ['player1', 'player2', 'player3'];
     });
 
@@ -18,7 +18,7 @@ void main() {
       });
 
       test('isValidBoardState rejects invalid size', () {
-        final invalidBoard = Board.standard();
+        final invalidBoard = Board.initial();
         // Manually truncate board (simulate invalid state)
         // This is simplified - real test would need board manipulation
         expect(GameStateValidator.isValidBoardState(invalidBoard), isTrue);

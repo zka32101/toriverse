@@ -34,8 +34,26 @@ class _CosmeticsShopScreenState extends ConsumerState<CosmeticsShopScreen> {
   Future<void> _logTypeFilterApplied(CosmeticType type) async {
     final analyticsService = AnalyticsService();
     await analyticsService.logCosmeticsShopFiltered(
-      filterType: type.typeString,
+      filterType: _typeToString(type),
     );
+  }
+
+  /// Convert a [CosmeticType] to its catalog string representation.
+  ///
+  /// [CosmeticType.typeString] only exists as an instance getter on
+  /// [CosmeticItem]; this mirrors it for the bare enum value used by the
+  /// type filter.
+  String _typeToString(CosmeticType type) {
+    switch (type) {
+      case CosmeticType.board:
+        return 'board';
+      case CosmeticType.stoneBlack:
+        return 'stone_black';
+      case CosmeticType.stoneWhite:
+        return 'stone_white';
+      case CosmeticType.stoneRed:
+        return 'stone_red';
+    }
   }
 
   @override

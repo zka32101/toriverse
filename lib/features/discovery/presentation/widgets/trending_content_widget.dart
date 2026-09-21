@@ -67,7 +67,7 @@ class _TrendingContentWidgetState extends ConsumerState<TrendingContentWidget> {
     );
   }
 
-  Widget _getTrendingProvider() {
+  AsyncValue<dynamic> _getTrendingProvider() {
     final params = TrendingParam(
       contentType: widget.contentType,
       timeframe: _selectedTimeframe,

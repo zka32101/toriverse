@@ -14,7 +14,7 @@ class RevenueCatService {
 
     try {
       // Initialize RevenueCat with API key
-      await Purchases.setLogLevel(PurchasesLogLevel.debug);
+      await Purchases.setLogLevel(LogLevel.debug);
       await Purchases.configure(PurchasesConfiguration(_apiKey));
       _initialized = true;
     } catch (e) {

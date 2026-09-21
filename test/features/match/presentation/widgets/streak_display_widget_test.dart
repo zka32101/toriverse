@@ -13,24 +13,22 @@ void main() {
       VoidCallback? onTapCollection,
       int currentStreak = 5,
       int bestStreak = 10,
-      int? nextMilestone = 10,
+      int nextMilestone = 10,
       bool isAtMilestone = false,
     }) {
-      return ProviderContainer(
+      return ProviderScope(
+        overrides: [
+          currentStreakProvider.overrideWithValue(currentStreak),
+          bestStreakProvider.overrideWithValue(bestStreak),
+          nextMilestoneProvider.overrideWithValue(nextMilestone),
+          isAtMilestoneProvider.overrideWithValue(isAtMilestone),
+        ],
         child: MaterialApp(
           home: Scaffold(
-            body: ProviderScope(
-              overrides: [
-                currentStreakProvider.overrideWithValue(currentStreak),
-                bestStreakProvider.overrideWithValue(bestStreak),
-                nextMilestoneProvider.overrideWithValue(nextMilestone),
-                isAtMilestoneProvider.overrideWithValue(isAtMilestone),
-              ],
-              child: StreakDisplayWidget(
-                isCompact: isCompact,
-                showBestStreak: showBestStreak,
-                onTapCollection: onTapCollection,
-              ),
+            body: StreakDisplayWidget(
+              isCompact: isCompact,
+              showBestStreak: showBestStreak,
+              onTapCollection: onTapCollection,
             ),
           ),
         ),
@@ -49,7 +47,7 @@ void main() {
 
       expect(find.text('🔥'), findsOneWidget);
       expect(find.text('7'), findsOneWidget);
-      expect(find.text('Max: 10'), findsOneWidget);
+      expect(find.textContaining('Max: 10'), findsOneWidget);
     });
 
     testWidgets('Compact layout hides best streak when showBestStreak is false',
@@ -106,20 +104,22 @@ void main() {
       expect(containerFinder, findsWidgets);
     });
 
-    testWidgets('Expanded layout hides next milestone when at 100',
+    testWidgets('Expanded layout continues milestone progression past 100',
         (WidgetTester tester) async {
+      // StreakState.nextMilestone never returns null — beyond the highest
+      // defined milestone (100) it keeps returning the next 25-increment.
       await tester.pumpWidget(
         createTestWidget(
           isCompact: false,
           currentStreak: 100,
           bestStreak: 100,
-          nextMilestone: null,
+          nextMilestone: 125,
           isAtMilestone: true,
         ),
       );
 
-      expect(find.text('Next Milestone:'), findsNothing);
-      expect(find.byType(LinearProgressIndicator), findsNothing);
+      expect(find.text('Next Milestone: 125'), findsOneWidget);
+      expect(find.byType(LinearProgressIndicator), findsOneWidget);
     });
 
     testWidgets('Compact layout has accessible tap target size',
@@ -190,7 +190,7 @@ void main() {
       );
 
       expect(find.text('42'), findsOneWidget);
-      expect(find.text('Max: 50'), findsOneWidget);
+      expect(find.textContaining('Max: 50'), findsOneWidget);
     });
   });
 }

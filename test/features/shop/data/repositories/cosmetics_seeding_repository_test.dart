@@ -1,8 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:toriverse/features/shop/data/repositories/cosmetics_seeding_repository.dart';
 import 'package:toriverse/features/shop/data/seeds/cosmetics_seed_data.dart';
+import 'package:toriverse/shared/models/cosmetic_item.dart';
 
 void main() {
   group('CosmeticsSeediingRepository', () {
@@ -40,10 +40,12 @@ void main() {
 
       final boards = await fakeFirestore
           .collection('cosmetics')
-          .where('typeString', isEqualTo: 'board')
+          .where('type', isEqualTo: 'board')
           .get();
 
-      expect(boards.docs.length, 5);
+      // 5 regular board cosmetics + 3 limited-edition items that are also
+      // typed 'board' (see cosmetics_seed_data.dart's limitedEditionCosmetics)
+      expect(boards.docs.length, 8);
     });
 
     test('seedAllCosmetics() seeds stone cosmetics', () async {
@@ -51,15 +53,15 @@ void main() {
 
       final blackStones = await fakeFirestore
           .collection('cosmetics')
-          .where('typeString', isEqualTo: 'stoneBlack')
+          .where('type', isEqualTo: 'stone_black')
           .get();
       final whiteStones = await fakeFirestore
           .collection('cosmetics')
-          .where('typeString', isEqualTo: 'stoneWhite')
+          .where('type', isEqualTo: 'stone_white')
           .get();
       final redStones = await fakeFirestore
           .collection('cosmetics')
-          .where('typeString', isEqualTo: 'stoneRed')
+          .where('type', isEqualTo: 'stone_red')
           .get();
 
       expect(blackStones.docs.length, 5);
@@ -151,7 +153,7 @@ void main() {
 
       expect(classic.name, 'クラシック盤');
       expect(classic.typeString, 'board');
-      expect(classic.priceJpy, 300);
+      expect(classic.price, 300);
       expect(classic.rarity.toString(), contains('common'));
     });
 
@@ -166,17 +168,21 @@ void main() {
 
       final cosmetics = await repository.getAllCosmeticsFromFirestore();
 
-      final boards = cosmetics.where((c) => c.typeString == 'board');
-      expect(boards.every((c) => c.priceJpy == 300), true);
+      // Excludes limited-edition items: 3 of the 8 'board'-typed cosmetics
+      // are limited-edition and priced at 500, checked separately below.
+      final boards = cosmetics.where((c) =>
+          c.typeString == 'board' && c.rarity != CosmeticRarity.limited);
+      expect(boards.every((c) => c.price == 300), true);
 
       final stones = cosmetics.where((c) =>
-          c.typeString == 'stoneBlack' ||
-          c.typeString == 'stoneWhite' ||
-          c.typeString == 'stoneRed');
-      expect(stones.every((c) => c.priceJpy == 120), true);
+          (c.typeString == 'stone_black' ||
+              c.typeString == 'stone_white' ||
+              c.typeString == 'stone_red') &&
+          c.rarity != CosmeticRarity.limited);
+      expect(stones.every((c) => c.price == 120), true);
 
       final limited = cosmetics.where((c) => c.rarity.toString().contains('limited'));
-      expect(limited.every((c) => c.priceJpy == 500), true);
+      expect(limited.every((c) => c.price == 500), true);
     });
 
     test('Seeded cosmetics have descriptions', () async {
@@ -184,8 +190,7 @@ void main() {
 
       final cosmetics = await repository.getAllCosmeticsFromFirestore();
 
-      expect(cosmetics.every((c) => c.description != null), true);
-      expect(cosmetics.every((c) => (c.description ?? '').isNotEmpty), true);
+      expect(cosmetics.every((c) => c.description.isNotEmpty), true);
     });
 
     test('Limited edition cosmetics have availability windows', () async {
@@ -196,8 +201,8 @@ void main() {
           .where((c) => c.rarity.toString().contains('limited'));
 
       for (final cosmetic in limited) {
-        expect(cosmetic.availableFrom, isNotNull);
-        expect(cosmetic.availableUntil, isNotNull);
+        expect(cosmetic.releaseDate, isNotNull);
+        expect(cosmetic.limitedEditionEndDate, isNotNull);
       }
     });
   });

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:toriverse/features/spectating/application/providers/streaming_providers.dart';
-import 'package:toriverse/features/spectating/domain/models/streaming_session.dart';
 
 /// Streamer dashboard widget for viewing active stream status and earnings
 ///

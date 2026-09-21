@@ -47,6 +47,10 @@ windows/flutter/generated_plugins.cmake
 windows/flutter/generated_plugins.cmake
 windows/flutter/generated_plugins.cmake
 
+# Android
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+
 # Web related
 lib/generated_plugin_registrant.dart
 

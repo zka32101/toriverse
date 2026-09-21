@@ -51,7 +51,9 @@ void main() {
         createTestApp(milestone: 10),
       );
 
-      expect(find.text('🏆'), findsOneWidget);
+      // The main trophy plus one of the confetti-row emojis is also a
+      // trophy, so two matches are expected.
+      expect(find.text('🏆'), findsWidgets);
     });
 
     testWidgets('Shows cosmetic reward details when provided',
@@ -162,9 +164,19 @@ void main() {
         createTestApp(milestone: 10),
       );
 
-      // Verify dialog is present (animation should be applied)
+      // Verify dialog is present (animation should be applied). Scope the
+      // ScaleTransition finder to MilestoneReachedDialog's own subtree,
+      // since Scaffold always contributes its own internal
+      // ScaleTransition (for the floating action button) regardless of
+      // whether a FAB is present.
       expect(find.byType(Dialog), findsOneWidget);
-      expect(find.byType(ScaleTransition), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(MilestoneReachedDialog),
+          matching: find.byType(ScaleTransition),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('Shows confetti emojis in header',

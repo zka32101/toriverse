@@ -12,6 +12,9 @@ class RescueCardNotifier extends StateNotifier<Map<String, RescueCardModel>> {
   final RemoteConfigService? configService;
 
   /// Initialize rescue cards for a match (all players start at 0 attacks)
+  ///
+  /// Merges into the existing state (keyed by `${matchId}_$playerId`) so
+  /// that initializing one match doesn't wipe out another match's cards.
   void initializeMatch(String matchId, List<String> playerIds) {
     final cards = <String, RescueCardModel>{};
     for (final playerId in playerIds) {
@@ -26,7 +29,7 @@ class RescueCardNotifier extends StateNotifier<Map<String, RescueCardModel>> {
         createdAt: DateTime.now(),
       );
     }
-    state = cards;
+    state = {...state, ...cards};
   }
 
   /// Record an attack on a player from an opponent

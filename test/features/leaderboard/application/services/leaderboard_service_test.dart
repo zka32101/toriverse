@@ -6,24 +6,36 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:toriverse/features/leaderboard/application/services/leaderboard_service.dart';
-import 'package:toriverse/features/leaderboard/domain/models/leaderboard_models.dart';
 
 // Mock classes
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
+// ignore: subtype_of_sealed_class
 class MockCollectionReference extends Mock implements CollectionReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockQuery extends Mock implements Query<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentReference extends Mock implements DocumentReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentSnapshot extends Mock implements DocumentSnapshot<Map<String, dynamic>> {}
+
+// ignore: subtype_of_sealed_class
+class MockQueryDocumentSnapshot extends Mock
+    implements QueryDocumentSnapshot<Map<String, dynamic>> {}
 
 class MockQuerySnapshot extends Mock implements QuerySnapshot<Map<String, dynamic>> {}
 
 void main() {
   late MockFirebaseFirestore mockFirestore;
   late LeaderboardService leaderboardService;
+
+  setUpAll(() {
+    registerFallbackValue(<String, dynamic>{});
+    registerFallbackValue(<String>[]);
+  });
 
   setUp(() {
     mockFirestore = MockFirebaseFirestore();
@@ -342,7 +354,7 @@ void main() {
 }
 
 // Helper functions
-MockDocumentSnapshot _createMockDocumentSnapshot(
+MockQueryDocumentSnapshot _createMockDocumentSnapshot(
   String uid,
   String username,
   int rankPoints,
@@ -352,7 +364,7 @@ MockDocumentSnapshot _createMockDocumentSnapshot(
   int totalLosses,
   double winRate,
 ) {
-  final mockDoc = MockDocumentSnapshot();
+  final mockDoc = MockQueryDocumentSnapshot();
   when(() => mockDoc.id).thenReturn(uid);
   when(() => mockDoc.data()).thenReturn({
     'username': username,
@@ -373,6 +385,60 @@ void _setupFirestoreChain(
 ) {
   final mockCollectionRef = MockCollectionReference();
   final mockDocRef = MockDocumentReference();
+  // orderBy('rankPoints') -> orderBy('username') -> [limit ->] get()
+  final mockOrderByQuery = MockQuery();
+  final mockOrderByQuery2 = MockQuery();
+  final mockLimitQuery = MockQuery();
+  // where(...) chains used by searchByUsername / getTopFriends
+  final mockWhereQuery1 = MockQuery();
+  final mockWhereQuery2 = MockQuery();
+  final mockSearchOrderByQuery = MockQuery();
+  final mockSearchLimitQuery = MockQuery();
+
+  when(() => mockFirestore.collection('leaderboards'))
+      .thenReturn(mockCollectionRef);
+  when(() => mockCollectionRef.doc('global')).thenReturn(mockDocRef);
+  when(() => mockDocRef.collection('entries')).thenReturn(mockCollectionRef);
+
+  // getGlobalLeaderboard / getPlayerRank / getPlayersNearRank chain
+  when(() => mockCollectionRef.orderBy('rankPoints', descending: true))
+      .thenReturn(mockOrderByQuery);
+  when(() => mockOrderByQuery.orderBy('username', descending: false))
+      .thenReturn(mockOrderByQuery2);
+  when(() => mockOrderByQuery2.limit(any())).thenReturn(mockLimitQuery);
+  when(() => mockLimitQuery.get()).thenAnswer((_) async => mockSnapshot);
+  // getPlayerRank / getPlayersNearRank call .get() directly, without .limit()
+  when(() => mockOrderByQuery2.get()).thenAnswer((_) async => mockSnapshot);
+
+  // searchByUsername: where(isGreaterThanOrEqualTo) -> where(isLessThan)
+  //   -> orderBy('username') -> limit -> get()
+  when(() => mockCollectionRef.where(
+        any(),
+        isGreaterThanOrEqualTo: any(named: 'isGreaterThanOrEqualTo'),
+      )).thenReturn(mockWhereQuery1);
+  when(() => mockWhereQuery1.where(
+        any(),
+        isLessThan: any(named: 'isLessThan'),
+      )).thenReturn(mockWhereQuery2);
+  when(() => mockWhereQuery2.orderBy('username'))
+      .thenReturn(mockSearchOrderByQuery);
+  when(() => mockSearchOrderByQuery.limit(any()))
+      .thenReturn(mockSearchLimitQuery);
+  when(() => mockSearchLimitQuery.get()).thenAnswer((_) async => mockSnapshot);
+
+  // getTopFriends: where(documentId, whereIn) -> orderBy('rankPoints')
+  //   -> orderBy('username') -> limit -> get()
+  when(() => mockCollectionRef.where(
+        FieldPath.documentId,
+        whereIn: any(named: 'whereIn'),
+      )).thenReturn(mockWhereQuery1);
+  when(() => mockWhereQuery1.orderBy('rankPoints', descending: true))
+      .thenReturn(mockOrderByQuery);
+}
+
+void _setupFirestoreChainWithError(MockFirebaseFirestore mockFirestore) {
+  final mockCollectionRef = MockCollectionReference();
+  final mockDocRef = MockDocumentReference();
   final mockQuery = MockQuery();
   final mockQuery2 = MockQuery();
   final mockQuery3 = MockQuery();
@@ -386,23 +452,7 @@ void _setupFirestoreChain(
   when(() => mockQuery.orderBy('username', descending: false))
       .thenReturn(mockQuery2);
   when(() => mockQuery2.limit(any())).thenReturn(mockQuery3);
-  when(() => mockQuery3.get()).thenAnswer((_) async => mockSnapshot);
-  when(() => mockCollectionRef.orderBy('rankPoints', descending: true))
-      .thenReturn(mockQuery);
-}
-
-void _setupFirestoreChainWithError(MockFirebaseFirestore mockFirestore) {
-  final mockCollectionRef = MockCollectionReference();
-  final mockDocRef = MockDocumentReference();
-  final mockQuery = MockQuery();
-
-  when(() => mockFirestore.collection('leaderboards'))
-      .thenReturn(mockCollectionRef);
-  when(() => mockCollectionRef.doc('global')).thenReturn(mockDocRef);
-  when(() => mockDocRef.collection('entries')).thenReturn(mockCollectionRef);
-  when(() => mockCollectionRef.orderBy('rankPoints', descending: true))
-      .thenReturn(mockQuery);
-  when(() => mockQuery.get()).thenThrow(Exception('Firestore error'));
+  when(() => mockQuery3.get()).thenThrow(Exception('Firestore error'));
 }
 
 void _setupFirestoreForDocReference(
@@ -414,7 +464,11 @@ void _setupFirestoreForDocReference(
 
   when(() => mockFirestore.collection('leaderboards'))
       .thenReturn(mockCollectionRef);
-  when(() => mockCollectionRef.doc('global')).thenReturn(mockDocRefWrapper);
   when(() => mockDocRefWrapper.collection('entries')).thenReturn(mockCollectionRef);
+  // Register the generic doc(any()) stub first: mocktail resolves the most
+  // recently registered *matching* stub first, so the exact doc('global')
+  // stub must be registered after it to win over the any() match for that
+  // specific argument while doc(uid) calls still fall through to it.
   when(() => mockCollectionRef.doc(any())).thenReturn(mockDocRef);
+  when(() => mockCollectionRef.doc('global')).thenReturn(mockDocRefWrapper);
 }

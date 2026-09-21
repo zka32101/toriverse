@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:toriverse/features/shop/application/providers/seasonal_providers.dart';
 import 'package:toriverse/features/shop/domain/services/seasonal_cosmetics_service.dart';
 import 'package:toriverse/shared/models/cosmetic_item.dart';
 
@@ -17,9 +16,9 @@ class SeasonalCosmeticCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final seasonalService = ref.watch(seasonalCosmeticsServiceProvider);
-    final daysLeft = seasonalService.getDaysUntilSeasonEnd(season);
-    final isAvailable = seasonalService.isCosmeticAvailable(cosmetic.id);
+    final daysLeft = SeasonalCosmeticsService.getDaysUntilSeasonEnd(season);
+    final isAvailable =
+        SeasonalCosmeticsService.isCosmeticAvailable(cosmetic.id);
 
     return Container(
       decoration: BoxDecoration(
@@ -96,7 +95,7 @@ class SeasonalCosmeticCard extends ConsumerWidget {
 
                   // Price
                   Text(
-                    '¥${cosmetic.priceJpy}',
+                    '¥${cosmetic.price}',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Colors.green.shade700,

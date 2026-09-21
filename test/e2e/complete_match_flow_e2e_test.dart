@@ -2,9 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:toriverse/shared/services/firebase_messaging_service.dart';
-import 'package:toriverse/features/match/application/services/push_notification_manager.dart';
 import 'package:toriverse/features/match/application/services/liveops_campaign_service.dart';
+import 'package:toriverse/shared/services/remote_config_service.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
 /// Mock FirebaseRemoteConfig for testing
@@ -39,7 +38,7 @@ void main() {
       mockRemoteConfig = MockFirebaseRemoteConfig();
       campaignService = LiveOpsCampaignService(
         firestore: fakeFirestore,
-        remoteConfig: mockRemoteConfig,
+        remoteConfig: RemoteConfigService(remoteConfig: mockRemoteConfig),
       );
     });
 
@@ -54,7 +53,7 @@ void main() {
           'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
           'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'requirement': '3_matches_completed',
-          'total_challenges': 3,
+          'challenges_required': 3,
         });
 
         // Setup: Create campaign rewards
@@ -97,7 +96,7 @@ void main() {
         await progressRef.set({
           'campaign_id': 'camp_001',
           'challenges_completed': 3,
-          'total_challenges': 3,
+          'challenges_required': 3,
           'claimed_rewards': [],
           'initialized_at': FieldValue.serverTimestamp(),
         });
@@ -107,8 +106,8 @@ void main() {
           userId: userId,
           campaignId: 'camp_001',
         );
-        expect(progress.challengesCompleted, equals(3));
-        expect(progress.totalChallenges, equals(3));
+        expect(progress!.challengesCompleted, equals(3));
+        expect(progress.challengesRequired, equals(3));
         expect(progress.hasClaimedReward, isFalse);
 
         // Step 5: Claim reward
@@ -124,7 +123,7 @@ void main() {
           userId: userId,
           campaignId: 'camp_001',
         );
-        expect(updatedProgress.hasClaimedReward, isTrue);
+        expect(updatedProgress!.hasClaimedReward, isTrue);
 
         // Step 7: Track participation (claimed_reward event)
         await campaignService.trackCampaignParticipation(
@@ -165,7 +164,7 @@ void main() {
               .doc(campaignId)
               .set({
                 'challenges_completed': challengesCompleted,
-                'total_challenges': 3,
+                'challenges_required': 3,
                 'claimed_rewards': i == 1 ? ['reward_001'] : [],
               });
         }
@@ -175,14 +174,14 @@ void main() {
           userId: userId,
           campaignId: 'camp_001',
         );
-        expect(progress1.hasClaimedReward, isTrue);
+        expect(progress1!.hasClaimedReward, isTrue);
         expect(progress1.challengesCompleted, equals(3));
 
         final progress2 = await campaignService.getUserCampaignProgress(
           userId: userId,
           campaignId: 'camp_002',
         );
-        expect(progress2.hasClaimedReward, isFalse);
+        expect(progress2!.hasClaimedReward, isFalse);
         expect(progress2.challengesCompleted, equals(2));
       });
 
@@ -220,7 +219,7 @@ void main() {
             .doc(campaignId)
             .set({
               'challenges_completed': 3,
-              'total_challenges': 3,
+              'challenges_required': 3,
               'claimed_rewards': [],
             });
 
@@ -245,7 +244,7 @@ void main() {
           userId: userId,
           campaignId: campaignId,
         );
-        expect(progress.hasClaimedReward, isTrue);
+        expect(progress!.hasClaimedReward, isTrue);
 
         // Verify no duplication
         final progressDoc = await fakeFirestore
@@ -286,7 +285,7 @@ void main() {
               .doc(campaignId)
               .set({
                 'challenges_completed': 3 - idx, // Different progress levels
-                'total_challenges': 3,
+                'challenges_required': 3,
                 'claimed_rewards': [],
               });
 
@@ -305,7 +304,7 @@ void main() {
             userId: userId,
             campaignId: campaignId,
           );
-          expect(progress.hasClaimedReward, isTrue);
+          expect(progress!.hasClaimedReward, isTrue);
           expect(progress.challengesCompleted, equals(3 - idx));
         }
       });
@@ -399,12 +398,9 @@ void main() {
             .doc(campaignId)
             .set({
               'challenges_completed': 3,
-              'total_challenges': 3,
+              'challenges_required': 3,
               'claimed_rewards': [],
             });
-
-        // Record time before claim
-        final timeBefore = DateTime.now();
 
         // Claim reward
         await campaignService.claimCampaignReward(
@@ -412,9 +408,6 @@ void main() {
           campaignId: campaignId,
           rewardId: 'reward_001',
         );
-
-        // Record time after claim
-        final timeAfter = DateTime.now();
 
         // Verify timestamp is within expected range
         final progressDoc = await fakeFirestore
@@ -493,7 +486,7 @@ void main() {
             .doc(campaignId)
             .set({
               'challenges_completed': 3,
-              'total_challenges': 3,
+              'challenges_required': 3,
               'claimed_rewards': [],
             });
 

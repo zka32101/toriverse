@@ -1,16 +1,23 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:toriverse/features/match/domain/services/streak_calculator.dart';
-import 'package:toriverse/features/match/application/providers/cosmetic_state.dart';
+import 'package:toriverse/features/match/application/providers/ai_takeover_state.dart';
 
 void main() {
+  final noTakeover = AITakeoverState.create();
+  final withTakeover = AITakeoverState.create().activateTakeover(
+    playerId: 'p1',
+    reason: 'timeout',
+  );
+
   group('StreakCalculator', () {
     group('shouldIncrementStreak', () {
       test('returns true for completed match', () {
         expect(
           StreakCalculator.shouldIncrementStreak(
-            matchStatus: 'finished',
-            quitReason: null,
-            timeoutReason: null,
+            matchFinished: true,
+            manuallyQuit: false,
+            timedOutWithoutAITakeover: false,
+            aiTakeover: noTakeover,
           ),
           isTrue,
         );
@@ -19,9 +26,10 @@ void main() {
       test('returns false for manual quit', () {
         expect(
           StreakCalculator.shouldIncrementStreak(
-            matchStatus: 'finished',
-            quitReason: 'manual',
-            timeoutReason: null,
+            matchFinished: true,
+            manuallyQuit: true,
+            timedOutWithoutAITakeover: false,
+            aiTakeover: noTakeover,
           ),
           isFalse,
         );
@@ -30,9 +38,10 @@ void main() {
       test('returns false for connection timeout without AI takeover', () {
         expect(
           StreakCalculator.shouldIncrementStreak(
-            matchStatus: 'finished',
-            quitReason: null,
-            timeoutReason: 'connection_lost',
+            matchFinished: true,
+            manuallyQuit: false,
+            timedOutWithoutAITakeover: true,
+            aiTakeover: noTakeover,
           ),
           isFalse,
         );
@@ -41,9 +50,10 @@ void main() {
       test('returns true for connection timeout with AI takeover', () {
         expect(
           StreakCalculator.shouldIncrementStreak(
-            matchStatus: 'finished',
-            quitReason: null,
-            timeoutReason: 'connection_lost_with_ai',
+            matchFinished: true,
+            manuallyQuit: false,
+            timedOutWithoutAITakeover: false,
+            aiTakeover: withTakeover,
           ),
           isTrue,
         );
@@ -52,9 +62,10 @@ void main() {
       test('returns false for non-finished match', () {
         expect(
           StreakCalculator.shouldIncrementStreak(
-            matchStatus: 'playing',
-            quitReason: null,
-            timeoutReason: null,
+            matchFinished: false,
+            manuallyQuit: false,
+            timedOutWithoutAITakeover: false,
+            aiTakeover: noTakeover,
           ),
           isFalse,
         );
@@ -65,9 +76,11 @@ void main() {
       test('returns null for valid completion', () {
         expect(
           StreakCalculator.getStreakResetReason(
-            matchStatus: 'finished',
-            quitReason: null,
-            timeoutReason: null,
+            matchFinished: true,
+            manuallyQuit: false,
+            connectionLost: false,
+            aiTakeoverActive: false,
+            matchErrorReason: null,
           ),
           isNull,
         );
@@ -76,9 +89,11 @@ void main() {
       test('returns manual_quit for user quit', () {
         expect(
           StreakCalculator.getStreakResetReason(
-            matchStatus: 'finished',
-            quitReason: 'manual',
-            timeoutReason: null,
+            matchFinished: true,
+            manuallyQuit: true,
+            connectionLost: false,
+            aiTakeoverActive: false,
+            matchErrorReason: null,
           ),
           equals('manual_quit'),
         );
@@ -87,9 +102,11 @@ void main() {
       test('returns connection_timeout for timeout without AI', () {
         expect(
           StreakCalculator.getStreakResetReason(
-            matchStatus: 'finished',
-            quitReason: null,
-            timeoutReason: 'connection_lost',
+            matchFinished: true,
+            manuallyQuit: false,
+            connectionLost: true,
+            aiTakeoverActive: false,
+            matchErrorReason: null,
           ),
           equals('connection_timeout'),
         );
@@ -98,9 +115,11 @@ void main() {
       test('returns system_error for other conditions', () {
         expect(
           StreakCalculator.getStreakResetReason(
-            matchStatus: 'error',
-            quitReason: null,
-            timeoutReason: null,
+            matchFinished: true,
+            manuallyQuit: false,
+            connectionLost: false,
+            aiTakeoverActive: false,
+            matchErrorReason: 'unexpected_error',
           ),
           equals('system_error'),
         );
@@ -171,9 +190,9 @@ void main() {
         expect(StreakCalculator.getNextMilestone(99), equals(100));
       });
 
-      test('returns null for streak >= 100', () {
-        expect(StreakCalculator.getNextMilestone(100), isNull);
-        expect(StreakCalculator.getNextMilestone(200), isNull);
+      test('returns next 25-increment for streak >= 100', () {
+        expect(StreakCalculator.getNextMilestone(100), equals(125));
+        expect(StreakCalculator.getNextMilestone(200), equals(225));
       });
     });
 
@@ -321,7 +340,7 @@ void main() {
         );
         expect(
           CosmeticRewardCalculator.getMilestoneRewardRarity(25),
-          equals('legendary'),
+          equals('rare'),
         );
       });
 
@@ -329,7 +348,7 @@ void main() {
         // Minor milestones (3, 5) get lower rarity
         expect(
           CosmeticRewardCalculator.getMilestoneRewardRarity(3),
-          equals('common'),
+          equals('uncommon'),
         );
         expect(
           CosmeticRewardCalculator.getMilestoneRewardRarity(5),
@@ -368,25 +387,25 @@ void main() {
         );
       });
 
-      test('returns 20% for streaks 10-24', () {
+      test('returns 15% for streaks 10-24', () {
         expect(
           CosmeticRewardCalculator.getBonusCosmeticProbability(10),
-          equals(0.20),
+          equals(0.15),
         );
         expect(
           CosmeticRewardCalculator.getBonusCosmeticProbability(24),
-          equals(0.20),
+          equals(0.15),
         );
       });
 
-      test('returns 35% for streaks 25-49', () {
+      test('returns 30% for streaks 25-49', () {
         expect(
           CosmeticRewardCalculator.getBonusCosmeticProbability(25),
-          equals(0.35),
+          equals(0.30),
         );
         expect(
           CosmeticRewardCalculator.getBonusCosmeticProbability(49),
-          equals(0.35),
+          equals(0.30),
         );
       });
 
@@ -401,14 +420,14 @@ void main() {
         );
       });
 
-      test('returns 0% for streaks < 5', () {
+      test('returns 5% for streaks < 5', () {
         expect(
           CosmeticRewardCalculator.getBonusCosmeticProbability(1),
-          equals(0.0),
+          equals(0.05),
         );
         expect(
           CosmeticRewardCalculator.getBonusCosmeticProbability(4),
-          equals(0.0),
+          equals(0.05),
         );
       });
     });

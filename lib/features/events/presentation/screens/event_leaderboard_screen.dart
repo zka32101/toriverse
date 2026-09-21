@@ -27,7 +27,9 @@ class EventLeaderboardScreen extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
+          // ignore: unused_result
           await ref.refresh(leaderboardFutureProvider('$eventId|100').future);
+          // ignore: unused_result
           await ref.refresh(userRankEntryProvider(eventId).future);
         },
         child: SingleChildScrollView(

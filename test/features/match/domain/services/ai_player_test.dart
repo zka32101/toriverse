@@ -7,7 +7,7 @@ void main() {
     late Board board;
 
     setUp(() {
-      board = Board.standard();
+      board = Board.initial();
     });
 
     group('Move Selection', () {
@@ -19,12 +19,12 @@ void main() {
 
         // Verify move is valid
         final validMoves = board.getValidMoves(Board.black);
-        expect(validMoves, contains(move));
+        expect(validMoves, contains(equals(move)));
       });
 
       test('selectMove returns null when no moves available', () {
         // Create a board where red has no valid moves
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
 
         // Red (player 2) has no moves initially
         final move = AIPlayer.selectMove(testBoard, Board.red);
@@ -50,7 +50,7 @@ void main() {
 
         expect(move, isNotNull);
         final validMoves = board.getValidMoves(Board.white);
-        expect(validMoves, contains(move));
+        expect(validMoves, contains(equals(move)));
       });
     });
 
@@ -102,8 +102,8 @@ void main() {
         // They might be different (not guaranteed, but likely)
         // So we just verify both are valid
         final validMoves = board.getValidMoves(Board.black);
-        expect(validMoves, contains(easyMove));
-        expect(validMoves, contains(hardMove));
+        expect(validMoves, contains(equals(easyMove)));
+        expect(validMoves, contains(equals(hardMove)));
       });
     });
 
@@ -155,7 +155,7 @@ void main() {
     group('Move Quality', () {
       test('AI corner preference works', () {
         // After some moves, AI should eventually prefer corners if available
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
 
         // Play through a few rounds
         for (int i = 0; i < 5; i++) {

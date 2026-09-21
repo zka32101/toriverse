@@ -10,6 +10,10 @@ on:
       - main
       - claude/triverse-development-r2e05a
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   analyze:
     name: Analyze Code
@@ -47,7 +51,6 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.4.x'
           channel: stable
           cache: true
 
@@ -91,7 +94,6 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.4.x'
           channel: stable
           cache: true
 
@@ -105,7 +107,7 @@ jobs:
         run: flutter build apk --release --obfuscate --split-debug-info=build/app/outputs/symbols
 
       - name: Upload APK artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-release.apk
           path: build/app/outputs/flutter-app.apk
@@ -125,7 +127,6 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.4.x'
           channel: stable
           cache: true
 
@@ -142,7 +143,7 @@ jobs:
         run: flutter build ios --release --obfuscate --split-debug-info=build/app/outputs/symbols
 
       - name: Upload IPA artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-release.ipa
           path: build/ios/ipa/
@@ -161,12 +162,11 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.4.x'
           channel: stable
           cache: true
 
       - name: Download IPA artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: app-release.ipa
 
@@ -195,12 +195,11 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.4.x'
           channel: stable
           cache: true
 
       - name: Download APK artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: app-release.apk
 

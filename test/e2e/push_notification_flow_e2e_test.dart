@@ -1,41 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:toriverse/features/match/application/providers/notification_state.dart';
-import 'package:flutter/material.dart';
-
-/// Mock FirebaseRemoteConfig for push notification testing
-class MockFirebaseRemoteConfig extends Mock implements FirebaseRemoteConfig {
-  final Map<String, dynamic> _values = {
-    'enable_milestone_notifications': true,
-    'enable_streak_recovery': true,
-    'enable_campaigns': true,
-    'enable_match_available': true,
-    'notification_sound_default': true,
-    'notification_vibration_default': true,
-  };
-
-  @override
-  String getString(String key) => _values[key]?.toString() ?? '';
-
-  @override
-  bool getBool(String key) => _values[key] as bool? ?? false;
-
-  @override
-  int getInt(String key) => int.tryParse(_values[key]?.toString() ?? '0') ?? 0;
-
-  @override
-  double getDouble(String key) =>
-      double.tryParse(_values[key]?.toString() ?? '0.0') ?? 0.0;
-}
 
 void main() {
   group('Push Notification Flow E2E Tests', () {
-    late MockFirebaseRemoteConfig mockRemoteConfig;
-
-    setUp(() {
-      mockRemoteConfig = MockFirebaseRemoteConfig();
-    });
 
     group('Notification Preferences Lifecycle', () {
       test('user can toggle all notifications and verify state propagation', () {

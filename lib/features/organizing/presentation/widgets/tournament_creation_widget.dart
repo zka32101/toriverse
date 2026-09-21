@@ -551,7 +551,7 @@ class _TournamentCreationWidgetState extends ConsumerState<TournamentCreationWid
     );
 
     try {
-      await ref.read(createTournamentProvider(_CreateTournamentParams(
+      await ref.read(createTournamentProvider(CreateTournamentParams(
         organizerId: widget.organizerId,
         name: _nameController.text,
         description: _descriptionController.text,

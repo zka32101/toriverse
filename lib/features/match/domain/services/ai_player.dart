@@ -71,9 +71,11 @@ class AIPlayer {
     final validMoves = board.getValidMoves(currentPlayer);
 
     // 合法手がないターンをスキップ
+    // depth を必ず減らして再帰の停止を保証する（両者とも手がない
+    // 状態が続くと depth 据え置きでは無限再帰になる）
     if (validMoves.isEmpty) {
       // 別のプレイヤーのターンへ（簡略化のため現在は敵プレイヤーのみ）
-      return _minimax(board, depth, aiPlayer, !isMaximizing);
+      return _minimax(board, depth - 1, aiPlayer, !isMaximizing);
     }
 
     int score = isMaximizing ? -10000 : 10000;

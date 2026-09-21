@@ -23,7 +23,7 @@ class RivalryState {
   /// Get aggregated rivalry scores across recent rounds
   Map<int, Map<int, int>> getAggregatedScores() {
     if (_cachedScores != null) {
-      return _cachedScores!;
+      return _cachedScores;
     }
 
     final scores = <int, Map<int, int>>{};
@@ -42,15 +42,15 @@ class RivalryState {
   RivalryState addRound(Map<int, Map<int, int>> roundBreakdown) {
     // Create deep copy of recentRounds to prevent mutation issues
     final updated = recentRounds
-        .map((round) => {
-              for (final (attacker, targets) in round.entries)
+        .map((round) => <int, Map<int, int>>{
+              for (final MapEntry(key: attacker, value: targets) in round.entries)
                 attacker: {...targets}, // Deep copy inner map
             })
         .toList();
 
     // Add deep copy of new round
     updated.add({
-      for (final (attacker, targets) in roundBreakdown.entries)
+      for (final MapEntry(key: attacker, value: targets) in roundBreakdown.entries)
         attacker: {...targets}, // Deep copy inner map
     });
 

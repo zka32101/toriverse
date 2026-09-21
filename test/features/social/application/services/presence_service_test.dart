@@ -10,15 +10,23 @@ import 'package:toriverse/features/social/application/services/presence_service.
 // Mock classes
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
+// ignore: subtype_of_sealed_class
 class MockCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentReference extends Mock
     implements DocumentReference<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
 class MockDocumentSnapshot extends Mock
     implements DocumentSnapshot<Map<String, dynamic>> {}
 
+// ignore: subtype_of_sealed_class
+class MockQueryDocumentSnapshot extends Mock
+    implements QueryDocumentSnapshot<Map<String, dynamic>> {}
+
+// ignore: subtype_of_sealed_class
 class MockQuery extends Mock implements Query<Map<String, dynamic>> {}
 
 class MockQuerySnapshot extends Mock
@@ -209,12 +217,12 @@ void main() {
         final mockSnapshot = MockQuerySnapshot();
         final now = DateTime.now();
 
-        final doc1 = MockDocumentSnapshot();
+        final doc1 = MockQueryDocumentSnapshot();
         when(() => doc1.id).thenReturn('uid1');
         when(() => doc1['isOnline']).thenReturn(true);
         when(() => doc1['lastSeenAt']).thenReturn(now.toIso8601String());
 
-        final doc2 = MockDocumentSnapshot();
+        final doc2 = MockQueryDocumentSnapshot();
         when(() => doc2.id).thenReturn('uid2');
         when(() => doc2['isOnline']).thenReturn(false);
         when(() => doc2['lastSeenAt']).thenReturn(now.toIso8601String());
@@ -290,13 +298,14 @@ void main() {
         final mockQuery = MockQuery();
         final mockSnapshot = MockQuerySnapshot();
 
-        final doc1 = MockDocumentSnapshot();
-        when(() => doc1.reference).thenReturn(MockDocumentReference());
-        when(() => doc1.reference.delete()).thenAnswer((_) async => {});
+        final doc1 = MockQueryDocumentSnapshot();
+        final doc1Ref = MockDocumentReference();
+        when(() => doc1Ref.delete()).thenAnswer((_) async {});
+        when(() => doc1.reference).thenReturn(doc1Ref);
 
         when(() => mockSnapshot.docs).thenReturn([doc1]);
         when(() => mockQuery.get()).thenAnswer((_) async => mockSnapshot);
-        when(() => mockCollectionRef.where(any(), isLessThan: any()))
+        when(() => mockCollectionRef.where(any(), isLessThan: any(named: 'isLessThan')))
             .thenReturn(mockQuery);
 
         when(() => mockFirestore.collection('presence'))
@@ -306,7 +315,7 @@ void main() {
         await presenceService.cleanupStalePresence(staleDaysOld: 30);
 
         // Assert
-        verify(() => mockCollectionRef.where(any(), isLessThan: any()))
+        verify(() => mockCollectionRef.where(any(), isLessThan: any(named: 'isLessThan')))
             .called(1);
       });
     });
@@ -333,6 +342,6 @@ void _setupQueryRef(
 
   when(() => mockFirestore.collection('presence'))
       .thenReturn(mockCollectionRef);
-  when(() => mockCollectionRef.where(any(), whereIn: any()))
+  when(() => mockCollectionRef.where(any(), whereIn: any(named: 'whereIn')))
       .thenReturn(mockQuery);
 }

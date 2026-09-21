@@ -338,7 +338,7 @@ class MatchRoomService {
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => MatchRoom.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => MatchRoom.fromJson(doc.data()))
           .toList();
     }).handleError((e) {
       return [];
@@ -355,7 +355,7 @@ class MatchRoomService {
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => Invitation.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => Invitation.fromJson(doc.data()))
           .toList();
     }).handleError((e) {
       return [];

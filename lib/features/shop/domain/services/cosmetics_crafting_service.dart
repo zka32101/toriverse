@@ -8,7 +8,11 @@ class CosmeticsCraftingService {
   /// Crafting recipe: 3 commons + 1 rare = 1 rare cosmetic
   ///
   /// Maps rare cosmetic ID to required common cosmetic IDs.
-  static const Map<String, CraftingRecipe> craftingRecipes = {
+  ///
+  /// Not `const` because [CraftingRecipe]'s constructor validates
+  /// `requiredMaterials.length` in an assert, and `List.length` cannot be
+  /// evaluated in a constant expression.
+  static final Map<String, CraftingRecipe> craftingRecipes = {
     'board_sakura': CraftingRecipe(
       resultId: 'board_sakura',
       resultName: 'さくら盤',
@@ -57,13 +61,7 @@ class CosmeticsCraftingService {
     Map<String, int> userInventory,
   ) {
     return craftingRecipes.entries
-        .where((entry) {
-          final recipe = entry.value;
-          // Check if user has all required materials
-          return recipe.requiredMaterials.every((material) {
-            return (userInventory[material] ?? 0) > 0;
-          });
-        })
+        .where((entry) => _hasRequiredMaterials(entry.value, userInventory))
         .map((entry) => entry.value)
         .toList();
   }
@@ -76,8 +74,23 @@ class CosmeticsCraftingService {
     final recipe = craftingRecipes[cosmeticId];
     if (recipe == null) return false;
 
-    return recipe.requiredMaterials.every((material) {
-      return (userInventory[material] ?? 0) > 0;
+    return _hasRequiredMaterials(recipe, userInventory);
+  }
+
+  /// Check inventory has enough of each required material *quantity*
+  /// (requiredMaterials may repeat the same id, e.g. 3x board_classic —
+  /// checking each occurrence against the same unconsumed inventory count
+  /// would let 1 unit satisfy a "need 3" recipe).
+  bool _hasRequiredMaterials(
+    CraftingRecipe recipe,
+    Map<String, int> userInventory,
+  ) {
+    final requiredCounts = <String, int>{};
+    for (final material in recipe.requiredMaterials) {
+      requiredCounts[material] = (requiredCounts[material] ?? 0) + 1;
+    }
+    return requiredCounts.entries.every((entry) {
+      return (userInventory[entry.key] ?? 0) >= entry.value;
     });
   }
 
@@ -142,7 +155,7 @@ class CraftingRecipe {
   /// Cost of recipe (if any)
   final int priceYen;
 
-  const CraftingRecipe({
+  CraftingRecipe({
     required this.resultId,
     required this.resultName,
     required this.resultType,

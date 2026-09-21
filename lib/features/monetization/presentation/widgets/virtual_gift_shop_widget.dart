@@ -56,18 +56,6 @@ class _GiftCard extends StatelessWidget {
     required this.creatorId,
   });
 
-  String _getRarityColor(String rarity) {
-    switch (rarity) {
-      case 'legendary':
-        return '#FFD700'; // Gold
-      case 'rare':
-        return '#C0C0C0'; // Silver
-      case 'common':
-      default:
-        return '#CD7F32'; // Bronze
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(

@@ -38,14 +38,15 @@ class CosmeticShowcaseService {
     );
   }
 
-  /// Get date of most recent purchase
+  /// Get release date of the most recently added owned cosmetic
+  ///
+  /// CosmeticItem carries no purchase timestamp, so `releaseDate` is used
+  /// as the best available proxy for "most recently acquired".
   DateTime? _getMostRecentPurchaseDate(List<CosmeticItem> cosmetics) {
     if (cosmetics.isEmpty) return null;
-    return cosmetics.reduce((a, b) {
-      final aDate = a.purchasedAt ?? DateTime(1970);
-      final bDate = b.purchasedAt ?? DateTime(1970);
-      return aDate.isAfter(bDate) ? a : b;
-    }).purchasedAt;
+    return cosmetics
+        .reduce((a, b) => a.releaseDate.isAfter(b.releaseDate) ? a : b)
+        .releaseDate;
   }
 
   /// Calculate collection completion percentage
@@ -78,9 +79,7 @@ class CosmeticShowcaseService {
 
       if (aOrder != bOrder) return aOrder.compareTo(bOrder);
 
-      final aDate = a.purchasedAt ?? DateTime(1970);
-      final bDate = b.purchasedAt ?? DateTime(1970);
-      return bDate.compareTo(aDate); // Newest first
+      return b.releaseDate.compareTo(a.releaseDate); // Newest first
     });
 
     // Group by rarity for display

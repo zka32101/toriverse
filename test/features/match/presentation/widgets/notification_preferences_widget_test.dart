@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide TimeOfDay;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:toriverse/features/match/application/providers/notification_state.dart';
@@ -165,24 +165,26 @@ class _QuietHoursDialogState extends State<QuietHoursDialog> {
         children: [
           ListTile(
             title: const Text('Start Time'),
-            subtitle: Text(startTime?.format(context) ?? 'Not set'),
-            onTap: () async {
-              final time = await showTimePicker(
-                context: context,
-                initialTime: startTime ?? const TimeOfDay(hour: 22, minute: 0),
-              );
-              if (time != null) setState(() => startTime = time);
+            subtitle: Text(startTime?.toString() ?? 'Not set'),
+            onTap: () {
+              // Simple mock time picker: cycle the hour forward.
+              final current = startTime ?? const TimeOfDay(hour: 22, minute: 0);
+              setState(() => startTime = TimeOfDay(
+                    hour: (current.hour + 1) % 24,
+                    minute: current.minute,
+                  ));
             },
           ),
           ListTile(
             title: const Text('End Time'),
-            subtitle: Text(endTime?.format(context) ?? 'Not set'),
-            onTap: () async {
-              final time = await showTimePicker(
-                context: context,
-                initialTime: endTime ?? const TimeOfDay(hour: 8, minute: 0),
-              );
-              if (time != null) setState(() => endTime = time);
+            subtitle: Text(endTime?.toString() ?? 'Not set'),
+            onTap: () {
+              // Simple mock time picker: cycle the hour forward.
+              final current = endTime ?? const TimeOfDay(hour: 8, minute: 0);
+              setState(() => endTime = TimeOfDay(
+                    hour: (current.hour + 1) % 24,
+                    minute: current.minute,
+                  ));
             },
           ),
         ],
@@ -424,14 +426,18 @@ void main() {
         ),
       );
 
-      // Tap set quiet hours button
+      // Tap set quiet hours button (scroll it into view first: it's below
+      // the fold in the default test viewport)
       final quietButton = find.text('Set Quiet Hours');
+      await tester.ensureVisible(quietButton);
+      await tester.pumpAndSettle();
       await tester.tap(quietButton);
       await tester.pumpAndSettle();
 
-      // Verify dialog is displayed
+      // Verify dialog is displayed (the button label and the dialog title
+      // both read "Set Quiet Hours", so there are 2 matches once open)
       expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.text('Set Quiet Hours'), findsOneWidget);
+      expect(find.text('Set Quiet Hours'), findsNWidgets(2));
       expect(find.text('Start Time'), findsOneWidget);
       expect(find.text('End Time'), findsOneWidget);
     });
@@ -446,7 +452,10 @@ void main() {
       );
 
       // Open dialog
-      await tester.tap(find.text('Set Quiet Hours'));
+      final quietButton = find.text('Set Quiet Hours');
+      await tester.ensureVisible(quietButton);
+      await tester.pumpAndSettle();
+      await tester.tap(quietButton);
       await tester.pumpAndSettle();
 
       // Tap cancel

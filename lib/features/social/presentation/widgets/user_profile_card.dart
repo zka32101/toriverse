@@ -194,24 +194,24 @@ class UserPublicProfileCard extends ConsumerWidget {
                   ),
                 ),
               ),
-              loading: () => const SizedBox(
+              loading: () => SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: null,
-                  icon: SizedBox(
+                  icon: const SizedBox(
                     height: 16,
                     width: 16,
                     child: CircularProgressIndicator(strokeWidth: 2),
                   ),
-                  label: Text('Follow'),
+                  label: const Text('Follow'),
                 ),
               ),
-              error: (err, stack) => const SizedBox(
+              error: (err, stack) => SizedBox(
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: null,
-                  icon: Icon(Icons.favorite_border),
-                  label: Text('Follow'),
+                  icon: const Icon(Icons.favorite_border),
+                  label: const Text('Follow'),
                 ),
               ),
             ),

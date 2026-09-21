@@ -17,8 +17,8 @@ void main() {
       final rare = cosmetics.where((c) => c.rarity == CosmeticRarity.rare);
       final limited = cosmetics.where((c) => c.rarity == CosmeticRarity.limited);
 
-      expect(common.length, 8); // 1 + 2 + 2 + 2 + 1
-      expect(rare.length, 12); // 4 + 3 + 3 + 3
+      expect(common.length, 8); // 2 + 2 + 2 + 2
+      expect(rare.length, 12); // 3 + 3 + 3 + 3
       expect(limited.length, 3);
     });
 
@@ -34,9 +34,9 @@ void main() {
 
       expect(stones.length, 15); // 5 + 5 + 5
       expect(stones.every((c) =>
-          c.typeString == 'stoneBlack' ||
-          c.typeString == 'stoneWhite' ||
-          c.typeString == 'stoneRed'), true);
+          c.typeString == 'stone_black' ||
+          c.typeString == 'stone_white' ||
+          c.typeString == 'stone_red'), true);
     });
 
     test('getLimitedEditionCosmetics() returns only limited editions', () {
@@ -62,31 +62,30 @@ void main() {
     test('All cosmetics have descriptions', () {
       final cosmetics = CosmeticsSeedData.getAllCosmetics();
 
-      expect(cosmetics.every((c) => c.description != null), true);
-      expect(cosmetics.every((c) => (c.description ?? '').isNotEmpty), true);
+      expect(cosmetics.every((c) => c.description.isNotEmpty), true);
     });
 
     test('Board cosmetics have correct price', () {
       final boards = CosmeticsSeedData.getBoardCosmetics();
 
-      expect(boards.every((c) => c.priceJpy == 300), true);
+      expect(boards.every((c) => c.price == 300), true);
     });
 
     test('Stone cosmetics have correct price', () {
       final stones = CosmeticsSeedData.getStoneCosmetics();
 
-      expect(stones.every((c) => c.priceJpy == 120), true);
+      expect(stones.every((c) => c.price == 120), true);
     });
 
     test('Limited edition cosmetics have correct price', () {
       final limited = CosmeticsSeedData.getLimitedEditionCosmetics();
 
-      expect(limited.every((c) => c.priceJpy == 500), true);
+      expect(limited.every((c) => c.price == 500), true);
     });
 
     test('All cosmetics have valid typeString', () {
       final cosmetics = CosmeticsSeedData.getAllCosmetics();
-      final validTypes = {'board', 'stoneBlack', 'stoneWhite', 'stoneRed'};
+      final validTypes = {'board', 'stone_black', 'stone_white', 'stone_red'};
 
       expect(cosmetics.every((c) => validTypes.contains(c.typeString)), true);
     });
@@ -95,28 +94,27 @@ void main() {
       final limited = CosmeticsSeedData.getLimitedEditionCosmetics();
 
       for (final cosmetic in limited) {
-        expect(cosmetic.availableFrom, isNotNull);
-        expect(cosmetic.availableUntil, isNotNull);
+        expect(cosmetic.releaseDate, isNotNull);
+        expect(cosmetic.limitedEditionEndDate, isNotNull);
       }
     });
 
-    test('Non-limited cosmetics have no availability windows', () {
+    test('Non-limited cosmetics have no limited edition end date', () {
       final cosmetics = CosmeticsSeedData.getAllCosmetics();
       final nonLimited =
           cosmetics.where((c) => c.rarity != CosmeticRarity.limited);
 
-      expect(nonLimited.every((c) => c.availableFrom == null), true);
-      expect(nonLimited.every((c) => c.availableUntil == null), true);
+      expect(nonLimited.every((c) => c.limitedEditionEndDate == null), true);
     });
 
     test('Stone cosmetics are distributed equally by color', () {
       final stones = CosmeticsSeedData.getStoneCosmetics();
 
       final black =
-          stones.where((c) => c.typeString == 'stoneBlack').length;
+          stones.where((c) => c.typeString == 'stone_black').length;
       final white =
-          stones.where((c) => c.typeString == 'stoneWhite').length;
-      final red = stones.where((c) => c.typeString == 'stoneRed').length;
+          stones.where((c) => c.typeString == 'stone_white').length;
+      final red = stones.where((c) => c.typeString == 'stone_red').length;
 
       expect(black, 5);
       expect(white, 5);
@@ -129,8 +127,10 @@ void main() {
       final common = boards.where((c) => c.rarity == CosmeticRarity.common);
       final rare = boards.where((c) => c.rarity == CosmeticRarity.rare);
 
-      expect(common.length, 1);
-      expect(rare.length, 4);
+      // board_classic + board_midnight are common; board_sakura, board_neon
+      // and board_crystal are rare.
+      expect(common.length, 2);
+      expect(rare.length, 3);
     });
 
     test('All cosmetics can be converted to map and back', () {
@@ -143,7 +143,7 @@ void main() {
         expect(restored.id, cosmetic.id);
         expect(restored.name, cosmetic.name);
         expect(restored.typeString, cosmetic.typeString);
-        expect(restored.priceJpy, cosmetic.priceJpy);
+        expect(restored.price, cosmetic.price);
         expect(restored.rarity, cosmetic.rarity);
       }
     });
@@ -165,7 +165,7 @@ void main() {
 
       expect(classic.name, 'クラシック盤');
       expect(classic.typeString, 'board');
-      expect(classic.priceJpy, 300);
+      expect(classic.price, 300);
       expect(classic.rarity, CosmeticRarity.common);
       expect(classic.description, contains('木目'));
     });
@@ -176,10 +176,10 @@ void main() {
 
       expect(golden.name, 'ゴールデンセット');
       expect(golden.typeString, 'board');
-      expect(golden.priceJpy, 500);
+      expect(golden.price, 500);
       expect(golden.rarity, CosmeticRarity.limited);
-      expect(golden.availableFrom, isNotNull);
-      expect(golden.availableUntil, isNotNull);
+      expect(golden.releaseDate, isNotNull);
+      expect(golden.limitedEditionEndDate, isNotNull);
     });
   });
 }

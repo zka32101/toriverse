@@ -6,12 +6,20 @@ void main() {
     late Board board;
 
     setUp(() {
-      board = Board.standard();
+      board = Board.initial();
     });
 
     group('Initialization', () {
       test('Standard 8x8 board has correct initial state', () {
-        expect(board.boardState.length, equals(64));
+        // Board is an 8x8 grid = 64 squares
+        int totalCells = 0;
+        for (int row = 0; row < 8; row++) {
+          for (int col = 0; col < 8; col++) {
+            board.getStone(row, col); // should not throw
+            totalCells++;
+          }
+        }
+        expect(totalCells, equals(64));
 
         // Center 4 stones
         expect(board.getStone(3, 3), equals(Board.white)); // Position 27
@@ -29,12 +37,13 @@ void main() {
       test('Clone creates independent copy', () {
         final cloned = board.clone();
 
-        // Modify cloned board
-        cloned.placeStone(0, 0, Board.black);
+        // Modify cloned board (use a legal opening move — corners aren't
+        // legal placements from the initial position)
+        cloned.placeStone(2, 3, Board.black);
 
         // Original should be unchanged
-        expect(board.getStone(0, 0), equals(Board.empty));
-        expect(cloned.getStone(0, 0), equals(Board.black));
+        expect(board.getStone(2, 3), equals(Board.empty));
+        expect(cloned.getStone(2, 3), equals(Board.black));
       });
     });
 
@@ -47,11 +56,11 @@ void main() {
       test('Out of bounds placement throws', () {
         expect(
           () => board.placeStone(-1, 0, Board.black),
-          throwsRangeError,
+          throwsArgumentError,
         );
         expect(
           () => board.placeStone(8, 0, Board.black),
-          throwsRangeError,
+          throwsArgumentError,
         );
       });
     });
@@ -117,7 +126,7 @@ void main() {
     group('Flipping Logic', () {
       test('Stones flip in all 8 directions', () {
         // Setup a specific board state to test flipping
-        final testBoard = Board.standard();
+        final testBoard = Board.initial();
 
         // Make a move that flips stones
         final validMoves = testBoard.getValidMoves(Board.black);
@@ -155,10 +164,17 @@ void main() {
 
     group('Edge Cases', () {
       test('Corner stones affect validity', () {
-        // Place a stone in corner
-        board.boardState[0] = Board.black; // Top-left corner
+        // Board doesn't expose direct grid mutation (placeStone() enforces
+        // move legality), so build a custom board via fromGrid() with the
+        // corner already set to test counting logic directly.
+        final grid = List.generate(
+          8,
+          (row) => List.generate(8, (col) => board.getStone(row, col)),
+        );
+        grid[0][0] = Board.black; // Top-left corner
+        final customBoard = Board.fromGrid(grid);
 
-        final counts = board.countStones();
+        final counts = customBoard.countStones();
         expect(counts[Board.black], equals(3)); // Original 2 + 1 new
       });
 

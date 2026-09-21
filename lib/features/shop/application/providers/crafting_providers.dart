@@ -2,7 +2,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:toriverse/features/shop/domain/services/cosmetics_crafting_service.dart';
-import 'package:toriverse/shared/models/cosmetic_item.dart';
 import 'cosmetics_providers.dart';
 
 /// Provider for CosmeticsCraftingService
@@ -35,7 +34,6 @@ final userCraftingProgressProvider = StreamProvider<CraftingProgress?>((ref) {
 
 /// Provider for user's inventory (owned cosmetics count)
 final userInventoryProvider = FutureProvider<Map<String, int>>((ref) async {
-  final userId = ref.watch(userIdProvider);
   final userCosmetics = await ref.watch(userCosmeticsProvider.future);
 
   // Count cosmetics by ID
@@ -167,13 +165,11 @@ class CraftingNotifier extends StateNotifier<AsyncValue<void>> {
       }, SetOptions(merge: true));
 
       // Add to crafting history
-      final historyId = _firestore.collection('dummy').doc().id;
       await _firestore
           .collection('users')
           .doc(_userId)
-          .collection('crafting')
-          .collection('history')
-          .doc(historyId)
+          .collection('craftingHistory')
+          .doc()
           .set({
         'cosmetic_id': cosmeticId,
         'completed_at': Timestamp.fromDate(now),

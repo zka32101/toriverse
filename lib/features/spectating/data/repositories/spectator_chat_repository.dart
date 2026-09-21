@@ -122,8 +122,6 @@ class SpectatorChatRepository {
   ///
   /// Returns a map with 'isFlagged' (bool) and 'reason' (String?).
   Map<String, dynamic> _checkMessageModeration(String text) {
-    final lowerText = text.toLowerCase();
-
     // Check profanity
     for (final pattern in ChatModerationConfig.profanityPatterns) {
       if (RegExp(pattern, caseSensitive: false).hasMatch(text)) {

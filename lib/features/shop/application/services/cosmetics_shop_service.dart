@@ -187,7 +187,7 @@ class CosmeticsShopService {
         parameters: {
           'cosmetic_id': cosmetic.id,
           'cosmetic_name': cosmetic.name,
-          'price_yen': cosmetic.priceJpy,
+          'price_yen': cosmetic.price,
           'type': cosmetic.typeString,
           'rarity': cosmetic.rarity.name,
           'payment_method': 'revenucat_validated',
@@ -337,7 +337,6 @@ class CosmeticsShopService {
   /// Get featured cosmetics (for UI showcase)
   Future<List<CosmeticItem>> getFeaturedCosmetics({int limit = 3}) async {
     try {
-      final now = DateTime.now();
       final cosmetics = await fetchAvailableCosmetics();
 
       // Sort by rarity (limited > rare > common) and date
