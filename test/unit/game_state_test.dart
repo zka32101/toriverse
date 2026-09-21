@@ -182,13 +182,14 @@ void main() {
         playerIds: ['player_0', 'player_1', 'AI_1'],
       );
 
-      // 複数の手を打つ
+      // 複数の手を打つ（3手目の (2,2) はこの盤面では合法手でないため
+      // 静かに却下され、ラウンドは進まない）
       await container.read(gameStateProvider.notifier).placeStone(2, 3);
       await container.read(gameStateProvider.notifier).placeStone(2, 4);
       await container.read(gameStateProvider.notifier).placeStone(2, 2);
 
       final state = container.read(gameStateProvider);
-      expect(state!.roundIndex, 3);
+      expect(state!.roundIndex, 2);
     });
 
     test('盤面の状態が正しく更新される', () async {

@@ -93,12 +93,13 @@ class StreakCalculator {
   /// 2 = second milestone (5)
   /// etc.
   static int getMilestoneLevel(int streak) {
+    int level = 0;
     for (int i = 0; i < milestoneBoundaries.length; i++) {
-      if (milestoneBoundaries[i] == streak) {
-        return i + 1;
+      if (milestoneBoundaries[i] <= streak) {
+        level = i + 1;
       }
     }
-    return 0;
+    return level;
   }
 
   /// Check if reaching this streak is a "major" milestone
