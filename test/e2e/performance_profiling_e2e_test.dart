@@ -168,7 +168,7 @@ void main() {
               .doc(campaignId)
               .set({
                 'challenges_completed': 10,
-                'total_challenges': 10,
+                'challenges_required': 10,
                 'claimed_rewards': [],
               });
         }
@@ -272,7 +272,7 @@ void main() {
               .doc(campaignId)
               .set({
                 'challenges_completed': i % 3 + 1,
-                'total_challenges': 3,
+                'challenges_required': 3,
                 'claimed_rewards': i % 2 == 0 ? ['reward_001'] : [],
               });
         }
@@ -382,7 +382,7 @@ void main() {
               .doc(campaignId)
               .set({
                 'challenges_completed': 3,
-                'total_challenges': 3,
+                'challenges_required': 3,
                 'claimed_rewards': [],
               });
         }

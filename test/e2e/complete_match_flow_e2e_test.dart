@@ -53,7 +53,7 @@ void main() {
           'start_time': DateTime.now().subtract(Duration(days: 1)).toIso8601String(),
           'end_time': DateTime.now().add(Duration(days: 7)).toIso8601String(),
           'requirement': '3_matches_completed',
-          'total_challenges': 3,
+          'challenges_required': 3,
         });
 
         // Setup: Create campaign rewards
@@ -96,7 +96,7 @@ void main() {
         await progressRef.set({
           'campaign_id': 'camp_001',
           'challenges_completed': 3,
-          'total_challenges': 3,
+          'challenges_required': 3,
           'claimed_rewards': [],
           'initialized_at': FieldValue.serverTimestamp(),
         });
@@ -164,7 +164,7 @@ void main() {
               .doc(campaignId)
               .set({
                 'challenges_completed': challengesCompleted,
-                'total_challenges': 3,
+                'challenges_required': 3,
                 'claimed_rewards': i == 1 ? ['reward_001'] : [],
               });
         }
@@ -219,7 +219,7 @@ void main() {
             .doc(campaignId)
             .set({
               'challenges_completed': 3,
-              'total_challenges': 3,
+              'challenges_required': 3,
               'claimed_rewards': [],
             });
 
@@ -285,7 +285,7 @@ void main() {
               .doc(campaignId)
               .set({
                 'challenges_completed': 3 - idx, // Different progress levels
-                'total_challenges': 3,
+                'challenges_required': 3,
                 'claimed_rewards': [],
               });
 
@@ -398,7 +398,7 @@ void main() {
             .doc(campaignId)
             .set({
               'challenges_completed': 3,
-              'total_challenges': 3,
+              'challenges_required': 3,
               'claimed_rewards': [],
             });
 
@@ -486,7 +486,7 @@ void main() {
             .doc(campaignId)
             .set({
               'challenges_completed': 3,
-              'total_challenges': 3,
+              'challenges_required': 3,
               'claimed_rewards': [],
             });
 
