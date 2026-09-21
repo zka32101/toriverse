@@ -33,7 +33,13 @@ dependencies:
 
   # 課金・広告
   purchases_flutter: ^7.0.0
-  google_mobile_ads: ^3.0.0
+  # google_mobile_ads is not yet wired into the app (no lib/ usage) and
+  # every version's iOS podspec depends on webview_flutter_wkwebview in a
+  # way that breaks `pod install` when that plugin is only a transitive
+  # dependency (see https://github.com/googleads/googleads-mobile-flutter
+  # issues for this exact "Unable to find a specification for
+  # `webview_flutter_wkwebview`" error). Re-add when reward-ad
+  # integration actually begins.
 
   # UI・アニメ
   lottie: ^2.6.0
