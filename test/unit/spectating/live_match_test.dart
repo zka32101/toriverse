@@ -540,7 +540,7 @@ void main() {
         engagementScore: calculatedScore,
       );
 
-      expect(engagement.engagementScore, 95); // (5*10) + (3*5) + (10*2)
+      expect(engagement.engagementScore, 85); // (5*10) + (3*5) + (10*2)
     });
 
     test('tracks match completion', () {

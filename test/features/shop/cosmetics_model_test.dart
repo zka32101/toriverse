@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:toriverse/shared/models/cosmetic_item.dart';
 
@@ -168,7 +169,7 @@ void main() {
           'rarity': 'common',
           'color_scheme': 'test',
           'preview_image_url': 'url',
-          'release_date': _now,
+          'release_date': Timestamp.fromDate(_now),
           'limited_edition_end_date': null,
           'revenueket_product_id': 'test',
           // missing 'requires_min_version'

@@ -2,6 +2,7 @@ import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:toriverse/features/shop/data/repositories/cosmetics_seeding_repository.dart';
 import 'package:toriverse/features/shop/data/seeds/cosmetics_seed_data.dart';
+import 'package:toriverse/shared/models/cosmetic_item.dart';
 
 void main() {
   group('CosmeticsSeediingRepository', () {
@@ -42,7 +43,9 @@ void main() {
           .where('type', isEqualTo: 'board')
           .get();
 
-      expect(boards.docs.length, 5);
+      // 5 regular board cosmetics + 3 limited-edition items that are also
+      // typed 'board' (see cosmetics_seed_data.dart's limitedEditionCosmetics)
+      expect(boards.docs.length, 8);
     });
 
     test('seedAllCosmetics() seeds stone cosmetics', () async {
@@ -165,13 +168,17 @@ void main() {
 
       final cosmetics = await repository.getAllCosmeticsFromFirestore();
 
-      final boards = cosmetics.where((c) => c.typeString == 'board');
+      // Excludes limited-edition items: 3 of the 8 'board'-typed cosmetics
+      // are limited-edition and priced at 500, checked separately below.
+      final boards = cosmetics.where((c) =>
+          c.typeString == 'board' && c.rarity != CosmeticRarity.limited);
       expect(boards.every((c) => c.price == 300), true);
 
       final stones = cosmetics.where((c) =>
-          c.typeString == 'stone_black' ||
-          c.typeString == 'stone_white' ||
-          c.typeString == 'stone_red');
+          (c.typeString == 'stone_black' ||
+              c.typeString == 'stone_white' ||
+              c.typeString == 'stone_red') &&
+          c.rarity != CosmeticRarity.limited);
       expect(stones.every((c) => c.price == 120), true);
 
       final limited = cosmetics.where((c) => c.rarity.toString().contains('limited'));
