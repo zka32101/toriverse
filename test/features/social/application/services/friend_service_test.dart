@@ -25,6 +25,15 @@ class MockDocumentSnapshot extends Mock
 class MockWriteBatch extends Mock implements WriteBatch {}
 
 void main() {
+  setUpAll(() {
+    // WriteBatch.update()'s `document` parameter is declared as the raw
+    // (unparameterized) `DocumentReference`, i.e. `DocumentReference<Object?>`.
+    // mocktail looks up fallbacks via `is`, and Dart's generics are
+    // covariant, so a `DocumentReference<Map<String, dynamic>>` instance
+    // also satisfies that lookup.
+    registerFallbackValue(MockDocumentReference());
+  });
+
   late MockFirebaseFirestore mockFirestore;
   late FriendService friendService;
 
