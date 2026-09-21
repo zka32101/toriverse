@@ -109,7 +109,7 @@ void main() {
           campaignId: 'camp_001',
         );
         expect(progress!.challengesCompleted, equals(3));
-        expect(progress!.totalChallenges, equals(3));
+        expect(progress!.challengesRequired, equals(3));
         expect(progress!.hasClaimedReward, isFalse);
 
         // Step 5: Claim reward
