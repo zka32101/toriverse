@@ -126,9 +126,6 @@ class EventService {
         throw Exception('Event not found');
       }
 
-      final event =
-          Event.fromJson(eventDoc.data() as Map<String, dynamic>);
-
       // Check if already joined
       final existingProgress = await _firestore
           .collection('users')

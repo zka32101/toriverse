@@ -9,6 +9,9 @@ import 'package:toriverse/shared/services/firebase_messaging_service.dart';
 /// a generic type parameter defers the check past analysis time.
 T _any<T>() => any as T;
 
+/// Same workaround as [_any], for mockito's `anyNamed`.
+T _anyNamed<T>(String named) => anyNamed(named) as T;
+
 // Mock classes
 class MockFirebaseMessaging extends Mock implements FirebaseMessaging {}
 
@@ -60,13 +63,13 @@ void main() {
 
         // Mock FCM request permission
         when(mockFcm.requestPermission(
-          alert: anyNamed('alert') as bool,
-          announcement: anyNamed('announcement') as bool,
-          badge: anyNamed('badge') as bool,
-          carPlay: anyNamed('carPlay') as bool,
-          criticalAlert: anyNamed('criticalAlert') as bool,
-          provisional: anyNamed('provisional') as bool,
-          sound: anyNamed('sound') as bool,
+          alert: _anyNamed<bool>('alert'),
+          announcement: _anyNamed<bool>('announcement'),
+          badge: _anyNamed<bool>('badge'),
+          carPlay: _anyNamed<bool>('carPlay'),
+          criticalAlert: _anyNamed<bool>('criticalAlert'),
+          provisional: _anyNamed<bool>('provisional'),
+          sound: _anyNamed<bool>('sound'),
         )).thenAnswer((_) async => const NotificationSettings(
           alert: AppleNotificationSetting.enabled,
           announcement: AppleNotificationSetting.enabled,
@@ -248,13 +251,13 @@ void main() {
 
       test('initializes with proper channel configuration', () async {
         when(mockFcm.requestPermission(
-          alert: anyNamed('alert') as bool,
-          announcement: anyNamed('announcement') as bool,
-          badge: anyNamed('badge') as bool,
-          carPlay: anyNamed('carPlay') as bool,
-          criticalAlert: anyNamed('criticalAlert') as bool,
-          provisional: anyNamed('provisional') as bool,
-          sound: anyNamed('sound') as bool,
+          alert: _anyNamed<bool>('alert'),
+          announcement: _anyNamed<bool>('announcement'),
+          badge: _anyNamed<bool>('badge'),
+          carPlay: _anyNamed<bool>('carPlay'),
+          criticalAlert: _anyNamed<bool>('criticalAlert'),
+          provisional: _anyNamed<bool>('provisional'),
+          sound: _anyNamed<bool>('sound'),
         )).thenAnswer((_) async => const NotificationSettings(
           alert: AppleNotificationSetting.enabled,
           announcement: AppleNotificationSetting.enabled,

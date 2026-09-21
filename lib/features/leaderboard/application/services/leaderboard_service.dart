@@ -9,7 +9,6 @@ import '../../../leaderboard/domain/models/leaderboard_models.dart';
 class LeaderboardService {
   final FirebaseFirestore _firestore;
 
-  static const String _playersCollection = 'players';
   static const String _leaderboardsCollection = 'leaderboards';
   static const String _globalLeaderboardDoc = 'global';
 

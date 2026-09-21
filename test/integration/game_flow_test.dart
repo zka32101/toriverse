@@ -315,21 +315,21 @@ void main() {
         playerIds: ['player_0', 'player_1', 'AI_1'],
       );
 
-      GameState? gameState = container.read(gameStateProvider);
-      expect(gameState!.status, GameStatus.playing);
+      final gameState1 = container.read(gameStateProvider);
+      expect(gameState1!.status, GameStatus.playing);
 
       container.read(gameStateProvider.notifier).resetGame();
-      gameState = container.read(gameStateProvider);
-      expect(gameState, null);
+      final gameState2 = container.read(gameStateProvider);
+      expect(gameState2, null);
 
       // マッチ2
       container.read(gameStateProvider.notifier).startGame(
         playerIds: ['player_0', 'player_2', 'AI_2'],
       );
 
-      gameState = container.read(gameStateProvider);
-      expect(gameState!.status, GameStatus.playing);
-      expect(gameState.playerIds.length, 3);
+      final gameState3 = container.read(gameStateProvider);
+      expect(gameState3!.status, GameStatus.playing);
+      expect(gameState3.playerIds.length, 3);
     });
 
     test('エラー回復: 不正な手をキャッチ', () {

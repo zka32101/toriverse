@@ -10,6 +10,9 @@ import 'package:toriverse/features/match/data/models/round_result_model.dart';
 /// a generic type parameter defers the check past analysis time.
 T _any<T>() => any as T;
 
+/// Same workaround as `_any`, for mockito's `captureAny`.
+T _captureAny<T>() => captureAny as T;
+
 class MockFirestoreMatchRepository extends Mock
     implements FirestoreMatchRepository {}
 
@@ -54,9 +57,9 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
         when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         // Save round result
         final roundSaved =
@@ -95,7 +98,7 @@ void main() {
 
         // Game flow continues - state update still attempted
         when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         final stateSaved = await service.updateMatchStateAfterRound(
           matchId: 'match_001',
@@ -109,7 +112,7 @@ void main() {
 
       test('handles game-over state updates correctly', () async {
         when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         final result = await service.updateMatchStateAfterRound(
           matchId: 'match_001',
@@ -122,7 +125,7 @@ void main() {
         expect(result, true);
 
         final captured = verify(mockRepository.updateMatchState(
-                'match_001', captureAny))
+                'match_001', _captureAny<Map<String, dynamic>>()))
             .captured;
         final updateData = captured[0] as Map<String, dynamic>;
 
@@ -205,7 +208,7 @@ void main() {
         };
 
         when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         await service.updateMatchStateAfterRound(
           matchId: 'match_001',
@@ -216,7 +219,7 @@ void main() {
         );
 
         final captured = verify(mockRepository.updateMatchState(
-                'match_001', captureAny))
+                'match_001', _captureAny<Map<String, dynamic>>()))
             .captured;
         final updateData = captured[0] as Map<String, dynamic>;
 
@@ -232,7 +235,7 @@ void main() {
 
       test('includes timestamp in all state updates', () async {
         when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         final beforeUpdate = DateTime.now();
         await service.updateMatchStateAfterRound(
@@ -245,7 +248,7 @@ void main() {
         final afterUpdate = DateTime.now();
 
         final captured = verify(mockRepository.updateMatchState(
-                'match_001', captureAny))
+                'match_001', _captureAny<Map<String, dynamic>>()))
             .captured;
         final updateData = captured[0] as Map<String, dynamic>;
 

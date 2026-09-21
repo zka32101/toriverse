@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/index.dart';
-import '../../data/models/event_model.dart';
 import '../widgets/index.dart';
 
 /// Events home screen showing active and upcoming events

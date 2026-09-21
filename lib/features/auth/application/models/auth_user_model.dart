@@ -20,7 +20,7 @@ class AuthUserModel {
 
   /// Create from Firebase User
   factory AuthUserModel.fromFirebaseUser(
-    covariant dynamic firebaseUser,
+    dynamic firebaseUser,
   ) {
     return AuthUserModel(
       id: firebaseUser.uid,

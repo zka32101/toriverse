@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/models/cosmetic_model.dart';
 import '../../domain/services/cosmetic_event_service.dart';

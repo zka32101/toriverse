@@ -55,7 +55,7 @@ void main() {
 
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('unavailable'))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         final result = await service.saveRoundResultWithRetry(testResult);
         expect(result, true);
@@ -71,7 +71,7 @@ void main() {
 
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('deadline-exceeded'))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         final result = await service.saveRoundResultWithRetry(testResult);
         expect(result, true);
@@ -87,7 +87,7 @@ void main() {
 
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('aborted'))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         final result = await service.saveRoundResultWithRetry(testResult);
         expect(result, true);
@@ -103,7 +103,7 @@ void main() {
 
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('internal'))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         final result = await service.saveRoundResultWithRetry(testResult);
         expect(result, true);
@@ -168,7 +168,7 @@ void main() {
         );
 
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         await service.saveRoundResultWithRetry(testResult);
         verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(1);
@@ -184,7 +184,7 @@ void main() {
 
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('unavailable'))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         await service.saveRoundResultWithRetry(testResult);
         verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(2);
@@ -201,7 +201,7 @@ void main() {
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('unavailable'))
             .thenThrow(TestFirebaseException('unavailable'))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         await service.saveRoundResultWithRetry(testResult);
         verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(3);

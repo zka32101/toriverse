@@ -10,7 +10,7 @@ void main() {
     late CosmeticItem testCosmetic;
 
     setUp(() {
-      testCosmetic = const CosmeticItem(
+      testCosmetic = CosmeticItem(
         id: 'test_board_1',
         name: 'Test Board Design',
         type: CosmeticType.board,

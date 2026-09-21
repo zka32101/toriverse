@@ -46,12 +46,12 @@ void main() {
           .initializeUser('user_123');
 
       container.read(userStateProvider.notifier).addRankPoints(50);
-      var state = container.read(userStateProvider);
-      expect(state!.rankPoints, 50);
+      final state1 = container.read(userStateProvider);
+      expect(state1!.rankPoints, 50);
 
       container.read(userStateProvider.notifier).addRankPoints(30);
-      state = container.read(userStateProvider);
-      expect(state!.rankPoints, 80);
+      final state2 = container.read(userStateProvider);
+      expect(state2!.rankPoints, 80);
     });
 
     test('完走ストリークをインクリメント', () {
@@ -60,13 +60,13 @@ void main() {
           .initializeUser('user_123');
 
       container.read(userStateProvider.notifier).incrementStreak();
-      var state = container.read(userStateProvider);
-      expect(state!.completedMatchStreak, 1);
-      expect(state.lastPlayedAt, isNotNull);
+      final state1 = container.read(userStateProvider);
+      expect(state1!.completedMatchStreak, 1);
+      expect(state1.lastPlayedAt, isNotNull);
 
       container.read(userStateProvider.notifier).incrementStreak();
-      state = container.read(userStateProvider);
-      expect(state!.completedMatchStreak, 2);
+      final state2 = container.read(userStateProvider);
+      expect(state2!.completedMatchStreak, 2);
     });
 
     test('完走ストリークをリセット', () {
@@ -76,12 +76,12 @@ void main() {
 
       container.read(userStateProvider.notifier).incrementStreak();
       container.read(userStateProvider.notifier).incrementStreak();
-      var state = container.read(userStateProvider);
-      expect(state!.completedMatchStreak, 2);
+      final state1 = container.read(userStateProvider);
+      expect(state1!.completedMatchStreak, 2);
 
       container.read(userStateProvider.notifier).resetStreak();
-      state = container.read(userStateProvider);
-      expect(state!.completedMatchStreak, 0);
+      final state2 = container.read(userStateProvider);
+      expect(state2!.completedMatchStreak, 0);
     });
 
     test('本日の無料マッチを使用', () {
@@ -89,14 +89,14 @@ void main() {
           .read(userStateProvider.notifier)
           .initializeUser('user_123');
 
-      var state = container.read(userStateProvider);
-      expect(state!.freeMatchUsedToday, 0);
-      expect(state.hasFreeMatchToday, true);
+      final state1 = container.read(userStateProvider);
+      expect(state1!.freeMatchUsedToday, 0);
+      expect(state1.hasFreeMatchToday, true);
 
       container.read(userStateProvider.notifier).useFreeMatch();
-      state = container.read(userStateProvider);
-      expect(state!.freeMatchUsedToday, 1);
-      expect(state.hasFreeMatchToday, false);
+      final state2 = container.read(userStateProvider);
+      expect(state2!.freeMatchUsedToday, 1);
+      expect(state2.hasFreeMatchToday, false);
     });
 
     test('本日の無料マッチをリセット', () {
@@ -105,13 +105,13 @@ void main() {
           .initializeUser('user_123');
 
       container.read(userStateProvider.notifier).useFreeMatch();
-      var state = container.read(userStateProvider);
-      expect(state!.hasFreeMatchToday, false);
+      final state1 = container.read(userStateProvider);
+      expect(state1!.hasFreeMatchToday, false);
 
       container.read(userStateProvider.notifier).resetDailyFreeMatch();
-      state = container.read(userStateProvider);
-      expect(state!.freeMatchUsedToday, 0);
-      expect(state.hasFreeMatchToday, true);
+      final state2 = container.read(userStateProvider);
+      expect(state2!.freeMatchUsedToday, 0);
+      expect(state2.hasFreeMatchToday, true);
     });
 
     test('サブスクリプションを有効化', () {
@@ -119,14 +119,14 @@ void main() {
           .read(userStateProvider.notifier)
           .initializeUser('user_123');
 
-      var state = container.read(userStateProvider);
-      expect(state!.subscriptionStatus, SubscriptionStatus.trial);
-      expect(state.isSubscribed, false);
+      final state1 = container.read(userStateProvider);
+      expect(state1!.subscriptionStatus, SubscriptionStatus.trial);
+      expect(state1.isSubscribed, false);
 
       container.read(userStateProvider.notifier).activateSubscription();
-      state = container.read(userStateProvider);
-      expect(state!.subscriptionStatus, SubscriptionStatus.active);
-      expect(state.isSubscribed, true);
+      final state2 = container.read(userStateProvider);
+      expect(state2!.subscriptionStatus, SubscriptionStatus.active);
+      expect(state2.isSubscribed, true);
     });
 
     test('サブスクリプションをキャンセル', () {
@@ -135,13 +135,13 @@ void main() {
           .initializeUser('user_123');
 
       container.read(userStateProvider.notifier).activateSubscription();
-      var state = container.read(userStateProvider);
-      expect(state!.isSubscribed, true);
+      final state1 = container.read(userStateProvider);
+      expect(state1!.isSubscribed, true);
 
       container.read(userStateProvider.notifier).cancelSubscription();
-      state = container.read(userStateProvider);
-      expect(state!.subscriptionStatus, SubscriptionStatus.cancelled);
-      expect(state.isSubscribed, false);
+      final state2 = container.read(userStateProvider);
+      expect(state2!.subscriptionStatus, SubscriptionStatus.cancelled);
+      expect(state2.isSubscribed, false);
     });
 
     test('ユーザーをログアウト', () {

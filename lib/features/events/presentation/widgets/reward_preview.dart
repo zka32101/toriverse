@@ -30,7 +30,7 @@ class RewardPreview extends StatelessWidget {
       case 'gold':
         return Icons.emoji_events;
       case 'silver':
-        return Icons.emoji_medal;
+        return Icons.military_tech;
       case 'bronze':
         return Icons.emoji_objects;
       default:

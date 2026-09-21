@@ -11,6 +11,7 @@ import 'package:toriverse/features/profile/domain/models/player_profile_models.d
 // Mock classes
 class MockFirebaseFirestore extends Mock implements FirebaseFirestore {}
 
+// ignore: subtype_of_sealed_class
 class MockCollectionReference extends Mock
     implements CollectionReference<Map<String, dynamic>> {}
 

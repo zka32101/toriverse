@@ -10,6 +10,9 @@ import 'package:toriverse/features/match/data/models/round_result_model.dart';
 /// a generic type parameter defers the check past analysis time.
 T _any<T>() => any as T;
 
+/// Same workaround as `_any`, for mockito's `captureAny`.
+T _captureAny<T>() => captureAny as T;
+
 class MockFirestoreMatchRepository extends Mock
     implements FirestoreMatchRepository {}
 
@@ -65,7 +68,7 @@ void main() {
 
         // Now update match state - should still work if repository is available
         when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         final stateSaved = await service.updateMatchStateAfterRound(
           matchId: 'test_match',
@@ -168,7 +171,7 @@ void main() {
       test('handles sequence of rounds with intermittent failures', () async {
         // Round 1: success
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         var result1 = await service.saveRoundResultWithRetry(
           RoundResultModel(
@@ -183,7 +186,7 @@ void main() {
         // Round 2: failure but recovers
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('unavailable'))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         var result2 = await service.saveRoundResultWithRetry(
           RoundResultModel(
@@ -211,7 +214,7 @@ void main() {
 
         // Round 4: recovers
         when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         var result4 = await service.saveRoundResultWithRetry(
           RoundResultModel(
@@ -229,7 +232,7 @@ void main() {
       test('match state update includes timestamp even on retry', () async {
         when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
             .thenThrow(TestFirebaseException('deadline-exceeded'))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         await service.updateMatchStateAfterRound(
           matchId: 'test_match',
@@ -239,7 +242,7 @@ void main() {
           isGameOver: false,
         );
 
-        final captured = verify(mockRepository.updateMatchState(_any<String>(), captureAny))
+        final captured = verify(mockRepository.updateMatchState(_any<String>(), _captureAny<Map<String, dynamic>>()))
             .captured;
         final updateData = captured.last as Map<String, dynamic>;
 
@@ -269,7 +272,7 @@ void main() {
 
         // When it succeeds on retry, verify stone counts would be sent
         when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
-            .thenAnswer((_) async => null);
+            .thenAnswer((_) async {});
 
         await service.updateMatchStateAfterRound(
           matchId: 'test_match',
@@ -279,7 +282,7 @@ void main() {
           isGameOver: false,
         );
 
-        final captured = verify(mockRepository.updateMatchState(_any<String>(), captureAny))
+        final captured = verify(mockRepository.updateMatchState(_any<String>(), _captureAny<Map<String, dynamic>>()))
             .captured;
         final updateData = captured.last as Map<String, dynamic>;
 
