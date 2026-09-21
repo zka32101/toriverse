@@ -74,7 +74,15 @@ dependencies:
   flutter_secure_storage: ^9.0.0
 
   # SNSシェア
-  share_plus: ^7.2.1
+  # >=9.0.0 required: 7.x/8.x's own android/build.gradle hardcodes
+  # compileSdkVersion 33, which conflicts with newer transitive
+  # AndroidX deps (activity 1.8.1, lifecycle 2.7.0, core 1.13.1, etc.)
+  # that require compileSdk >=34 — a hard AAR-metadata check failure,
+  # not a warning. Fixed in 9.0.0 (compileSdk 34). 9.0.0's one
+  # breaking change widens Share.share()'s return type from
+  # Future<void> to Future<ShareResult>; this app's only call site
+  # awaits it without capturing the result, so no code change needed.
+  share_plus: ^9.0.0
 
 dev_dependencies:
   flutter_test:
