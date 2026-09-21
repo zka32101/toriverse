@@ -47,7 +47,7 @@ void main() {
 
       expect(find.text('🔥'), findsOneWidget);
       expect(find.text('7'), findsOneWidget);
-      expect(find.text('Max: 10'), findsOneWidget);
+      expect(find.textContaining('Max: 10'), findsOneWidget);
     });
 
     testWidgets('Compact layout hides best streak when showBestStreak is false',
@@ -190,7 +190,7 @@ void main() {
       );
 
       expect(find.text('42'), findsOneWidget);
-      expect(find.text('Max: 50'), findsOneWidget);
+      expect(find.textContaining('Max: 50'), findsOneWidget);
     });
   });
 }

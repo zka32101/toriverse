@@ -426,14 +426,18 @@ void main() {
         ),
       );
 
-      // Tap set quiet hours button
+      // Tap set quiet hours button (scroll it into view first: it's below
+      // the fold in the default test viewport)
       final quietButton = find.text('Set Quiet Hours');
+      await tester.ensureVisible(quietButton);
+      await tester.pumpAndSettle();
       await tester.tap(quietButton);
       await tester.pumpAndSettle();
 
-      // Verify dialog is displayed
+      // Verify dialog is displayed (the button label and the dialog title
+      // both read "Set Quiet Hours", so there are 2 matches once open)
       expect(find.byType(AlertDialog), findsOneWidget);
-      expect(find.text('Set Quiet Hours'), findsOneWidget);
+      expect(find.text('Set Quiet Hours'), findsNWidgets(2));
       expect(find.text('Start Time'), findsOneWidget);
       expect(find.text('End Time'), findsOneWidget);
     });
@@ -448,7 +452,10 @@ void main() {
       );
 
       // Open dialog
-      await tester.tap(find.text('Set Quiet Hours'));
+      final quietButton = find.text('Set Quiet Hours');
+      await tester.ensureVisible(quietButton);
+      await tester.pumpAndSettle();
+      await tester.tap(quietButton);
       await tester.pumpAndSettle();
 
       // Tap cancel
