@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:toriverse/features/match/application/services/move_applicator.dart';
-import 'package:toriverse/features/match/data/models/round_result_model.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
 import 'package:toriverse/features/match/domain/services/bonus_calculator.dart';
 
