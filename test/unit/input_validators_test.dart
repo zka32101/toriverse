@@ -59,7 +59,7 @@ void main() {
     test('無効な文字が拒否される', () {
       expect(InputValidators.validateDisplayName('Player@123'), isNotNull);
       expect(InputValidators.validateDisplayName('Player#1'), isNotNull);
-      expect(InputValidators.validateDisplayName('Player$1'), isNotNull);
+      expect(InputValidators.validateDisplayName(r'Player$1'), isNotNull);
     });
 
     test('アルファベット、数字、アンダースコアが許可される', () {

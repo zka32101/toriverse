@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 // TODO: Import actual SpectatorViewScreen when path resolves
 // import 'package:toriverse/features/spectating/presentation/screens/spectator_view_screen.dart';

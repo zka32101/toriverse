@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 // TODO: Import actual SpectatorChatWidget when path resolves
 // import 'package:toriverse/features/spectating/presentation/widgets/spectator_chat_widget.dart';

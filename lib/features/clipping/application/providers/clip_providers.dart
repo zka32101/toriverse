@@ -149,139 +149,139 @@ class PlatformParam {
 // ============ STREAM PROVIDERS (Real-time) ============
 
 /// Watch a single clip in real-time
-final watchClipProvider = StreamProvider.family<MatchClip?, ClipIdParam>(
+final watchClipProvider = StreamProvider.autoDispose.family<MatchClip?, ClipIdParam>(
   (ref, param) {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.watchClip(param.clipId);
   },
-).autoDispose;
+);
 
 /// Watch trending clips in real-time
 final watchTrendingClipsProvider =
-    StreamProvider<List<TrendingClip>>((ref) {
+    StreamProvider.autoDispose<List<TrendingClip>>((ref) {
   final repo = ref.watch(clipRepositoryProvider);
   return repo.watchTrendingClips(limit: 20);
-}).autoDispose;
+});
 
 /// Watch creator profile in real-time
 final watchCreatorProfileProvider =
-    StreamProvider.family<ClipCreatorProfile?, UserIdParam>(
+    StreamProvider.autoDispose.family<ClipCreatorProfile?, UserIdParam>(
   (ref, param) {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.watchCreatorProfile(param.userId);
   },
-).autoDispose;
+);
 
 /// Watch clip generation job progress
 final watchGenerationJobProvider =
-    StreamProvider.family<ClipGenerationJob?, GenerationJobParam>(
+    StreamProvider.autoDispose.family<ClipGenerationJob?, GenerationJobParam>(
   (ref, param) {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.watchGenerationJob(param.clipId, param.jobId);
   },
-).autoDispose;
+);
 
 /// Watch clip upload status
 final watchUploadStatusProvider =
-    StreamProvider.family<ClipUploadStatus?, UploadStatusParam>(
+    StreamProvider.autoDispose.family<ClipUploadStatus?, UploadStatusParam>(
   (ref, param) {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.watchUploadStatus(param.clipId, param.uploadStatusId);
   },
-).autoDispose;
+);
 
 // ============ FUTURE PROVIDERS (Async Operations) ============
 
 /// Get single clip
-final getClipProvider = FutureProvider.family<MatchClip?, ClipIdParam>(
+final getClipProvider = FutureProvider.autoDispose.family<MatchClip?, ClipIdParam>(
   (ref, param) async {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.getClip(param.clipId);
   },
-).autoDispose;
+);
 
 /// Get clips by match
-final clipsByMatchProvider = FutureProvider.family<List<MatchClip>, MatchIdParam>(
+final clipsByMatchProvider = FutureProvider.autoDispose.family<List<MatchClip>, MatchIdParam>(
   (ref, param) async {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.getClipsByMatch(param.matchId);
   },
-).autoDispose;
+);
 
 /// Get creator's clips
-final creatorClipsProvider = FutureProvider.family<List<MatchClip>, CreatorIdParam>(
+final creatorClipsProvider = FutureProvider.autoDispose.family<List<MatchClip>, CreatorIdParam>(
   (ref, param) async {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.getCreatorClips(param.creatorId);
   },
-).autoDispose;
+);
 
 /// Get all formats for a clip
-final clipFormatsProvider = FutureProvider.family<List<ClipFormat>, ClipIdParam>(
+final clipFormatsProvider = FutureProvider.autoDispose.family<List<ClipFormat>, ClipIdParam>(
   (ref, param) async {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.getClipFormats(param.clipId);
   },
-).autoDispose;
+);
 
 /// Get specific format by aspect ratio
 final clipFormatByAspectRatioProvider =
-    FutureProvider.family<ClipFormat?, AspectRatioParam>(
+    FutureProvider.autoDispose.family<ClipFormat?, AspectRatioParam>(
   (ref, param) async {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.getClipFormatByAspectRatio(param.clipId, param.aspectRatio);
   },
-).autoDispose;
+);
 
 /// Get all shares for a clip
-final clipSharesProvider = FutureProvider.family<List<ClipShare>, ClipIdParam>(
+final clipSharesProvider = FutureProvider.autoDispose.family<List<ClipShare>, ClipIdParam>(
   (ref, param) async {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.getClipShares(param.clipId);
   },
-).autoDispose;
+);
 
 /// Get recommendations for user
-final recommendationsProvider = FutureProvider.family<List<ClipRecommendation>, UserIdParam>(
+final recommendationsProvider = FutureProvider.autoDispose.family<List<ClipRecommendation>, UserIdParam>(
   (ref, param) async {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.getRecommendations(param.userId, limit: 20);
   },
-).autoDispose;
+);
 
 /// Get clip metrics
-final clipMetricsProvider = FutureProvider.family<ClipMetrics?, ClipIdParam>(
+final clipMetricsProvider = FutureProvider.autoDispose.family<ClipMetrics?, ClipIdParam>(
   (ref, param) async {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.getClipMetrics(param.clipId);
   },
-).autoDispose;
+);
 
 /// Get creator profile
 final creatorProfileProvider =
-    FutureProvider.family<ClipCreatorProfile?, UserIdParam>(
+    FutureProvider.autoDispose.family<ClipCreatorProfile?, UserIdParam>(
   (ref, param) async {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.getCreatorProfile(param.userId);
   },
-).autoDispose;
+);
 
 /// Get viral tracking data
-final viralTrackingDataProvider = FutureProvider.family<ViralTrackingData?, ClipIdParam>(
+final viralTrackingDataProvider = FutureProvider.autoDispose.family<ViralTrackingData?, ClipIdParam>(
   (ref, param) async {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.getViralTrackingData(param.clipId);
   },
-).autoDispose;
+);
 
 /// Get upload status for platform
 final uploadStatusForPlatformProvider =
-    FutureProvider.family<ClipUploadStatus?, PlatformParam>(
+    FutureProvider.autoDispose.family<ClipUploadStatus?, PlatformParam>(
   (ref, param) async {
     final repo = ref.watch(clipRepositoryProvider);
     return repo.getUploadStatusForPlatform(param.clipId, param.platform);
   },
-).autoDispose;
+);
 
 // ============ MUTATION PROVIDERS (State Changes) ============
 

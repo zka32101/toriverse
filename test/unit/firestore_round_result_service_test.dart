@@ -5,6 +5,11 @@ import 'package:toriverse/features/match/application/services/firestore_round_re
 import 'package:toriverse/features/match/application/providers/firestore_match_provider.dart';
 import 'package:toriverse/features/match/data/models/round_result_model.dart';
 
+/// Workaround for mockito's `any` being statically typed `Null`, which makes
+/// `any as SomeType` provably always-throwing to the analyzer. Casting through
+/// a generic type parameter defers the check past analysis time.
+T _any<T>() => any as T;
+
 // Mock classes
 class MockFirestoreMatchRepository extends Mock
     implements FirestoreMatchRepository {}
@@ -53,7 +58,7 @@ void main() {
       });
 
       test('saves successfully on first attempt', () async {
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenAnswer((_) async => null);
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -63,7 +68,7 @@ void main() {
       });
 
       test('retries on retryable error', () async {
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('unavailable'))
             .thenAnswer((_) async => null);
 
@@ -74,7 +79,7 @@ void main() {
       });
 
       test('returns false after max retries exceeded', () async {
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -84,7 +89,7 @@ void main() {
       });
 
       test('does not retry on non-retryable error', () async {
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('permission-denied'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -94,7 +99,7 @@ void main() {
       });
 
       test('handles deadline-exceeded as retryable', () async {
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('deadline-exceeded'))
             .thenAnswer((_) async => null);
 
@@ -105,7 +110,7 @@ void main() {
       });
 
       test('handles aborted as retryable', () async {
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('aborted'))
             .thenAnswer((_) async => null);
 
@@ -116,7 +121,7 @@ void main() {
       });
 
       test('handles internal as retryable', () async {
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('internal'))
             .thenAnswer((_) async => null);
 
@@ -127,7 +132,7 @@ void main() {
       });
 
       test('does not retry on invalid-argument error', () async {
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('invalid-argument'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -137,7 +142,7 @@ void main() {
       });
 
       test('does not retry on not-found error', () async {
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('not-found'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -147,7 +152,7 @@ void main() {
       });
 
       test('handles non-Firebase exceptions gracefully', () async {
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(Exception('Network error'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -159,7 +164,7 @@ void main() {
 
     group('updateMatchStateAfterRound', () {
       test('updates match state successfully', () async {
-        when(mockRepository.updateMatchState(any, any))
+        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
             .thenAnswer((_) async => null);
 
         final result = await service.updateMatchStateAfterRound(
@@ -171,11 +176,11 @@ void main() {
         );
 
         expect(result, true);
-        verify(mockRepository.updateMatchState(any, any)).called(1);
+        verify(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>())).called(1);
       });
 
       test('retries on retryable error', () async {
-        when(mockRepository.updateMatchState(any, any))
+        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
             .thenThrow(TestFirebaseException('deadline-exceeded'))
             .thenAnswer((_) async => null);
 
@@ -188,11 +193,11 @@ void main() {
         );
 
         expect(result, true);
-        verify(mockRepository.updateMatchState(any, any)).called(2);
+        verify(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>())).called(2);
       });
 
       test('returns false after max retries', () async {
-        when(mockRepository.updateMatchState(any, any))
+        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         final result = await service.updateMatchStateAfterRound(
@@ -204,11 +209,11 @@ void main() {
         );
 
         expect(result, false);
-        verify(mockRepository.updateMatchState(any, any)).called(4);
+        verify(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>())).called(4);
       });
 
       test('sets isGameOver in update payload when true', () async {
-        when(mockRepository.updateMatchState(any, any))
+        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
             .thenAnswer((_) async => null);
 
         await service.updateMatchStateAfterRound(

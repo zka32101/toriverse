@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide ProgressIndicator;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../application/providers/index.dart';
 import '../../data/models/event_model.dart';
@@ -32,7 +32,9 @@ class EventDetailScreen extends ConsumerWidget {
 
           return RefreshIndicator(
             onRefresh: () async {
+              // ignore: unused_result
               await ref.refresh(eventDetailsStreamProvider(eventId).future);
+              // ignore: unused_result
               await ref.refresh(hasJoinedEventProvider(eventId).future);
             },
             child: SingleChildScrollView(

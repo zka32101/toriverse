@@ -22,7 +22,7 @@ class ChallengeService {
           .get();
 
       return snapshot.docs
-          .map((doc) => Challenge.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => Challenge.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];
@@ -44,7 +44,7 @@ class ChallengeService {
           .get();
 
       return snapshot.docs
-          .map((doc) => Challenge.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => Challenge.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];
@@ -279,7 +279,7 @@ class ChallengeService {
         .snapshots()
         .map((snapshot) {
       return snapshot.docs
-          .map((doc) => Challenge.fromJson(doc.data() as Map<String, dynamic>))
+          .map((doc) => Challenge.fromJson(doc.data()))
           .toList();
     }).handleError((e) {
       return [];

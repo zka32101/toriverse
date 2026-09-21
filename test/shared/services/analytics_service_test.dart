@@ -3,6 +3,11 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:mockito/mockito.dart';
 import 'package:toriverse/shared/services/analytics_service.dart';
 
+/// Workaround for mockito's `any` being statically typed `Null`, which makes
+/// `any as SomeType` provably always-throwing to the analyzer. Casting through
+/// a generic type parameter defers the check past analysis time.
+T _any<T>() => any as T;
+
 class MockFirebaseAnalytics extends Mock implements FirebaseAnalytics {}
 
 void main() {
@@ -370,7 +375,7 @@ void main() {
     group('Error handling', () {
       test('Silently handles event logging errors', () async {
         when(mockFirebaseAnalytics.logEvent(
-          name: any as String,
+          name: _any<String>(),
           parameters: any,
         )).thenThrow(Exception('Firebase unavailable'));
 

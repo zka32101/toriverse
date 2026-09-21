@@ -77,7 +77,7 @@ void main() {
       await tester.pumpWidget(buildTestApp());
 
       final board = container.read(gameStateProvider)!.board;
-      final initialBlackCount = board.countStones()[Board.black];
+      final initialBlackCount = board.countStones()[Board.black] ?? 0;
 
       // 合法手の1つをタップ（例: (2, 3)）
       final validMoves = container.read(gameStateProvider)!.validMoves;

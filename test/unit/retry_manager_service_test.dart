@@ -4,6 +4,11 @@ import 'package:toriverse/features/match/application/services/retry_manager_serv
 import 'package:toriverse/features/match/application/services/offline_queue_service.dart';
 import 'package:toriverse/features/match/application/services/firestore_round_result_service.dart';
 
+/// Workaround for mockito's `any` being statically typed `Null`, which makes
+/// `any as SomeType` provably always-throwing to the analyzer. Casting through
+/// a generic type parameter defers the check past analysis time.
+T _any<T>() => any as T;
+
 // Mock implementations
 class MockOfflineQueueService extends Mock implements OfflineQueueService {}
 
@@ -65,7 +70,7 @@ void main() {
       await retryManager.retryNow();
 
       verify(mockQueueService.getQueue()).called(1);
-      verifyNever(mockQueueService.incrementRetryCount(any));
+      verifyNever(mockQueueService.incrementRetryCount(_any<String>()));
     });
 
     test('removes successful operations from queue', () async {
@@ -258,7 +263,7 @@ void main() {
       );
 
       when(mockQueueService.getQueue()).thenAnswer((_) async => [op1, op2]);
-      when(mockQueueService.shouldRetry(any)).thenReturn(true);
+      when(mockQueueService.shouldRetry(_any<QueuedOperation>())).thenReturn(true);
       when(mockFirestoreService.updateMatchStateAfterRound(
         matchId: 'match_5',
         roundIndex: 1,

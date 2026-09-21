@@ -5,6 +5,11 @@ import 'package:toriverse/features/match/application/services/firestore_round_re
 import 'package:toriverse/features/match/application/providers/firestore_match_provider.dart';
 import 'package:toriverse/features/match/data/models/round_result_model.dart';
 
+/// Workaround for mockito's `any` being statically typed `Null`, which makes
+/// `any as SomeType` provably always-throwing to the analyzer. Casting through
+/// a generic type parameter defers the check past analysis time.
+T _any<T>() => any as T;
+
 class MockFirestoreMatchRepository extends Mock
     implements FirestoreMatchRepository {}
 
@@ -48,9 +53,9 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenAnswer((_) async => null);
-        when(mockRepository.updateMatchState(any, any))
+        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
             .thenAnswer((_) async => null);
 
         // Save round result
@@ -68,8 +73,8 @@ void main() {
         );
         expect(stateSaved, true);
 
-        verify(mockRepository.saveRoundResult(any)).called(1);
-        verify(mockRepository.updateMatchState(any, any)).called(1);
+        verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(1);
+        verify(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>())).called(1);
       });
 
       test('continues game flow even if round save fails', () async {
@@ -81,7 +86,7 @@ void main() {
         );
 
         // First call fails, but game should continue
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         final roundSaved =
@@ -89,7 +94,7 @@ void main() {
         expect(roundSaved, false);
 
         // Game flow continues - state update still attempted
-        when(mockRepository.updateMatchState(any, any))
+        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
             .thenAnswer((_) async => null);
 
         final stateSaved = await service.updateMatchStateAfterRound(
@@ -103,7 +108,7 @@ void main() {
       });
 
       test('handles game-over state updates correctly', () async {
-        when(mockRepository.updateMatchState(any, any))
+        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
             .thenAnswer((_) async => null);
 
         final result = await service.updateMatchStateAfterRound(
@@ -137,7 +142,7 @@ void main() {
         );
 
         int attemptCount = 0;
-        when(mockRepository.saveRoundResult(any)).thenAnswer((_) async {
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>())).thenAnswer((_) async {
           attemptCount++;
           if (attemptCount == 1) {
             throw TestFirebaseException('deadline-exceeded');
@@ -159,7 +164,7 @@ void main() {
         );
 
         int attemptCount = 0;
-        when(mockRepository.saveRoundResult(any)).thenAnswer((_) async {
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>())).thenAnswer((_) async {
           attemptCount++;
           throw TestFirebaseException('permission-denied');
         });
@@ -179,7 +184,7 @@ void main() {
         );
 
         int attemptCount = 0;
-        when(mockRepository.saveRoundResult(any)).thenAnswer((_) async {
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>())).thenAnswer((_) async {
           attemptCount++;
           throw TestFirebaseException('unavailable');
         });
@@ -199,7 +204,7 @@ void main() {
           'player_3': 17,
         };
 
-        when(mockRepository.updateMatchState(any, any))
+        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
             .thenAnswer((_) async => null);
 
         await service.updateMatchStateAfterRound(
@@ -226,7 +231,7 @@ void main() {
       });
 
       test('includes timestamp in all state updates', () async {
-        when(mockRepository.updateMatchState(any, any))
+        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
             .thenAnswer((_) async => null);
 
         final beforeUpdate = DateTime.now();
@@ -261,9 +266,9 @@ void main() {
         );
 
         // Simulate complete Firestore outage
-        when(mockRepository.saveRoundResult(any))
+        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
             .thenThrow(TestFirebaseException('unavailable'));
-        when(mockRepository.updateMatchState(any, any))
+        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         // Both operations should return false but not throw

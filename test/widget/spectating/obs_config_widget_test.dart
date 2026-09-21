@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 // TODO: Import actual OBSConfigWidget when path resolves
 // import 'package:toriverse/features/spectating/presentation/widgets/obs_config_widget.dart';

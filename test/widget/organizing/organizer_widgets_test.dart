@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 // TODO: Import widgets when paths resolve
 // import 'package:toriverse/features/organizing/presentation/widgets/organizer_dashboard_widget.dart';

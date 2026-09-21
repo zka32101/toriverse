@@ -10,6 +10,11 @@ class MockFirebaseMessagingService extends Mock
 
 class MockRemoteConfigService extends Mock implements RemoteConfigService {}
 
+/// Workaround for mockito's `any` being statically typed `Null`, which makes
+/// `any as String` provably always-throwing to the analyzer. Casting through
+/// a generic type parameter defers the check past analysis time.
+T _any<T>() => any as T;
+
 void main() {
   group('PushNotificationManager', () {
     late MockFirebaseMessagingService mockMessaging;
@@ -80,7 +85,7 @@ void main() {
       });
 
       test('subscribeToCohortTopic handles common cohorts', () async {
-        when(mockMessaging.subscribeToTopic(any as String)).thenAnswer((_) async {});
+        when(mockMessaging.subscribeToTopic(_any<String>())).thenAnswer((_) async {});
 
         final cohorts = ['new_players_day_1', 'high_engagement', 'at_risk_churn', 'vip_subscribers', 'locale_japan'];
 
@@ -136,7 +141,7 @@ void main() {
       });
 
       test('enableAllNotifications subscribes to default topics', () async {
-        when(mockMessaging.subscribeToTopic(any as String)).thenAnswer((_) async {});
+        when(mockMessaging.subscribeToTopic(_any<String>())).thenAnswer((_) async {});
 
         await manager.enableAllNotifications();
 
@@ -145,7 +150,7 @@ void main() {
       });
 
       test('enableAllNotifications handles error silently', () async {
-        when(mockMessaging.subscribeToTopic(any as String))
+        when(mockMessaging.subscribeToTopic(_any<String>()))
             .thenThrow(Exception('Enable failed'));
 
         // Should not throw

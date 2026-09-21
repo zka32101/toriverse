@@ -4,6 +4,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:toriverse/shared/services/firebase_messaging_service.dart';
 
+/// Workaround for mockito's `any` being statically typed `Null`, which makes
+/// `any as SomeType` provably always-throwing to the analyzer. Casting through
+/// a generic type parameter defers the check past analysis time.
+T _any<T>() => any as T;
+
 // Mock classes
 class MockFirebaseMessaging extends Mock implements FirebaseMessaging {}
 
@@ -42,7 +47,7 @@ void main() {
       mockLocalNotifications = MockFlutterLocalNotificationsPlugin();
 
       // Default mock behaviors
-      when(mockLocalNotifications.initialize(any as InitializationSettings, onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse')))
+      when(mockLocalNotifications.initialize(_any<InitializationSettings>(), onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse')))
           .thenAnswer((_) async => true);
     });
 
@@ -90,7 +95,7 @@ void main() {
           localNotifications: mockLocalNotifications,
         );
 
-        when(mockLocalNotifications.initialize(any as InitializationSettings, onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse')))
+        when(mockLocalNotifications.initialize(_any<InitializationSettings>(), onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse')))
             .thenThrow(Exception('Init failed'));
 
         // Should not throw
@@ -139,7 +144,7 @@ void main() {
       });
 
       test('unsubscribeFromAll unsubscribes from all topics', () async {
-        when(mockFcm.unsubscribeFromTopic(any as String)).thenAnswer((_) async {});
+        when(mockFcm.unsubscribeFromTopic(_any<String>())).thenAnswer((_) async {});
 
         await service.unsubscribeFromAll();
 
@@ -268,7 +273,7 @@ void main() {
 
         await service.initialize();
 
-        verify(mockLocalNotifications.initialize(any as InitializationSettings, onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse'))).called(1);
+        verify(mockLocalNotifications.initialize(_any<InitializationSettings>(), onDidReceiveNotificationResponse: anyNamed('onDidReceiveNotificationResponse'))).called(1);
       });
     });
 
@@ -289,7 +294,7 @@ void main() {
       });
 
       test('handles multiple topic subscriptions', () async {
-        when(mockFcm.subscribeToTopic(any as String)).thenAnswer((_) async {});
+        when(mockFcm.subscribeToTopic(_any<String>())).thenAnswer((_) async {});
 
         await service.subscribeToTopic('topic_1');
         await service.subscribeToTopic('topic_2');

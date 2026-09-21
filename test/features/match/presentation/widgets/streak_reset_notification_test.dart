@@ -236,15 +236,11 @@ void main() {
 
     testWidgets('Persistent banner dismissible via callback',
         (WidgetTester tester) async {
-      bool dismissCalled = false;
-
       await tester.pumpWidget(
         createTestApp(
           reason: 'connection_timeout',
           isPersistent: true,
-          onDismiss: () {
-            dismissCalled = true;
-          },
+          onCancel: () {},
         ),
       );
 

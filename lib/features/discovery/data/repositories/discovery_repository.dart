@@ -393,7 +393,7 @@ class DiscoveryRepository {
           .get();
 
       return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         return CreatorSearchCard(
           creatorId: doc.id,
           displayName: data['displayName'] ?? '',
@@ -422,7 +422,7 @@ class DiscoveryRepository {
           .get();
 
       return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         return CreatorSearchCard(
           creatorId: doc.id,
           displayName: data['displayName'] ?? '',
@@ -507,7 +507,7 @@ class DiscoveryRepository {
           .get();
 
       return snapshot.docs.map((doc) {
-        final data = doc.data() as Map<String, dynamic>;
+        final data = doc.data();
         return CreatorSearchCard(
           creatorId: data['contentId'] ?? '',
           displayName: data['displayName'] ?? '',
@@ -535,7 +535,7 @@ class DiscoveryRepository {
           .get();
 
       return snapshot.docs.asMap().entries.map((entry) {
-        final data = entry.value.data() as Map<String, dynamic>;
+        final data = entry.value.data();
         return SearchResult(
           resultId: '${entry.key}_${entry.value.id}',
           queryId: 'trending_clips',
@@ -566,7 +566,7 @@ class DiscoveryRepository {
           .get();
 
       return snapshot.docs.asMap().entries.map((entry) {
-        final data = entry.value.data() as Map<String, dynamic>;
+        final data = entry.value.data();
         return SearchResult(
           resultId: '${entry.key}_${entry.value.id}',
           queryId: 'trending_matches',

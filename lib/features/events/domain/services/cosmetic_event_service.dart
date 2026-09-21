@@ -18,7 +18,7 @@ class CosmeticEventService {
 
       return snapshot.docs
           .map((doc) =>
-              LimitedCosmetic.fromJson(doc.data() as Map<String, dynamic>))
+              LimitedCosmetic.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];
@@ -35,7 +35,7 @@ class CosmeticEventService {
         .map((snapshot) {
       return snapshot.docs
           .map((doc) =>
-              LimitedCosmetic.fromJson(doc.data() as Map<String, dynamic>))
+              LimitedCosmetic.fromJson(doc.data()))
           .toList();
     }).handleError((e) {
       return [];
@@ -124,7 +124,7 @@ class CosmeticEventService {
 
       return snapshot.docs
           .map((doc) =>
-              UserEventCosmetic.fromJson(doc.data() as Map<String, dynamic>))
+              UserEventCosmetic.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];
@@ -145,7 +145,7 @@ class CosmeticEventService {
         .map((snapshot) {
       return snapshot.docs
           .map((doc) =>
-              UserEventCosmetic.fromJson(doc.data() as Map<String, dynamic>))
+              UserEventCosmetic.fromJson(doc.data()))
           .toList();
     }).handleError((e) {
       return [];
@@ -202,7 +202,7 @@ class CosmeticEventService {
       }
 
       return UserEventCosmetic.fromJson(
-        snapshot.docs.first.data() as Map<String, dynamic>,
+        snapshot.docs.first.data(),
       );
     } catch (e) {
       return null;
@@ -241,7 +241,7 @@ class CosmeticEventService {
 
       return snapshot.docs
           .map((doc) =>
-              LimitedCosmetic.fromJson(doc.data() as Map<String, dynamic>))
+              LimitedCosmetic.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];
@@ -263,7 +263,7 @@ class CosmeticEventService {
 
       return snapshot.docs
           .map((doc) =>
-              LimitedCosmetic.fromJson(doc.data() as Map<String, dynamic>))
+              LimitedCosmetic.fromJson(doc.data()))
           .toList();
     } catch (e) {
       return [];

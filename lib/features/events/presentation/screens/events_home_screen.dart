@@ -21,6 +21,7 @@ class EventsHomeScreen extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
+          // ignore: unused_result
           await ref.refresh(upcomingEventsProvider.future);
         },
         child: SingleChildScrollView(

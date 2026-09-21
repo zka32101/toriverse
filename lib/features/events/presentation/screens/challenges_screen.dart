@@ -36,6 +36,7 @@ class ChallengesScreen extends ConsumerWidget {
             // Daily Challenges
             RefreshIndicator(
               onRefresh: () async {
+                // ignore: unused_result
                 await ref.refresh(dailyChallengesProvider(eventId).future);
               },
               child: dailyChallengesAsync.when(
@@ -76,6 +77,7 @@ class ChallengesScreen extends ConsumerWidget {
             // Weekly Challenges
             RefreshIndicator(
               onRefresh: () async {
+                // ignore: unused_result
                 await ref.refresh(weeklyChallengesProvider(eventId).future);
               },
               child: weeklyChallengesAsync.when(
