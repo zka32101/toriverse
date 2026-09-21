@@ -25,15 +25,37 @@ dependencies:
   firebase_messaging: ^14.7.10
 
   # プッシュ通知（ローカル表示）
-  flutter_local_notifications: ^16.3.0
+  # >=17.2.1 required: 17.0.0-17.2.0 fail to compile against modern
+  # Android SDKs (ambiguous bigLargeIcon(Bitmap|Icon) overload with a
+  # null argument); fixed in 17.2.1. No Dart-facing breaking changes
+  # since 16.3.x other than compileSdk 34 (already satisfied here).
+  flutter_local_notifications: ^17.2.1
 
   # 認証（OAuth）
   google_sign_in: ^6.1.0
-  sign_in_with_apple: ^5.0.0
+  # >=6.1.1 required: earlier versions' Android Kotlin source still
+  # references Flutter's removed v1 plugin embedding (PluginRegistry
+  # .Registrar), fixed in 6.1.1 ("Removes references to Flutter v1
+  # Android embedding classes"). No Dart-facing breaking changes;
+  # this app only uses the stable getAppleIDCredential() API.
+  sign_in_with_apple: ^6.1.1
 
   # 課金・広告
-  purchases_flutter: ^7.0.0
-  google_mobile_ads: ^3.0.0
+  # >=8.0.0 required: 7.x's Android plugin still references Flutter's
+  # v1 plugin embedding (PluginRegistry.Registrar, FlutterNativeView),
+  # which the engine has since removed entirely, so it fails to
+  # compile. 8.0.0's only breaking change is dropping v1-embedding
+  # support natively — no Dart-facing API changes; this app already
+  # only uses the stable Purchases/PurchasesConfiguration/CustomerInfo
+  # API surface.
+  purchases_flutter: ^8.0.0
+  # google_mobile_ads is not yet wired into the app (no lib/ usage) and
+  # every version's iOS podspec depends on webview_flutter_wkwebview in a
+  # way that breaks `pod install` when that plugin is only a transitive
+  # dependency (see https://github.com/googleads/googleads-mobile-flutter
+  # issues for this exact "Unable to find a specification for
+  # `webview_flutter_wkwebview`" error). Re-add when reward-ad
+  # integration actually begins.
 
   # UI・アニメ
   lottie: ^2.6.0
@@ -52,7 +74,15 @@ dependencies:
   flutter_secure_storage: ^9.0.0
 
   # SNSシェア
-  share_plus: ^7.2.1
+  # >=9.0.0 required: 7.x/8.x's own android/build.gradle hardcodes
+  # compileSdkVersion 33, which conflicts with newer transitive
+  # AndroidX deps (activity 1.8.1, lifecycle 2.7.0, core 1.13.1, etc.)
+  # that require compileSdk >=34 — a hard AAR-metadata check failure,
+  # not a warning. Fixed in 9.0.0 (compileSdk 34). 9.0.0's one
+  # breaking change widens Share.share()'s return type from
+  # Future<void> to Future<ShareResult>; this app's only call site
+  # awaits it without capturing the result, so no code change needed.
+  share_plus: ^9.0.0
 
 dev_dependencies:
   flutter_test:
