@@ -36,7 +36,14 @@ dependencies:
   sign_in_with_apple: ^5.0.0
 
   # 課金・広告
-  purchases_flutter: ^7.0.0
+  # >=8.0.0 required: 7.x's Android plugin still references Flutter's
+  # v1 plugin embedding (PluginRegistry.Registrar, FlutterNativeView),
+  # which the engine has since removed entirely, so it fails to
+  # compile. 8.0.0's only breaking change is dropping v1-embedding
+  # support natively — no Dart-facing API changes; this app already
+  # only uses the stable Purchases/PurchasesConfiguration/CustomerInfo
+  # API surface.
+  purchases_flutter: ^8.0.0
   # google_mobile_ads is not yet wired into the app (no lib/ usage) and
   # every version's iOS podspec depends on webview_flutter_wkwebview in a
   # way that breaks `pod install` when that plugin is only a transitive
