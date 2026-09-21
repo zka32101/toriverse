@@ -102,8 +102,9 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Should display content
-      expect(find.byType(Scaffold), findsOneWidget);
+      // Should display content (the test's own wrapper Scaffold plus
+      // FriendsScreen's own)
+      expect(find.byType(Scaffold), findsWidgets);
     });
 
     testWidgets('displays friends list view structure', (WidgetTester tester) async {
@@ -136,8 +137,10 @@ void main() {
 
       await tester.pumpAndSettle();
 
-      // Should have friends screen structure
-      expect(find.byType(Scaffold), findsOneWidget);
+      // Should have friends screen structure (the test's own wrapper
+      // Scaffold plus FriendsScreen's own, consistent with every other
+      // test in this file using the same home: Scaffold(body: ...) wrapper)
+      expect(find.byType(Scaffold), findsWidgets);
     });
 
     testWidgets('shows no pending requests message when empty', (WidgetTester tester) async {
