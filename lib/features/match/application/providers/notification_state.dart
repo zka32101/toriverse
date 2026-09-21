@@ -108,6 +108,8 @@ class NotificationPreferences {
       matchAvailableNotifications: map['match_available_notifications'] as bool? ?? false,
       soundEnabled: map['sound_enabled'] as bool? ?? true,
       vibrationEnabled: map['vibration_enabled'] as bool? ?? true,
+      quietHourStart: TimeOfDay.parse(map['quiet_hour_start'] as String?),
+      quietHourEnd: TimeOfDay.parse(map['quiet_hour_end'] as String?),
     );
   }
 
@@ -121,6 +123,14 @@ class TimeOfDay {
   final int minute; // 0-59
 
   const TimeOfDay({required this.hour, required this.minute});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TimeOfDay && other.hour == hour && other.minute == minute);
+
+  @override
+  int get hashCode => Object.hash(hour, minute);
 
   @override
   String toString() => '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
