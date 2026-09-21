@@ -134,7 +134,7 @@ class BattlePassService {
   bool isBattlePassActive(DateTime seasonStartDate) {
     final now = DateTime.now();
     final endDate = getSeasonEndDate(seasonStartDate);
-    return now.isBefore(endDate);
+    return !now.isBefore(seasonStartDate) && now.isBefore(endDate);
   }
 
   /// Calculate days remaining in season
