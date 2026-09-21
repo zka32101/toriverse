@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:toriverse/features/match/application/services/liveops_campaign_service.dart';
 import 'package:toriverse/shared/services/remote_config_service.dart';
@@ -26,9 +26,9 @@ void main() {
       testCampaignId = 'campaign_summer_2026';
 
       // Setup Remote Config defaults
-      when(mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('2.0');
-      when(mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.1');
-      when(mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('1.5');
+      when(() => mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('2.0');
+      when(() => mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.1');
+      when(() => mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('1.5');
     });
 
     group('basic campaign claiming', () {

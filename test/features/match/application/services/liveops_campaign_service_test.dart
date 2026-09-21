@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:toriverse/features/match/application/services/liveops_campaign_service.dart';
 import 'package:toriverse/shared/services/remote_config_service.dart';
@@ -364,9 +364,9 @@ void main() {
 
     group('special event bonuses', () {
       test('getSpecialEventBonuses returns bonuses from Remote Config', () async {
-        when(mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('2.0');
-        when(mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.1');
-        when(mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('1.5');
+        when(() => mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('2.0');
+        when(() => mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.1');
+        when(() => mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('1.5');
 
         final bonuses = await service.getSpecialEventBonuses();
 
@@ -377,9 +377,9 @@ void main() {
       });
 
       test('getSpecialEventBonuses returns defaults on error', () async {
-        when(mockRemoteConfig.getString('weekend_streak_multiplier')).thenThrow(Exception());
-        when(mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenThrow(Exception());
-        when(mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenThrow(Exception());
+        when(() => mockRemoteConfig.getString('weekend_streak_multiplier')).thenThrow(Exception());
+        when(() => mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenThrow(Exception());
+        when(() => mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenThrow(Exception());
 
         final bonuses = await service.getSpecialEventBonuses();
 
@@ -390,9 +390,9 @@ void main() {
       });
 
       test('getSpecialEventBonuses parses numeric strings correctly', () async {
-        when(mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('3.5');
-        when(mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.25');
-        when(mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('2.0');
+        when(() => mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('3.5');
+        when(() => mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('0.25');
+        when(() => mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('2.0');
 
         final bonuses = await service.getSpecialEventBonuses();
 
@@ -402,9 +402,9 @@ void main() {
       });
 
       test('getSpecialEventBonuses handles invalid numeric strings', () async {
-        when(mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('invalid');
-        when(mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('also_invalid');
-        when(mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('not_a_number');
+        when(() => mockRemoteConfig.getString('weekend_streak_multiplier')).thenReturn('invalid');
+        when(() => mockRemoteConfig.getString('special_event_cosmetic_drop_rate')).thenReturn('also_invalid');
+        when(() => mockRemoteConfig.getString('holiday_bonus_match_rewards')).thenReturn('not_a_number');
 
         final bonuses = await service.getSpecialEventBonuses();
 

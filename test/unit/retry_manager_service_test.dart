@@ -1,13 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:toriverse/features/match/application/services/retry_manager_service.dart';
 import 'package:toriverse/features/match/application/services/offline_queue_service.dart';
 import 'package:toriverse/features/match/application/services/firestore_round_result_service.dart';
-
-/// Workaround for mockito's `any` being statically typed `Null`, which makes
-/// `any as SomeType` provably always-throwing to the analyzer. Casting through
-/// a generic type parameter defers the check past analysis time.
-T _any<T>() => any as T;
 
 // Mock implementations
 class MockOfflineQueueService extends Mock implements OfflineQueueService {}
@@ -16,6 +11,16 @@ class MockFirestoreRoundResultService extends Mock
     implements FirestoreRoundResultService {}
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(QueuedOperation(
+      id: 'fallback_op',
+      operationType: 'updateMatchState',
+      matchId: 'fallback_match',
+      data: const {},
+      enqueuedAt: DateTime(2000),
+    ));
+  });
+
   group('RetryManagerService', () {
     late MockOfflineQueueService mockQueueService;
     late MockFirestoreRoundResultService mockFirestoreService;
@@ -28,6 +33,17 @@ void main() {
         queueService: mockQueueService,
         firestoreService: mockFirestoreService,
       );
+
+      // Unlike mockito's plain Mock, mocktail's Mock does not auto-generate
+      // a dummy completed Future for unstubbed Future<void> methods (it
+      // returns null, which throws when cast to Future<void>). Provide
+      // sensible no-op defaults here; individual tests still add their own
+      // `when(...)` overrides where the return value matters.
+      when(() => mockQueueService.removeFromQueue(any()))
+          .thenAnswer((_) async {});
+      when(() => mockQueueService.incrementRetryCount(any()))
+          .thenAnswer((_) async {});
+      when(() => mockQueueService.clearQueue()).thenAnswer((_) async {});
     });
 
     tearDown(() {
@@ -35,42 +51,42 @@ void main() {
     });
 
     test('startRetrying initializes periodic timer', () async {
-      when(mockQueueService.getQueue()).thenAnswer((_) async => []);
+      when(() => mockQueueService.getQueue()).thenAnswer((_) async => []);
 
       retryManager.startRetrying();
       await Future.delayed(const Duration(milliseconds: 100));
 
-      verify(mockQueueService.getQueue()).called(greaterThan(0));
+      verify(() => mockQueueService.getQueue()).called(greaterThan(0));
       retryManager.stopRetrying();
     });
 
     test('stopRetrying cancels timer', () async {
-      when(mockQueueService.getQueue()).thenAnswer((_) async => []);
+      when(() => mockQueueService.getQueue()).thenAnswer((_) async => []);
 
       retryManager.startRetrying();
       await Future.delayed(const Duration(milliseconds: 100));
       retryManager.stopRetrying();
 
       final callCount =
-          verify(mockQueueService.getQueue()).callCount;
+          verify(() => mockQueueService.getQueue()).callCount;
       expect(callCount, greaterThan(0));
     });
 
     test('retryNow processes queue immediately', () async {
-      when(mockQueueService.getQueue()).thenAnswer((_) async => []);
+      when(() => mockQueueService.getQueue()).thenAnswer((_) async => []);
 
       await retryManager.retryNow();
 
-      verify(mockQueueService.getQueue()).called(1);
+      verify(() => mockQueueService.getQueue()).called(1);
     });
 
     test('empty queue does not attempt processing', () async {
-      when(mockQueueService.getQueue()).thenAnswer((_) async => []);
+      when(() => mockQueueService.getQueue()).thenAnswer((_) async => []);
 
       await retryManager.retryNow();
 
-      verify(mockQueueService.getQueue()).called(1);
-      verifyNever(mockQueueService.incrementRetryCount(_any<String>()));
+      verify(() => mockQueueService.getQueue()).called(1);
+      verifyNever(() => mockQueueService.incrementRetryCount(any()));
     });
 
     test('removes successful operations from queue', () async {
@@ -87,10 +103,10 @@ void main() {
         enqueuedAt: DateTime.now(),
       );
 
-      when(mockQueueService.getQueue())
+      when(() => mockQueueService.getQueue())
           .thenAnswer((_) async => [operation]);
-      when(mockQueueService.shouldRetry(operation)).thenReturn(true);
-      when(mockFirestoreService.updateMatchStateAfterRound(
+      when(() => mockQueueService.shouldRetry(operation)).thenReturn(true);
+      when(() => mockFirestoreService.updateMatchStateAfterRound(
         matchId: 'match_1',
         roundIndex: 1,
         status: 'playing',
@@ -100,8 +116,8 @@ void main() {
 
       await retryManager.retryNow();
 
-      verify(mockQueueService.removeFromQueue('test_op_1')).called(1);
-      verifyNever(mockQueueService.incrementRetryCount('test_op_1'));
+      verify(() => mockQueueService.removeFromQueue('test_op_1')).called(1);
+      verifyNever(() => mockQueueService.incrementRetryCount('test_op_1'));
     });
 
     test('increments retry count on failed operations', () async {
@@ -118,10 +134,10 @@ void main() {
         enqueuedAt: DateTime.now(),
       );
 
-      when(mockQueueService.getQueue())
+      when(() => mockQueueService.getQueue())
           .thenAnswer((_) async => [operation]);
-      when(mockQueueService.shouldRetry(operation)).thenReturn(true);
-      when(mockFirestoreService.updateMatchStateAfterRound(
+      when(() => mockQueueService.shouldRetry(operation)).thenReturn(true);
+      when(() => mockFirestoreService.updateMatchStateAfterRound(
         matchId: 'match_2',
         roundIndex: 2,
         status: 'playing',
@@ -131,8 +147,8 @@ void main() {
 
       await retryManager.retryNow();
 
-      verify(mockQueueService.incrementRetryCount('test_op_2')).called(1);
-      verifyNever(mockQueueService.removeFromQueue('test_op_2'));
+      verify(() => mockQueueService.incrementRetryCount('test_op_2')).called(1);
+      verifyNever(() => mockQueueService.removeFromQueue('test_op_2'));
     });
 
     test('removes operations that exceed max retries', () async {
@@ -150,14 +166,14 @@ void main() {
         retryCount: 3,
       );
 
-      when(mockQueueService.getQueue())
+      when(() => mockQueueService.getQueue())
           .thenAnswer((_) async => [operation]);
-      when(mockQueueService.shouldRetry(operation)).thenReturn(false);
+      when(() => mockQueueService.shouldRetry(operation)).thenReturn(false);
 
       await retryManager.retryNow();
 
-      verify(mockQueueService.removeFromQueue('test_op_3')).called(1);
-      verifyNever(mockQueueService.incrementRetryCount('test_op_3'));
+      verify(() => mockQueueService.removeFromQueue('test_op_3')).called(1);
+      verifyNever(() => mockQueueService.incrementRetryCount('test_op_3'));
     });
 
     test('getQueueStatus returns status from queue service', () async {
@@ -167,22 +183,22 @@ void main() {
         'matchStateUpdates': 1,
       };
 
-      when(mockQueueService.getQueueStatus()).thenAnswer((_) async => status);
+      when(() => mockQueueService.getQueueStatus()).thenAnswer((_) async => status);
 
       final result = await retryManager.getQueueStatus();
 
       expect(result, equals(status));
-      verify(mockQueueService.getQueueStatus()).called(1);
+      verify(() => mockQueueService.getQueueStatus()).called(1);
     });
 
     test('clearQueue delegates to queue service', () async {
       await retryManager.clearQueue();
 
-      verify(mockQueueService.clearQueue()).called(1);
+      verify(() => mockQueueService.clearQueue()).called(1);
     });
 
     test('does not process queue concurrently', () async {
-      when(mockQueueService.getQueue())
+      when(() => mockQueueService.getQueue())
           .thenAnswer((_) async => Future.delayed(
             const Duration(milliseconds: 100),
             () => [],
@@ -195,7 +211,7 @@ void main() {
       await Future.wait([future1, future2]);
 
       // getQueue should only be called once due to concurrency guard
-      verify(mockQueueService.getQueue()).called(1);
+      verify(() => mockQueueService.getQueue()).called(1);
     });
 
     test('processes updateMatchState operations correctly', () async {
@@ -212,10 +228,10 @@ void main() {
         enqueuedAt: DateTime.now(),
       );
 
-      when(mockQueueService.getQueue())
+      when(() => mockQueueService.getQueue())
           .thenAnswer((_) async => [operation]);
-      when(mockQueueService.shouldRetry(operation)).thenReturn(true);
-      when(mockFirestoreService.updateMatchStateAfterRound(
+      when(() => mockQueueService.shouldRetry(operation)).thenReturn(true);
+      when(() => mockFirestoreService.updateMatchStateAfterRound(
         matchId: 'match_4',
         roundIndex: 4,
         status: 'finished',
@@ -225,14 +241,14 @@ void main() {
 
       await retryManager.retryNow();
 
-      verify(mockFirestoreService.updateMatchStateAfterRound(
+      verify(() => mockFirestoreService.updateMatchStateAfterRound(
         matchId: 'match_4',
         roundIndex: 4,
         status: 'finished',
         stoneCounts: {'p1': 18, 'p2': 20, 'p3': 10},
         isGameOver: true,
       )).called(1);
-      verify(mockQueueService.removeFromQueue('state_op_1')).called(1);
+      verify(() => mockQueueService.removeFromQueue('state_op_1')).called(1);
     });
 
     test('handles multiple operations in queue', () async {
@@ -262,16 +278,16 @@ void main() {
         enqueuedAt: DateTime.now(),
       );
 
-      when(mockQueueService.getQueue()).thenAnswer((_) async => [op1, op2]);
-      when(mockQueueService.shouldRetry(_any<QueuedOperation>())).thenReturn(true);
-      when(mockFirestoreService.updateMatchStateAfterRound(
+      when(() => mockQueueService.getQueue()).thenAnswer((_) async => [op1, op2]);
+      when(() => mockQueueService.shouldRetry(any())).thenReturn(true);
+      when(() => mockFirestoreService.updateMatchStateAfterRound(
         matchId: 'match_5',
         roundIndex: 1,
         status: 'playing',
         stoneCounts: {'p1': 10, 'p2': 10, 'p3': 14},
         isGameOver: false,
       )).thenAnswer((_) async => true);
-      when(mockFirestoreService.updateMatchStateAfterRound(
+      when(() => mockFirestoreService.updateMatchStateAfterRound(
         matchId: 'match_6',
         roundIndex: 2,
         status: 'playing',
@@ -281,8 +297,8 @@ void main() {
 
       await retryManager.retryNow();
 
-      verify(mockQueueService.removeFromQueue('op_1')).called(1);
-      verify(mockQueueService.removeFromQueue('op_2')).called(1);
+      verify(() => mockQueueService.removeFromQueue('op_1')).called(1);
+      verify(() => mockQueueService.removeFromQueue('op_2')).called(1);
     });
 
     test('handles exceptions during operation processing', () async {
@@ -299,10 +315,10 @@ void main() {
         enqueuedAt: DateTime.now(),
       );
 
-      when(mockQueueService.getQueue())
+      when(() => mockQueueService.getQueue())
           .thenAnswer((_) async => [operation]);
-      when(mockQueueService.shouldRetry(operation)).thenReturn(true);
-      when(mockFirestoreService.updateMatchStateAfterRound(
+      when(() => mockQueueService.shouldRetry(operation)).thenReturn(true);
+      when(() => mockFirestoreService.updateMatchStateAfterRound(
         matchId: 'match_error',
         roundIndex: 1,
         status: 'playing',
@@ -313,8 +329,8 @@ void main() {
       // Should not throw, should handle gracefully
       await retryManager.retryNow();
 
-      verify(mockQueueService.incrementRetryCount('error_op')).called(1);
-      verifyNever(mockQueueService.removeFromQueue('error_op'));
+      verify(() => mockQueueService.incrementRetryCount('error_op')).called(1);
+      verifyNever(() => mockQueueService.removeFromQueue('error_op'));
     });
   });
 }
