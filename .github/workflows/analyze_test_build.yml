@@ -88,7 +88,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
-          java-version: '11'
+          java-version: '17'
           cache: gradle
 
       - name: Setup Flutter
@@ -140,7 +140,7 @@ jobs:
         env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           REVENUCAT_API_KEY: ${{ secrets.REVENUCAT_API_KEY }}
-        run: flutter build ios --release --obfuscate --split-debug-info=build/app/outputs/symbols
+        run: flutter build ipa --release --obfuscate --split-debug-info=build/app/outputs/symbols
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
