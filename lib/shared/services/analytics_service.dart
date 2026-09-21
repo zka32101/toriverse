@@ -5,10 +5,26 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 /// Wraps Firebase Analytics with strongly-typed events and parameters.
 /// All events include timestamp and session context automatically.
 class AnalyticsService {
-  final FirebaseAnalytics _analytics;
+  final FirebaseAnalytics? _analytics;
 
   AnalyticsService({FirebaseAnalytics? analytics})
-      : _analytics = analytics ?? FirebaseAnalytics.instance;
+      : _analytics = analytics ?? _tryGetDefaultInstance();
+
+  /// Resolves the default [FirebaseAnalytics] instance, or `null` if
+  /// Firebase hasn't been initialized (e.g. in widget tests that don't call
+  /// `Firebase.initializeApp()`).
+  ///
+  /// Every logging method below already treats analytics failures as
+  /// non-fatal ("Silent fail — analytics should never break game flow");
+  /// without this, simply *constructing* the service could throw before any
+  /// of that try/catch logic ever ran.
+  static FirebaseAnalytics? _tryGetDefaultInstance() {
+    try {
+      return FirebaseAnalytics.instance;
+    } catch (e) {
+      return null;
+    }
+  }
 
   /// Log a match completion event
   ///
@@ -21,7 +37,7 @@ class AnalyticsService {
     required int matchDurationSeconds,
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'match_completed',
         parameters: {
           'match_id': matchId,
@@ -46,7 +62,7 @@ class AnalyticsService {
     required String cosmeticRarity,
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'milestone_reached',
         parameters: {
           'milestone_level': milestone,
@@ -71,7 +87,7 @@ class AnalyticsService {
     required String source, // 'starter_kit', 'match_reward', 'milestone_reward', 'shop_purchase'
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'cosmetic_activated',
         parameters: {
           'cosmetic_id': cosmeticId,
@@ -98,7 +114,7 @@ class AnalyticsService {
     required String paymentMethod, // 'credit_card', 'apple_pay', 'google_pay'
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'cosmetic_purchased',
         parameters: {
           'cosmetic_id': cosmeticId,
@@ -123,7 +139,7 @@ class AnalyticsService {
     required String reason, // 'manual_quit', 'connection_timeout', 'match_loss'
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'streak_reset',
         parameters: {
           'lost_streak': lostStreakCount,
@@ -145,7 +161,7 @@ class AnalyticsService {
     required String seasonId,
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'rankpass_purchased',
         parameters: {
           'price_yen': priceYen,
@@ -167,7 +183,7 @@ class AnalyticsService {
     required String platform, // 'twitter', 'tiktok', 'instagram', 'line'
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'clip_shared',
         parameters: {
           'clip_id': clipId,
@@ -189,7 +205,7 @@ class AnalyticsService {
     required int effectValue,
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'bonus_activated',
         parameters: {
           'bonus_type': bonusType,
@@ -208,7 +224,7 @@ class AnalyticsService {
   /// Tracks shop engagement and visit frequency.
   Future<void> logCosmeticsShopOpened() async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'cosmetics_shop_opened',
         parameters: {
           'timestamp': DateTime.now().toIso8601String(),
@@ -227,7 +243,7 @@ class AnalyticsService {
     required String filterType, // 'board', 'stoneBlack', 'stoneWhite', 'stoneRed'
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'cosmetics_shop_filtered_by_type',
         parameters: {
           'filter_type': filterType,
@@ -251,7 +267,7 @@ class AnalyticsService {
     required bool isOwned,
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'cosmetic_item_previewed',
         parameters: {
           'cosmetic_id': cosmeticId,
@@ -277,7 +293,7 @@ class AnalyticsService {
     required String failureReason, // 'insufficient_balance', 'payment_failed', 'network_error', 'unknown'
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'cosmetic_purchased_failed',
         parameters: {
           'cosmetic_id': cosmeticId,
@@ -301,7 +317,7 @@ class AnalyticsService {
     required String rarity,
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'cosmetic_applied_to_match',
         parameters: {
           'cosmetic_id': cosmeticId,
@@ -328,7 +344,7 @@ class AnalyticsService {
     required String cosmeticType,
   }) async {
     try {
-      await _analytics.logEvent(
+      await _analytics?.logEvent(
         name: 'match_completed_with_cosmetic',
         parameters: {
           'match_id': matchId,
@@ -355,16 +371,16 @@ class AnalyticsService {
     required bool isPaidSubscriber,
   }) async {
     try {
-      await _analytics.setUserId(id: userId);
-      await _analytics.setUserProperty(
+      await _analytics?.setUserId(id: userId);
+      await _analytics?.setUserProperty(
         name: 'account_age_minutes',
         value: accountAgeMinutes.toString(),
       );
-      await _analytics.setUserProperty(
+      await _analytics?.setUserProperty(
         name: 'total_matches',
         value: totalMatchesPlayed.toString(),
       );
-      await _analytics.setUserProperty(
+      await _analytics?.setUserProperty(
         name: 'paid_subscriber',
         value: isPaidSubscriber ? 'true' : 'false',
       );

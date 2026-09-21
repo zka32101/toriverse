@@ -129,7 +129,10 @@ void main() {
       await tester.pump();
 
       expect(find.byType(AppBar), findsOneWidget);
-      expect(find.byType(SafeArea), findsOneWidget);
+      // Material's `AppBar` wraps its own content in a `SafeArea`
+      // internally, in addition to the one CosmeticsShopScreen wraps its
+      // body in — so two `SafeArea`s is the correct count here, not one.
+      expect(find.byType(SafeArea), findsNWidgets(2));
     });
   });
 }

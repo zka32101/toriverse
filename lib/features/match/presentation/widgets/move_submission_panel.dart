@@ -23,7 +23,7 @@ class MoveSubmissionPanel extends StatefulWidget {
 
 class _MoveSubmissionPanelState extends State<MoveSubmissionPanel>
     with SingleTickerProviderStateMixin {
-  late AnimationController _timerController;
+  AnimationController? _timerController;
   int _secondsRemaining = 30;
 
   @override
@@ -32,14 +32,15 @@ class _MoveSubmissionPanelState extends State<MoveSubmissionPanel>
 
     // Only use internal timer if timeRemaining is not provided
     if (widget.timeRemaining == null) {
-      _timerController = AnimationController(
+      final controller = AnimationController(
         duration: const Duration(seconds: 30),
         vsync: this,
       )..forward();
+      _timerController = controller;
 
-      _timerController.addListener(() {
+      controller.addListener(() {
         setState(() {
-          _secondsRemaining = (30 * (1 - _timerController.value)).ceil();
+          _secondsRemaining = (30 * (1 - controller.value)).ceil();
           if (_secondsRemaining <= 0 && widget.onTimeout != null) {
             widget.onTimeout!();
           }
@@ -50,7 +51,7 @@ class _MoveSubmissionPanelState extends State<MoveSubmissionPanel>
 
   @override
   void dispose() {
-    _timerController.dispose();
+    _timerController?.dispose();
     super.dispose();
   }
 
