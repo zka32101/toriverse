@@ -321,6 +321,15 @@ void main() {
       });
 
       test('throws error for unknown achievement', () async {
+        // Arrange - unlockAchievement checks whether it's already unlocked
+        // (a Firestore read) before validating the achievement id
+        final mockDocRef = MockDocumentReference();
+        final mockSnapshot = MockDocumentSnapshot();
+        when(() => mockSnapshot.exists).thenReturn(false);
+        when(() => mockDocRef.get()).thenAnswer((_) async => mockSnapshot);
+
+        _setupAchievementDocRef(mockFirestore, mockDocRef);
+
         // Act & Assert
         expect(
           profileService.unlockAchievement(
@@ -335,16 +344,18 @@ void main() {
     group('getAchievements', () {
       test('retrieves player achievements', () async {
         // Arrange
-        final mockQuery = MockQuery();
         final mockSnapshot = MockQuerySnapshot();
 
-        when(() => mockSnapshot.docs).thenReturn([
+        // Built before the when()/thenReturn() chain below: _createMockAchievementDoc
+        // calls when() internally, and mocktail doesn't allow starting a new
+        // stub while another when()...then...() call is still pending.
+        final achievementDocs = [
           _createMockAchievementDoc('first_win'),
           _createMockAchievementDoc('ten_wins'),
-        ]);
-        when(() => mockQuery.get()).thenAnswer((_) async => mockSnapshot);
+        ];
+        when(() => mockSnapshot.docs).thenReturn(achievementDocs);
 
-        _setupGetAchievements(mockFirestore, mockQuery);
+        _setupGetAchievements(mockFirestore, mockSnapshot);
 
         // Act
         final achievements = await profileService.getAchievements('uid1');
@@ -400,10 +411,14 @@ void main() {
         final mockQuery = MockQuery();
         final mockSnapshot = MockQuerySnapshot();
 
-        when(() => mockSnapshot.docs).thenReturn([
+        // Built before the when()/thenReturn() chain below: _createMockProfileDoc
+        // calls when() internally, and mocktail doesn't allow starting a new
+        // stub while another when()...then...() call is still pending.
+        final profileDocs = [
           _createMockProfileDoc('uid1', 'alice'),
           _createMockProfileDoc('uid2', 'alice123'),
-        ]);
+        ];
+        when(() => mockSnapshot.docs).thenReturn(profileDocs);
         when(() => mockQuery.get()).thenAnswer((_) async => mockSnapshot);
 
         _setupProfileSearch(mockFirestore, mockQuery);
@@ -509,7 +524,7 @@ void _setupAchievementDocRef(
 
 void _setupGetAchievements(
   MockFirebaseFirestore mockFirestore,
-  MockQuery mockQuery,
+  MockQuerySnapshot mockSnapshot,
 ) {
   final mockProfileRef = MockDocumentReference();
   final mockCollectionRef = MockCollectionReference();
@@ -521,7 +536,7 @@ void _setupGetAchievements(
   when(() => mockProfileRef.collection('achievements'))
       .thenReturn(mockProfileCollectionRef);
   when(() => mockProfileCollectionRef.get())
-      .thenAnswer((_) async => MockQuerySnapshot());
+      .thenAnswer((_) async => mockSnapshot);
 }
 
 void _setupProfileSearch(
@@ -532,9 +547,10 @@ void _setupProfileSearch(
 
   when(() => mockFirestore.collection('profiles'))
       .thenReturn(mockCollectionRef);
-  when(() => mockCollectionRef.where(any(), isGreaterThanOrEqualTo: any()))
+  when(() => mockCollectionRef.where(any(),
+          isGreaterThanOrEqualTo: any(named: 'isGreaterThanOrEqualTo')))
       .thenReturn(mockQuery);
-  when(() => mockQuery.where(any(), isLessThan: any()))
+  when(() => mockQuery.where(any(), isLessThan: any(named: 'isLessThan')))
       .thenReturn(mockQuery);
   when(() => mockQuery.where(any(), isEqualTo: true))
       .thenReturn(mockQuery);
