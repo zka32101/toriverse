@@ -1,14 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:toriverse/features/match/application/services/firestore_round_result_service.dart';
 import 'package:toriverse/features/match/application/providers/firestore_match_provider.dart';
 import 'package:toriverse/features/match/data/models/round_result_model.dart';
-
-/// Workaround for mockito's `any` being statically typed `Null`, which makes
-/// `any as SomeType` provably always-throwing to the analyzer. Casting through
-/// a generic type parameter defers the check past analysis time.
-T _any<T>() => any as T;
 
 class MockFirestoreMatchRepository extends Mock
     implements FirestoreMatchRepository {}
@@ -34,6 +29,15 @@ class TestFirebaseException implements FirebaseException {
 }
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(RoundResultModel(
+      id: 'fallback',
+      matchId: 'fallback',
+      roundIndex: 0,
+      createdAt: DateTime.now(),
+    ));
+  });
+
   group('Firestore Retry Logic Tests', () {
     late MockFirestoreMatchRepository mockRepository;
     late FirestoreRoundResultService service;
@@ -54,7 +58,7 @@ void main() {
         );
 
         var attempt = 0;
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenAnswer((_) async {
           attempt++;
           if (attempt == 1) throw TestFirebaseException('unavailable');
@@ -73,7 +77,7 @@ void main() {
         );
 
         var attempt = 0;
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenAnswer((_) async {
           attempt++;
           if (attempt == 1) throw TestFirebaseException('deadline-exceeded');
@@ -92,7 +96,7 @@ void main() {
         );
 
         var attempt = 0;
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenAnswer((_) async {
           attempt++;
           if (attempt == 1) throw TestFirebaseException('aborted');
@@ -111,7 +115,7 @@ void main() {
         );
 
         var attempt = 0;
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenAnswer((_) async {
           attempt++;
           if (attempt == 1) throw TestFirebaseException('internal');
@@ -129,12 +133,12 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('permission-denied'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
         expect(result, false);
-        verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(1);
+        verify(() => mockRepository.saveRoundResult(any())).called(1);
       });
 
       test('invalid-argument error is not retryable', () async {
@@ -145,12 +149,12 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('invalid-argument'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
         expect(result, false);
-        verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(1);
+        verify(() => mockRepository.saveRoundResult(any())).called(1);
       });
 
       test('not-found error is not retryable', () async {
@@ -161,12 +165,12 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('not-found'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
         expect(result, false);
-        verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(1);
+        verify(() => mockRepository.saveRoundResult(any())).called(1);
       });
     });
 
@@ -179,11 +183,11 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenAnswer((_) async {});
 
         await service.saveRoundResultWithRetry(testResult);
-        verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(1);
+        verify(() => mockRepository.saveRoundResult(any())).called(1);
       });
 
       test('retries once on first transient error then succeeds', () async {
@@ -195,17 +199,18 @@ void main() {
         );
 
         var attempt = 0;
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenAnswer((_) async {
           attempt++;
           if (attempt == 1) throw TestFirebaseException('unavailable');
         });
 
         await service.saveRoundResultWithRetry(testResult);
-        verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(2);
+        verify(() => mockRepository.saveRoundResult(any())).called(2);
       });
 
-      test('retries twice on repeated transient errors then succeeds', () async {
+      test('retries twice on repeated transient errors then succeeds',
+          () async {
         final testResult = RoundResultModel(
           id: 'test_match_round_10',
           matchId: 'test_match',
@@ -214,14 +219,14 @@ void main() {
         );
 
         var attempt = 0;
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenAnswer((_) async {
           attempt++;
           if (attempt <= 2) throw TestFirebaseException('unavailable');
         });
 
         await service.saveRoundResultWithRetry(testResult);
-        verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(3);
+        verify(() => mockRepository.saveRoundResult(any())).called(3);
       });
 
       test('respects max retry limit of 3', () async {
@@ -232,11 +237,12 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         await service.saveRoundResultWithRetry(testResult);
-        verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(4); // 1 + 3 retries
+        verify(() => mockRepository.saveRoundResult(any()))
+            .called(4); // 1 + 3 retries
       });
     });
 
@@ -249,7 +255,7 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('unauthenticated'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -264,7 +270,7 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(Exception('Unexpected error'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -279,7 +285,7 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(Exception('Fatal error'));
 
         expect(() async {
@@ -298,7 +304,8 @@ void main() {
         expect(FirestoreRoundResultService.maxRetries, 3);
       });
 
-      test('total wait time for 3 retries is 3500ms (500+1000+2000)', () async {
+      test('total wait time for 3 retries is 3500ms (500+1000+2000)',
+          () async {
         // 500ms + 1000ms + 2000ms = 3500ms total backoff time
         final testResult = RoundResultModel(
           id: 'test_match_round_15',
@@ -307,7 +314,7 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         final stopwatch = Stopwatch()..start();

@@ -1,17 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:toriverse/features/match/application/services/firestore_round_result_service.dart';
 import 'package:toriverse/features/match/application/providers/firestore_match_provider.dart';
 import 'package:toriverse/features/match/data/models/round_result_model.dart';
-
-/// Workaround for mockito's `any` being statically typed `Null`, which makes
-/// `any as SomeType` provably always-throwing to the analyzer. Casting through
-/// a generic type parameter defers the check past analysis time.
-T _any<T>() => any as T;
-
-/// Same workaround as `_any`, for mockito's `captureAny`.
-T _captureAny<T>() => captureAny as T;
 
 class MockFirestoreMatchRepository extends Mock
     implements FirestoreMatchRepository {}
@@ -37,6 +29,15 @@ class TestFirebaseException implements FirebaseException {
 }
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(RoundResultModel(
+      id: 'fallback',
+      matchId: 'fallback',
+      roundIndex: 0,
+      createdAt: DateTime.now(),
+    ));
+  });
+
   group('Firestore Graceful Degradation Tests', () {
     late MockFirestoreMatchRepository mockRepository;
     late FirestoreRoundResultService service;
@@ -57,7 +58,7 @@ void main() {
         );
 
         // Round save fails
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         // Should return false but not throw exception
@@ -67,7 +68,7 @@ void main() {
         expect(roundSaved, false);
 
         // Now update match state - should still work if repository is available
-        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
+        when(() => mockRepository.updateMatchState(any(), any()))
             .thenAnswer((_) async {});
 
         final stateSaved = await service.updateMatchStateAfterRound(
@@ -90,9 +91,9 @@ void main() {
         );
 
         // Both operations unavailable
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('unavailable'));
-        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
+        when(() => mockRepository.updateMatchState(any(), any()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         // No exception should be thrown
@@ -119,7 +120,7 @@ void main() {
         );
 
         // Simulate timeout - this should be treated as transient error
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('deadline-exceeded'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
@@ -127,7 +128,7 @@ void main() {
         // Should retry but eventually fail
         expect(result, false);
         // Should retry max times
-        verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(4);
+        verify(() => mockRepository.saveRoundResult(any())).called(4);
       });
 
       test('continues game with permanent auth error', () async {
@@ -138,14 +139,14 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('permission-denied'));
 
         final result = await service.saveRoundResultWithRetry(testResult);
 
         expect(result, false);
         // No retries on permanent error
-        verify(mockRepository.saveRoundResult(_any<RoundResultModel>())).called(1);
+        verify(() => mockRepository.saveRoundResult(any())).called(1);
       });
 
       test('reports failure but allows game to proceed', () async {
@@ -156,7 +157,7 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         // This should not throw - graceful degradation
@@ -170,7 +171,7 @@ void main() {
     group('Multiple Round Sequence with Failures', () {
       test('handles sequence of rounds with intermittent failures', () async {
         // Round 1: success
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenAnswer((_) async {});
 
         var result1 = await service.saveRoundResultWithRetry(
@@ -185,7 +186,7 @@ void main() {
 
         // Round 2: failure but recovers
         var round2Attempt = 0;
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenAnswer((_) async {
           round2Attempt++;
           if (round2Attempt == 1) throw TestFirebaseException('unavailable');
@@ -202,7 +203,7 @@ void main() {
         expect(result2, true);
 
         // Round 3: failure, game continues
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         var result3 = await service.saveRoundResultWithRetry(
@@ -216,7 +217,7 @@ void main() {
         expect(result3, false);
 
         // Round 4: recovers
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenAnswer((_) async {});
 
         var result4 = await service.saveRoundResultWithRetry(
@@ -234,7 +235,7 @@ void main() {
     group('State Consistency on Failure', () {
       test('match state update includes timestamp even on retry', () async {
         var attempt = 0;
-        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
+        when(() => mockRepository.updateMatchState(any(), any()))
             .thenAnswer((_) async {
           attempt++;
           if (attempt == 1) throw TestFirebaseException('deadline-exceeded');
@@ -248,7 +249,8 @@ void main() {
           isGameOver: false,
         );
 
-        final captured = verify(mockRepository.updateMatchState(_any<String>(), _captureAny<Map<String, dynamic>>()))
+        final captured = verify(
+                () => mockRepository.updateMatchState(any(), captureAny()))
             .captured;
         final updateData = captured.last as Map<String, dynamic>;
 
@@ -263,7 +265,7 @@ void main() {
           'player_3': 19,
         };
 
-        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
+        when(() => mockRepository.updateMatchState(any(), any()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         final result = await service.updateMatchStateAfterRound(
@@ -277,7 +279,7 @@ void main() {
         expect(result, false);
 
         // When it succeeds on retry, verify stone counts would be sent
-        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
+        when(() => mockRepository.updateMatchState(any(), any()))
             .thenAnswer((_) async {});
 
         await service.updateMatchStateAfterRound(
@@ -288,7 +290,8 @@ void main() {
           isGameOver: false,
         );
 
-        final captured = verify(mockRepository.updateMatchState(_any<String>(), _captureAny<Map<String, dynamic>>()))
+        final captured = verify(
+                () => mockRepository.updateMatchState(any(), captureAny()))
             .captured;
         final updateData = captured.last as Map<String, dynamic>;
 
@@ -298,9 +301,9 @@ void main() {
 
     group('Offline Scenario', () {
       test('handles complete Firestore unavailability', () async {
-        when(mockRepository.saveRoundResult(_any<RoundResultModel>()))
+        when(() => mockRepository.saveRoundResult(any()))
             .thenThrow(TestFirebaseException('unavailable'));
-        when(mockRepository.updateMatchState(_any<String>(), _any<Map<String, dynamic>>()))
+        when(() => mockRepository.updateMatchState(any(), any()))
             .thenThrow(TestFirebaseException('unavailable'));
 
         // Simulate complete offline scenario
