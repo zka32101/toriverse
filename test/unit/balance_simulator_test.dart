@@ -22,8 +22,8 @@ void main() {
       );
 
       final totalWins = report.winRateByPlayer.values.reduce((a, b) => a + b);
-      // 3 players, so total should be ~1.0
-      expect(totalWins, closeTo(3.0, 0.5)); // Allow 50% variance in small sample
+      // win rates are fractions of total matches, so they should sum to ~1.0
+      expect(totalWins, closeTo(1.0, 0.5)); // Allow 50% variance in small sample
     });
 
     test('bonus activation stats are computed correctly', () async {

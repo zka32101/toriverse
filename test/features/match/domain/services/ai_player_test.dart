@@ -19,7 +19,7 @@ void main() {
 
         // Verify move is valid
         final validMoves = board.getValidMoves(Board.black);
-        expect(validMoves, contains(move));
+        expect(validMoves, contains(equals(move)));
       });
 
       test('selectMove returns null when no moves available', () {
@@ -50,7 +50,7 @@ void main() {
 
         expect(move, isNotNull);
         final validMoves = board.getValidMoves(Board.white);
-        expect(validMoves, contains(move));
+        expect(validMoves, contains(equals(move)));
       });
     });
 
@@ -102,8 +102,8 @@ void main() {
         // They might be different (not guaranteed, but likely)
         // So we just verify both are valid
         final validMoves = board.getValidMoves(Board.black);
-        expect(validMoves, contains(easyMove));
-        expect(validMoves, contains(hardMove));
+        expect(validMoves, contains(equals(easyMove)));
+        expect(validMoves, contains(equals(hardMove)));
       });
     });
 

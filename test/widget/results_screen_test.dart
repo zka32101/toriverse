@@ -9,18 +9,17 @@ import 'package:toriverse/features/results/presentation/screens/results_screen.d
 /// Pumps [ResultsScreen] wired to the given [container] so that both the
 /// game state and user state notifiers created in tests are visible to the
 /// widget tree.
+///
+/// Uses [UncontrolledProviderScope] so the widget tree shares [container]
+/// directly instead of a second, separately-owned scope — two containers
+/// both trying to dispose the same notifier crashes on teardown.
 Future<void> _pumpResultsScreen(
   WidgetTester tester,
   ProviderContainer container,
 ) {
   return tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        gameStateProvider
-            .overrideWith((ref) => container.read(gameStateProvider.notifier)),
-        userStateProvider
-            .overrideWith((ref) => container.read(userStateProvider.notifier)),
-      ],
+    UncontrolledProviderScope(
+      container: container,
       child: MaterialApp(
         theme: ToriverseTheme.lightTheme(),
         home: const ResultsScreen(matchId: 'test_match'),
@@ -191,7 +190,9 @@ void main() {
 
     testWidgets('異なるスクリーンサイズでの表示', (WidgetTester tester) async {
       tester.binding.window.physicalSizeTestValue = const Size(400, 800);
+      tester.binding.window.devicePixelRatioTestValue = 1.0;
       addTearDown(tester.binding.window.clearPhysicalSizeTestValue);
+      addTearDown(tester.binding.window.clearDevicePixelRatioTestValue);
 
       await _pumpResultsScreen(tester, container);
 

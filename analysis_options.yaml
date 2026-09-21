@@ -15,6 +15,9 @@ analyzer:
   # pubspec), so it isn't part of this project's dependency graph.
   exclude:
     - firebase/**
+    - build/**
+    - android/**
+    - ios/**
 
 linter:
   # The lint rules applied to this project can be customized in the

@@ -51,16 +51,15 @@ class BonusCalculator {
   ) {
     final myStones = stoneCounts[playerIndex];
     final maxStones = stoneCounts.reduce((a, b) => max(a, b));
-    final minStones = stoneCounts.reduce((a, b) => min(a, b));
 
     // 石差
     final diff = maxStones - myStones;
 
-    // 下位20%の目安: 石数の差が一定以上 or 最下位
+    // 下位20%の目安: 石数の差が閾値以上（僅差の最下位は対象外）
     // Remote Config で threshold を調整可能（デフォルト: 8石）
     final thresholdDifference = config.getWeakBonusStoneDiffThreshold();
 
-    return diff >= thresholdDifference || myStones == minStones;
+    return diff >= thresholdDifference;
   }
 
   /// ボーナス効果を適用（例：追加手数）
