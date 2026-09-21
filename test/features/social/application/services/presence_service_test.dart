@@ -299,12 +299,13 @@ void main() {
         final mockSnapshot = MockQuerySnapshot();
 
         final doc1 = MockQueryDocumentSnapshot();
-        when(() => doc1.reference).thenReturn(MockDocumentReference());
-        when(() => doc1.reference.delete()).thenAnswer((_) async => {});
+        final doc1Ref = MockDocumentReference();
+        when(() => doc1Ref.delete()).thenAnswer((_) async {});
+        when(() => doc1.reference).thenReturn(doc1Ref);
 
         when(() => mockSnapshot.docs).thenReturn([doc1]);
         when(() => mockQuery.get()).thenAnswer((_) async => mockSnapshot);
-        when(() => mockCollectionRef.where(any(), isLessThan: any()))
+        when(() => mockCollectionRef.where(any(), isLessThan: any(named: 'isLessThan')))
             .thenReturn(mockQuery);
 
         when(() => mockFirestore.collection('presence'))
@@ -314,7 +315,7 @@ void main() {
         await presenceService.cleanupStalePresence(staleDaysOld: 30);
 
         // Assert
-        verify(() => mockCollectionRef.where(any(), isLessThan: any()))
+        verify(() => mockCollectionRef.where(any(), isLessThan: any(named: 'isLessThan')))
             .called(1);
       });
     });
@@ -341,6 +342,6 @@ void _setupQueryRef(
 
   when(() => mockFirestore.collection('presence'))
       .thenReturn(mockCollectionRef);
-  when(() => mockCollectionRef.where(any(), whereIn: any()))
+  when(() => mockCollectionRef.where(any(), whereIn: any(named: 'whereIn')))
       .thenReturn(mockQuery);
 }
