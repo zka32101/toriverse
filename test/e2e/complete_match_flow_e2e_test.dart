@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
-import 'package:toriverse/shared/services/firebase_messaging_service.dart';
-import 'package:toriverse/features/match/application/services/push_notification_manager.dart';
 import 'package:toriverse/features/match/application/services/liveops_campaign_service.dart';
 import 'package:toriverse/shared/services/remote_config_service.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
@@ -109,8 +107,8 @@ void main() {
           campaignId: 'camp_001',
         );
         expect(progress!.challengesCompleted, equals(3));
-        expect(progress!.challengesRequired, equals(3));
-        expect(progress!.hasClaimedReward, isFalse);
+        expect(progress.challengesRequired, equals(3));
+        expect(progress.hasClaimedReward, isFalse);
 
         // Step 5: Claim reward
         final claimResult = await campaignService.claimCampaignReward(
@@ -177,14 +175,14 @@ void main() {
           campaignId: 'camp_001',
         );
         expect(progress1!.hasClaimedReward, isTrue);
-        expect(progress1!.challengesCompleted, equals(3));
+        expect(progress1.challengesCompleted, equals(3));
 
         final progress2 = await campaignService.getUserCampaignProgress(
           userId: userId,
           campaignId: 'camp_002',
         );
         expect(progress2!.hasClaimedReward, isFalse);
-        expect(progress2!.challengesCompleted, equals(2));
+        expect(progress2.challengesCompleted, equals(2));
       });
 
       test('user can claim multiple rewards from same campaign', () async {
@@ -307,7 +305,7 @@ void main() {
             campaignId: campaignId,
           );
           expect(progress!.hasClaimedReward, isTrue);
-          expect(progress!.challengesCompleted, equals(3 - idx));
+          expect(progress.challengesCompleted, equals(3 - idx));
         }
       });
 
@@ -404,18 +402,12 @@ void main() {
               'claimed_rewards': [],
             });
 
-        // Record time before claim
-        final timeBefore = DateTime.now();
-
         // Claim reward
         await campaignService.claimCampaignReward(
           userId: userId,
           campaignId: campaignId,
           rewardId: 'reward_001',
         );
-
-        // Record time after claim
-        final timeAfter = DateTime.now();
 
         // Verify timestamp is within expected range
         final progressDoc = await fakeFirestore

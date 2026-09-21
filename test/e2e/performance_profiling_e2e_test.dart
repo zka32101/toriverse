@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -127,6 +126,7 @@ void main() {
 
         expect(stopwatch.elapsedMilliseconds, lessThan(1000),
             reason: 'Stream should emit first event within 1000ms');
+        expect(eventCount, greaterThan(0));
 
         await subscription.cancel();
       });
