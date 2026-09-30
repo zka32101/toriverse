@@ -113,22 +113,50 @@ void main() {
       });
 
       test('applyRoundMoves respects bonus activation limits', () {
-        final testBoard = Board.initial();
-        final submittedPositions = <String, int>{};
+        // Reuse the same late-game, stone-deficit board as the "includes
+        // bonus events in replay" test below: player3 (red) qualifies for
+        // the bonus on every OTHER condition (round threshold, stone
+        // deficit). The only thing this test exercises is whether the
+        // max-activations-per-match limit (previousBonusActivations)
+        // actually blocks it.
+        //
+        // The previous version of this test used roundIndex: 10 (54
+        // rounds remaining) against a fresh Board.initial() with no
+        // stone deficit at all, so it was already blocked by the
+        // round-threshold and stone-diff checks before the activation
+        // limit was ever consulted — it would have passed even if the
+        // activation-limit check were deleted from BonusCalculator.
+        final grid = List.generate(8, (_) => List.filled(8, Board.empty));
+        for (int row = 0; row < 2; row++) {
+          for (int col = 0; col < 8; col++) {
+            grid[row][col] = Board.black; // 16 black
+          }
+        }
+        for (int row = 5; row < 7; row++) {
+          for (int col = 0; col < 8; col++) {
+            grid[row][col] = Board.white; // 16 white
+          }
+        }
+        grid[3][0] = Board.red;
+        grid[3][1] = Board.red; // 2 red - far behind the threshold
+        final testBoard = Board.fromGrid(grid);
 
-        // Test with max activations already reached (previousBonusActivations = [2, 2, 2])
+        // Test with max activations already reached for player3
+        // (previousBonusActivations = [0, 0, 2])
         final result = MoveApplicator.applyRoundMoves(
           matchId: 'test-match',
-          roundIndex: 10,
+          roundIndex: 55, // late game: 64 - 55 = 9 rounds remaining
           boardBefore: testBoard,
           playerIds: playerIds,
           processOrder: playerIds,
-          submittedPositions: submittedPositions,
+          submittedPositions: {},
           rivalryTracker: null,
-          previousBonusActivations: [2, 2, 2], // Max reached
+          bonusCalculator: BonusCalculator(),
+          previousBonusActivations: [0, 0, 2], // player3 already at max
         );
 
-        // Bonus should NOT trigger since limit reached
+        // Bonus should NOT trigger for player3 since their limit is reached,
+        // even though they'd otherwise qualify on round + stone deficit.
         expect(result.bonusTriggered, isEmpty);
       });
 
