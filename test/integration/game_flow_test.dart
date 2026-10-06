@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:toriverse/features/match/application/providers/ai_takeover_state.dart';
 import 'package:toriverse/features/match/application/providers/game_state.dart';
+import 'package:toriverse/features/match/application/providers/rescue_card_state.dart';
 import 'package:toriverse/features/match/application/providers/user_state.dart';
 import 'package:toriverse/features/match/application/providers/matching_state.dart';
 import 'package:toriverse/features/match/domain/entities/board.dart';
@@ -115,18 +117,41 @@ void main() {
       expect(gameState.roundIndex, lessThanOrEqualTo(11));
     });
 
-    test('救済カード発動条件の検証', () {
+    test('救済カード発動条件の検証: 連続被弾2ラウンドで自動付与', () {
+      const matchId = 'match_rescue_card_flow';
       container.read(userStateProvider.notifier).initializeUser('player_0');
       container.read(gameStateProvider.notifier).startGame(
         playerIds: ['player_0', 'player_1', 'AI_1'],
       );
 
-      // ゲーム状態を確認
-      var gameState = container.read(gameStateProvider)!;
-      expect(gameState.status, GameStatus.playing);
+      final rescueNotifier =
+          container.read(rescueCardStateProvider(matchId).notifier);
+      rescueNotifier.initializeMatch(matchId, ['player_0', 'player_1', 'AI_1']);
 
-      // 救済カードは連続攻撃で発動
-      // この検証は実装されたロジックに基づく
+      // 1ラウンド目の被弾: まだ閾値未満なのでカードは付与されない
+      final grantedAfterFirst = rescueNotifier.recordAttack(matchId, 'player_1');
+      expect(grantedAfterFirst, isFalse);
+      expect(rescueNotifier.hasActiveCard(matchId, 'player_1'), isFalse);
+
+      // 2ラウンド連続被弾（デフォルト閾値）でカードが自動付与される
+      final grantedAfterSecond = rescueNotifier.recordAttack(matchId, 'player_1');
+      expect(grantedAfterSecond, isTrue);
+      expect(rescueNotifier.hasActiveCard(matchId, 'player_1'), isTrue);
+
+      // エッジケース: 次のラウンドで攻撃が発生しなければカードは消費されない
+      rescueNotifier.resetConsecutiveAttacks(matchId, 'player_1');
+      expect(rescueNotifier.hasActiveCard(matchId, 'player_1'), isTrue);
+      expect(rescueNotifier.getConsecutiveAttackCount(matchId, 'player_1'), 0);
+
+      // カードを実際に使用すると2手連続実行権が消費される
+      final gameState = container.read(gameStateProvider)!;
+      final activated = rescueNotifier.activateCard(
+        matchId,
+        'player_1',
+        gameState.roundIndex,
+      );
+      expect(activated, isTrue);
+      expect(rescueNotifier.hasActiveCard(matchId, 'player_1'), isFalse);
     });
 
     test('ゲーム終了検出', () async {
@@ -198,7 +223,7 @@ void main() {
       expect(players.length, 3);
     });
 
-    test('離脱時のAI引き継ぎ', () {
+    test('離脱時のAI引き継ぎ: 離脱側にペナルティなく対局継続', () {
       container.read(userStateProvider.notifier).initializeUser('player_0');
       container.read(gameStateProvider.notifier).startGame(
         playerIds: ['player_0', 'player_1', 'player_2'],
@@ -207,9 +232,33 @@ void main() {
       var gameState = container.read(gameStateProvider)!;
       expect(gameState.playerIds.length, 3);
 
-      // player_1が離脱をシミュレート
-      // AIが代打ちするロジックは実装済み
+      final takeoverNotifier = container.read(aiTakeoverProvider.notifier);
+      expect(container.read(aiTakeoverProvider).hasAITakeover, isFalse);
+
+      // player_1が離脱（非アクティブ検知によるタイムアウト）をシミュレート
+      takeoverNotifier.activateTakeover(
+        playerId: 'player_1',
+        reason: 'inactivity',
+      );
+
+      var takeoverState = container.read(aiTakeoverProvider);
+      expect(takeoverState.hasAITakeover, isTrue);
+      expect(takeoverState.isAIControlled('player_1'), isTrue);
+      expect(takeoverState.aiControlledPlayers, contains('player_1'));
+      // 他の2人は影響を受けない
+      expect(takeoverState.isAIControlled('player_0'), isFalse);
+      expect(takeoverState.isAIControlled('player_2'), isFalse);
+
+      // 対局自体は中断せず継続する（離脱側にペナルティなし = playerIds/statusは不変）
+      gameState = container.read(gameStateProvider)!;
       expect(gameState.status, GameStatus.playing);
+      expect(gameState.playerIds, ['player_0', 'player_1', 'player_2']);
+
+      // player_1が復帰した場合、AI引き継ぎは解除される
+      takeoverNotifier.deactivateTakeover('player_1');
+      takeoverState = container.read(aiTakeoverProvider);
+      expect(takeoverState.isAIControlled('player_1'), isFalse);
+      expect(takeoverState.hasAITakeover, isFalse);
     });
 
     test('盤面状態の一貫性検証', () async {
@@ -255,7 +304,8 @@ void main() {
       expect(updatedBlackCount + updatedWhiteCount, greaterThan(4));
     });
 
-    test('完全フロー: ログイン → マッチング → 対局 → 結果', () async {
+    test('完全フロー: ログイン → マッチング → 対局 → 離脱 → AI引き継ぎ → 終局',
+        () async {
       // 1. ユーザーログイン
       container.read(userStateProvider.notifier).initializeUser(
         'player_0',
@@ -282,7 +332,7 @@ void main() {
       expect(gameState.status, GameStatus.playing);
 
       // 4. 複数ラウンド実行
-      for (int i = 0; i < 5; i++) {
+      for (int i = 0; i < 3; i++) {
         gameState = container.read(gameStateProvider)!;
         if (gameState.validMoves.isNotEmpty &&
             gameState.status == GameStatus.playing) {
@@ -293,7 +343,32 @@ void main() {
         }
       }
 
-      // 5. ゲーム終了
+      // 5. player_1が離脱 → AIが代打ち（離脱側にペナルティなし）
+      final takeoverNotifier = container.read(aiTakeoverProvider.notifier);
+      takeoverNotifier.activateTakeover(
+        playerId: players[1],
+        reason: 'inactivity',
+      );
+      var takeoverState = container.read(aiTakeoverProvider);
+      expect(takeoverState.isAIControlled(players[1]), isTrue);
+
+      // 6. AI引き継ぎ後も対局は中断せず継続する
+      for (int i = 0; i < 2; i++) {
+        gameState = container.read(gameStateProvider)!;
+        if (gameState.validMoves.isNotEmpty &&
+            gameState.status == GameStatus.playing) {
+          final move = gameState.validMoves.first;
+          await container
+              .read(gameStateProvider.notifier)
+              .placeStone(move[0], move[1]);
+        }
+      }
+      gameState = container.read(gameStateProvider)!;
+      expect(gameState.status, GameStatus.playing);
+      expect(container.read(aiTakeoverProvider).isAIControlled(players[1]),
+          isTrue);
+
+      // 7. 終局
       gameState = container.read(gameStateProvider)!;
       final finalState = gameState.copyWith(status: GameStatus.finished);
       container.read(gameStateProvider.notifier).state = finalState;
@@ -301,7 +376,7 @@ void main() {
       gameState = container.read(gameStateProvider)!;
       expect(gameState.isGameOver, true);
 
-      // 6. ストリーク増加
+      // 8. ストリーク増加（AI引き継ぎがあっても完走扱い）
       container.read(userStateProvider.notifier).incrementStreak();
       userState = container.read(userStateProvider)!;
       expect(userState.completedMatchStreak, 1);

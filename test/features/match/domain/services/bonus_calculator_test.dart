@@ -285,6 +285,74 @@ void main() {
       expect(result['description'], isNotEmpty);
       expect(result['description'], contains('同マス被り'));
     });
+
+    // CLAUDE.md §16「同マス被り時のランダム抽選（偏りチェック）」:
+    // 均等分布であることを統計的に確認する。既存のテストは1回のみの実行で
+    // winner が playerIds のいずれかであることしか確認しておらず、
+    // 偏り（例: 常に同じプレイヤーが勝つ）を検出できなかった。
+    test('resolveCollision: 3人抽選は十分な回数で均等分布に近い', () {
+      const trials = 9000;
+      const players = ['player1', 'player2', 'player3'];
+      final winCounts = {for (final p in players) p: 0};
+
+      for (int i = 0; i < trials; i++) {
+        final result = CollisionResolver.resolveCollision(
+          playerIds: players,
+          boardRow: 0,
+          boardCol: 0,
+        );
+        winCounts[result['winner'] as String] =
+            winCounts[result['winner'] as String]! + 1;
+      }
+
+      // 期待値は trials/3 = 3000。真に均等な乱数なら標準偏差は約36.5
+      // (sqrt(trials * 1/3 * 2/3))。±16%（約±480、13標準偏差相当）の
+      // 許容幅を取っても、「常に同じプレイヤーが選ばれる」等の明確な
+      // 偏りバグは確実に検出できる一方、統計的揺らぎでは誤検知しない。
+      final expected = trials / players.length;
+      final tolerance = expected * 0.16;
+      for (final player in players) {
+        expect(
+          winCounts[player],
+          inInclusiveRange(
+            (expected - tolerance).round(),
+            (expected + tolerance).round(),
+          ),
+          reason: '$player の当選回数が均等分布から大きく偏っている: '
+              '${winCounts[player]} (期待値: $expected)',
+        );
+      }
+    });
+
+    test('resolveCollision: 2人抽選も均等分布に近い', () {
+      const trials = 6000;
+      const players = ['player1', 'player2'];
+      final winCounts = {for (final p in players) p: 0};
+
+      for (int i = 0; i < trials; i++) {
+        final result = CollisionResolver.resolveCollision(
+          playerIds: players,
+          boardRow: 0,
+          boardCol: 0,
+        );
+        winCounts[result['winner'] as String] =
+            winCounts[result['winner'] as String]! + 1;
+      }
+
+      final expected = trials / players.length; // 3000
+      final tolerance = expected * 0.1; // ±300, ~13 standard deviations
+      for (final player in players) {
+        expect(
+          winCounts[player],
+          inInclusiveRange(
+            (expected - tolerance).round(),
+            (expected + tolerance).round(),
+          ),
+          reason: '$player の当選回数が均等分布から大きく偏っている: '
+              '${winCounts[player]} (期待値: $expected)',
+        );
+      }
+    });
   });
 
   group('ProcessOrderRandomizer', () {
